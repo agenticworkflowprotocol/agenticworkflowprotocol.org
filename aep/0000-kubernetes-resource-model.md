@@ -4,7 +4,7 @@
 | --- | --- |
 | **AEP** | 0000 (assigned by a maintainer) |
 | **Title** | Kubernetes resource model alignment |
-| **Authors** | @slauger |
+| **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Draft |
