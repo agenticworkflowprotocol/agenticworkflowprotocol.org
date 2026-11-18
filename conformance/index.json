@@ -105,7 +105,7 @@
       "id": "3.2-unsupported-api-version",
       "file": "invalid/3.2-unsupported-api-version.yaml",
       "section": "3.2",
-      "rule": "apiVersion MUST be awp.agenticworkflowprotocol.org/v1alpha1.",
+      "rule": "apiVersion MUST name a supported version.",
       "expect": "invalid",
       "code": "schema.const",
       "path": "/apiVersion"

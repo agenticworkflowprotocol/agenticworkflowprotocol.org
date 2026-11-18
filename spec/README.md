@@ -5,9 +5,11 @@ This directory contains the normative text of the Agentic Workflow Protocol (AWP
 | API version | Status | Text |
 | ----------- | ------ | ---- |
 | `v1alpha1` | **Draft / alpha** - may change incompatibly | [v1alpha1/README.md](v1alpha1/README.md) |
+| `v1alpha2` | **Working draft / alpha** - starts from `v1alpha1` with the Kubernetes resource model alignment of AEP-0000 (not accepted); other AEPs for `v1alpha2` are not applied yet | [v1alpha2/README.md](v1alpha2/README.md) |
 
-- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md)
-- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/)
+- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md), [v1alpha2/glossary.md](v1alpha2/glossary.md)
+- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/), [v1alpha2/examples/](v1alpha2/examples/)
+- Kubernetes CustomResourceDefinitions for `v1alpha2`, generated from the schema: [../schema/crd/](../schema/crd/)
 
 ## Roadmap: proposed changes
 
@@ -33,6 +35,7 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
 | [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
 | [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
+| [0000](../aep/0000-kubernetes-resource-model.md) | Kubernetes resource model alignment (number to be assigned) | Draft | proposed for `v1alpha2` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

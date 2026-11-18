@@ -1,4 +1,4 @@
-# AWP JSON Schema (v1alpha1)
+# AWP JSON Schema (v1alpha1, v1alpha2)
 
 [`awp.v1alpha1.json`](awp.v1alpha1.json) is a JSON Schema (draft 2020-12) for AWP manifests of the
 API version `awp.agenticworkflowprotocol.org/v1alpha1`. It expresses the **structural** rules of the
@@ -23,6 +23,8 @@ from the schema, not the other way round.
 | `schema/awp.v1alpha1.json#/$defs/Workflow` | A manifest of kind `Workflow`. |
 | `schema/awp.v1alpha1.json#/$defs/Agent` | A manifest of kind `Agent`. |
 | `schema/awp.v1alpha1.json#/$defs/Policy` | A manifest of kind `Policy`. |
+| `schema/awp.v1alpha2.json` (and the same `$defs`) | Manifests of `awp.agenticworkflowprotocol.org/v1alpha2` ([specification](../spec/v1alpha2/README.md), working draft). |
+| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions for `v1alpha2`, generated from `awp.v1alpha2.json` (see below). |
 
 YAML manifests are parsed first (YAML 1.2 core schema; custom tags and non-string keys rejected,
 spec 3.1) and the resulting JSON value is validated. Every document of a multi-document file is
@@ -59,6 +61,27 @@ complete pipeline: YAML restrictions, then this schema, then the semantic rules.
   rule. No JSON Schema `format` keyword is used, so validators need no format plugins.
 - Event envelopes, reproducibility records and conformance statements (spec 10 and 11.3) are not
   manifests and are not covered by this schema.
+
+## v1alpha2 and Kubernetes
+
+`awp.v1alpha2.json` has the same rules as `awp.v1alpha1.json` except for the document model
+([spec v1alpha2 section 14.1](../spec/v1alpha2/README.md#141-changes-from-v1alpha1)): `metadata`
+holds only Kubernetes `ObjectMeta` fields, the common governance fields are in `spec`, extension
+fields are keys of `extensions` objects instead of `x-` properties, `owner` and policy conditions
+have a single type, and `status` is reserved. These changes make the schema expressible as a
+Kubernetes structural schema.
+
+`conformance/crd.mjs` generates the CustomResourceDefinitions in [`crd/`](crd/) from it:
+`$ref` is inlined, `const` becomes `enum`, `if`/`then`/`else`, combinators, `propertyNames` and
+patterns that Go's RE2 cannot evaluate (lookahead) are dropped, and every object keeps unknown
+fields (`x-kubernetes-preserve-unknown-fields`) instead of pruning them. The API server therefore
+checks types and the remaining constraints, and unknown or misplaced fields stay visible to the
+AWP validator in the runtime or an admission webhook (spec v1alpha2 section 3.10). `npm test`
+fails when the generated files are stale; regenerate them with `node conformance/crd.mjs write`.
+
+The semantic rules below apply to both versions. In `v1alpha2` their paths use `spec` where
+`v1alpha1` uses `metadata` (for example `/spec/risk/level`), and `extensions` objects are skipped
+where `v1alpha1` skips `x-` fields.
 
 ## Semantic validation rules
 

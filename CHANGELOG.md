@@ -16,6 +16,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 ### Changed
 
 - README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).
+- Conformance case `3.2-unsupported-api-version` uses `awp.agenticworkflowprotocol.org/v9`, because `v1alpha2` is now a supported version of the reference checker.
 - The repository is implementation-neutral (decision D17): implementation-specific alignment documents, mappings and the single implementation page were removed, the AEPs describe prior art without naming products, the extension prefix list starts empty, and the project contact is info@agenticworkflowprotocol.org. Repository links point to `agenticworkflowprotocol/agenticworkflowprotocol.org`.
 - Extension prefix list: two more conventions (a field sits on the object it modifies; each field is documented as safe to ignore or critical, with its planned successor).
 - AEP process adopted (`docs/aep-process.md`, owner decision of 2026-10-10, in force with the merge after the 5-working-day discussion period): AEPs need a reviewer who is not an author and, while all maintainers belong to one organisation, an external one (new section 5.1); no self-acceptance, also during alpha. New section 7.0 defines when an implementation may say "AWP `<version>` schema conformant (alpha)": the conformance suite passes against its validator and its real exports in public CI; until then the wording is "built to the AWP schema, conformance in progress (alpha)".
@@ -27,6 +28,9 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- Working draft `v1alpha2` (`spec/v1alpha2`, `schema/awp.v1alpha2.json`) with the Kubernetes resource model alignment proposed in `aep/0000-kubernetes-resource-model.md` (Draft, not accepted): `metadata` holds only Kubernetes `ObjectMeta` fields and DNS-1123 names, the governance fields (`version`, `owner`, `classification`, `risk`, `integrity`, ...) are in `spec`, extension fields are keys of `extensions` objects, `owner` and policy conditions have one type, `status` is reserved, and the digest covers `apiVersion`, `kind`, `metadata.name` and `spec`. New section 3.10 on object stores and the Kubernetes binding. Other AEPs for `v1alpha2` are not applied yet.
+- Kubernetes CustomResourceDefinitions for `v1alpha2` (`schema/crd/`), generated from the JSON Schema by `conformance/crd.mjs`; `npm test` fails when they are stale.
+- Conformance suite for `v1alpha2` (`conformance/v1alpha2/`), the reference checker selects the schema by `apiVersion`, and `awp-check.mjs migrate` converts `v1alpha1` manifests to `v1alpha2`.
 - Proposed (Draft, not accepted) AEPs from implementation experience with `v1alpha1` (decision D18): `aep/0012` tool steps (a step that performs one declared action without a model), `aep/0013` runtime clarifications (metering of budgets known only after a call, rendering of non-string values in expressions, the outcome of a rejected action approval, the minimum events of `core`), `aep/0014` input examples and object schemas. They do not change `v1alpha1`.
 - AWP logo: brand assets in light and dark (`site/public/brand/`, served at `/brand/`), logo in the site header and the README, new favicons and social preview image.
 - Website header: links to the validator, the editor and the viewer next to GitHub; footer link to the viewer.

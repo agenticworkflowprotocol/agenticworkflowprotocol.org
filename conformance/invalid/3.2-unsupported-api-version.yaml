@@ -1,7 +1,7 @@
 # Conformance case 3.2-unsupported-api-version
-# Spec section 3.2: apiVersion MUST be awp.agenticworkflowprotocol.org/v1alpha1.
+# Spec section 3.2: apiVersion MUST name a supported version.
 # Expected: invalid (schema.const at /apiVersion)
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v9
 kind: Workflow
 metadata:
   name: conformance-base

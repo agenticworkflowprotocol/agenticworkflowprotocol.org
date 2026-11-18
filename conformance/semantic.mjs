@@ -1,4 +1,6 @@
-// Semantic validation rules of AWP v1alpha1 that JSON Schema cannot express.
+// Semantic validation rules of AWP v1alpha1 and v1alpha2 that JSON Schema cannot express.
+// v1alpha2 differs only in layout: governance fields live in spec instead of metadata,
+// extension fields in `extensions` objects instead of x- keys, and `status` is ignored.
 // Rule catalogue: schema/README.md. Every diagnostic has a stable `code`.
 // Runs on documents that already passed the structural schema.
 
@@ -13,6 +15,16 @@ const esc = s => String(s).replace(/~/g, '~0').replace(/\//g, '~1');
 const ptr = (...parts) => parts.map(p => '/' + esc(p)).join('');
 const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 
+const V1ALPHA2 = 'awp.agenticworkflowprotocol.org/v1alpha2';
+const INTEGRITY_FIELDS = ['integrity', 'signature', 'provenance'];
+
+/** Where the governance fields (version, owner, classification, risk, integrity, ...) live. */
+function governanceOf(doc) {
+  return doc.apiVersion === V1ALPHA2
+    ? { fields: doc.spec ?? {}, base: 'spec' }
+    : { fields: doc.metadata ?? {}, base: 'metadata' };
+}
+
 export function jcs(value) {
   // JSON Canonicalization Scheme (RFC 8785) for the JSON subset used by manifests.
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -21,13 +33,22 @@ export function jcs(value) {
   return '{' + keys.map(k => JSON.stringify(k) + ':' + jcs(value[k])).join(',') + '}';
 }
 
-export function manifestDigest(doc, algorithm = 'sha256') {
-  const copy = structuredClone(doc);
-  if (copy.metadata) {
-    delete copy.metadata.integrity;
-    delete copy.metadata.signature;
-    delete copy.metadata.provenance;
+/** The value the digest is computed over (spec 9.1). */
+function digestInput(doc) {
+  if (doc.apiVersion !== V1ALPHA2) {
+    const copy = structuredClone(doc);
+    if (copy.metadata) for (const f of INTEGRITY_FIELDS) delete copy.metadata[f];
+    return copy;
   }
+  // v1alpha2: identity and spec only. Labels, annotations, namespace, store-populated metadata and
+  // status are changed by deployment tools and object stores, so they are not covered.
+  const spec = structuredClone(doc.spec ?? {});
+  for (const f of INTEGRITY_FIELDS) delete spec[f];
+  return { apiVersion: doc.apiVersion, kind: doc.kind, metadata: { name: doc.metadata?.name }, spec };
+}
+
+export function manifestDigest(doc, algorithm = 'sha256') {
+  const copy = digestInput(doc);
   return `${algorithm}:${createHash(algorithm).update(jcs(copy), 'utf8').digest('hex')}`;
 }
 
@@ -44,7 +65,8 @@ function forEachNode(node, fn, path = []) {
   if (Array.isArray(node)) node.forEach((v, i) => forEachNode(v, fn, [...path, i]));
   else if (isObj(node)) {
     for (const [k, v] of Object.entries(node)) {
-      if (k.startsWith('x-')) continue; // extension subtrees are opaque (spec 3.3)
+      if (k.startsWith('x-') || (k === 'extensions' && isObj(v))) continue; // extension subtrees are opaque (spec 3.3)
+      if (path.length === 0 && k === 'status') continue; // runtime-owned (v1alpha2 spec 3.2)
       forEachNode(v, fn, [...path, k]);
     }
   }
@@ -68,8 +90,8 @@ export function semanticCheck(doc, opts = {}) {
   };
 
   const kind = doc.kind;
-  const meta = doc.metadata ?? {};
   const spec = doc.spec ?? {};
+  const { fields: gov, base } = governanceOf(doc);
 
   // 3.8 / 9.1: digest verification and algorithm support
   forEachNode(doc, (n, p) => {
@@ -80,14 +102,15 @@ export function semanticCheck(doc, opts = {}) {
       }
     }
   });
-  if (opts.verifyDigest && meta.integrity?.digest) {
-    const alg = meta.integrity.digest.split(':')[0];
+  if (opts.verifyDigest && gov.integrity?.digest) {
+    const alg = gov.integrity.digest.split(':')[0];
+    const path = `/${base}/integrity/digest`;
     if (!['sha256', 'sha384', 'sha512'].includes(alg)) {
-      err('digest.unsupported-algorithm', '9.1', '/metadata/integrity/digest', `cannot verify digest algorithm "${alg}"`);
+      err('digest.unsupported-algorithm', '9.1', path, `cannot verify digest algorithm "${alg}"`);
     } else {
       const expected = manifestDigest(doc, alg);
-      if (expected !== meta.integrity.digest) {
-        err('digest.mismatch', '9.1', '/metadata/integrity/digest', `metadata.integrity.digest does not match the manifest (computed ${expected})`);
+      if (expected !== gov.integrity.digest) {
+        err('digest.mismatch', '9.1', path, `${base}.integrity.digest does not match the manifest (computed ${expected})`);
       }
     }
   }
@@ -108,15 +131,15 @@ export function semanticCheck(doc, opts = {}) {
   };
 
   // 3.3: profile-bound fields
-  if (meta.risk && ['high', 'critical'].includes(meta.risk.level)) {
-    needProfile('governance', `metadata.risk.level: ${meta.risk.level}`, '/metadata/risk/level', '3.3');
+  if (gov.risk && ['high', 'critical'].includes(gov.risk.level)) {
+    needProfile('governance', `${base}.risk.level: ${gov.risk.level}`, `/${base}/risk/level`, '3.3');
   }
-  if (meta.signature) needProfile('security', 'metadata.signature', '/metadata/signature', '3.3');
+  if (gov.signature) needProfile('security', `${base}.signature`, `/${base}/signature`, '3.3');
   if (kind === 'Policy') needProfile('governance', 'kind: Policy', '/kind', '3.3');
 
   // 7.1: governance profile requirements
-  if (profiles.has('governance') && (kind === 'Workflow' || kind === 'Agent') && meta.classification === undefined) {
-    err('governance.classification-required', '7.1', '/metadata', 'metadata.classification is REQUIRED for Workflow and Agent under the governance profile');
+  if (profiles.has('governance') && (kind === 'Workflow' || kind === 'Agent') && gov.classification === undefined) {
+    err('governance.classification-required', '7.1', `/${base}`, `${base}.classification is REQUIRED for Workflow and Agent under the governance profile`);
   }
 
   const secretsDecl = new Map((spec.secrets ?? []).map(s => [s.name, s]));
