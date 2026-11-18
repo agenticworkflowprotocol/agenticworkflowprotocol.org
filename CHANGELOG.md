@@ -8,6 +8,11 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ## [Unreleased]
 
+### Fixed
+
+- Schema `v1alpha1`: an approval step (`type: approval`) no longer accepts `requiredFor` and `separationOfDuties`; spec section 5.6.1 lists only `approvers`, `minApprovals`, `timeout`, `onTimeout` and `message` (new definition `ApprovalStep`, two conformance cases).
+- Spec `v1alpha1` section 5.2 (editorial): a `schedule` trigger supplies no input values, so a workflow with a required input cannot be started by it. The conformance case `5.2-triggers`, the `invoice-processing` example and the triggers page of the website relied on that combination and were corrected; the reference checker reports it as the warning `lint.schedule-required-input`.
+
 ### Changed
 
 - README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).

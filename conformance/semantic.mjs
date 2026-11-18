@@ -308,6 +308,14 @@ export function semanticCheck(doc, opts = {}) {
       warn('lint.environment-not-listed', '7.10', '/spec/environment/name', `default environment "${spec.environment.name}" is not listed in spec.environments; executions would not start`);
     }
 
+    // 5.2/5.3: a schedule trigger supplies no inputs, so required inputs block it (runtime rule; lint only)
+    const requiredInputs = (spec.inputs ?? []).filter(inp => inp.required === true).map(inp => inp.name);
+    (spec.triggers ?? []).forEach((t, i) => {
+      if (t.type === 'schedule' && requiredInputs.length) {
+        warn('lint.schedule-required-input', '5.2', ptr('spec', 'triggers', i), `schedule trigger supplies no inputs, but ${requiredInputs.join(', ')} ${requiredInputs.length === 1 ? 'is' : 'are'} required; scheduled executions would not start`);
+      }
+    });
+
     // 7.5.3: absent permissions
     if (spec.permissions === undefined && profiles.has('security')) {
       warn('lint.permissions-absent', '7.5.3', '/spec', 'no spec.permissions: every action of exposed tools is allowed by permissions');

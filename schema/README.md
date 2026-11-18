@@ -101,6 +101,7 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `permissions.secret-undeclared` | 7.5.1 | `permissions.secrets` names a secret that is not declared. |
 | `digest.algorithm-unknown` | 3.8 | A digest uses an algorithm other than sha256, sha384, sha512. |
 | `lint.command-expression` | 5.6.2 | `command` contains `${{ }}`; commands are not expression-enabled and the text is passed literally. |
+| `lint.schedule-required-input` | 5.2 | A `schedule` trigger is declared, but an input is `required`; schedule triggers supply no inputs, so scheduled executions would not start. |
 | `lint.environment-not-listed` | 7.10 | `spec.environment.name` is not a key of `spec.environments`. |
 | `lint.permissions-absent` | 7.5.3 | Security profile only: no `permissions` object, so every action of exposed tools is allowed by permissions. |
 

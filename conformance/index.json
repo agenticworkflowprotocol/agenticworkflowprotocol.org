@@ -789,6 +789,24 @@
       "path": "/spec/workflow/2"
     },
     {
+      "id": "5.6.1-approval-step-required-for",
+      "file": "invalid/5.6.1-approval-step-required-for.yaml",
+      "section": "5.6.1",
+      "rule": "An approval step has no requiredFor; it applies only at workflow level.",
+      "expect": "invalid",
+      "code": "schema.additionalProperties",
+      "path": "/spec/workflow/2/approval/requiredFor"
+    },
+    {
+      "id": "5.6.1-approval-step-separation-of-duties",
+      "file": "invalid/5.6.1-approval-step-separation-of-duties.yaml",
+      "section": "5.6.1",
+      "rule": "An approval step has no separationOfDuties; it applies only at workflow level.",
+      "expect": "invalid",
+      "code": "schema.additionalProperties",
+      "path": "/spec/workflow/2/approval/separationOfDuties"
+    },
+    {
       "id": "5.6.1-command-step-with-agent",
       "file": "invalid/5.6.1-command-step-with-agent.yaml",
       "section": "5.6.1",
