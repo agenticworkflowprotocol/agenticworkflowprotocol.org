@@ -36,7 +36,7 @@ AWP does not replace MCP or A2A. See [Relationship to other protocols](/specific
 
 ## What AWP is not
 
-- Not a runtime, a hosting service or a product. OpenAgentix is one implementation.
+- Not a runtime, a hosting service or a product. Any runtime may implement it.
 - Not a compliance certification. AWP offers primitives; compliance depends on the implementation and the organization.
 - Not a standard for model reasoning. It standardizes events, inputs, outputs, decisions and policy results, not private chain-of-thought.
 

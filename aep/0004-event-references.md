@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0004 |
 | **Title** | Event references (`${{ event.* }}`) |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer, privacy reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D7](../docs/alignment/decisions.md#d7-own-event-root) (2026-10-10) |
+| **Owner decisions** | [D7](../docs/decisions.md#d7-own-event-root) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-10-09 |
@@ -128,8 +128,8 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) exposes `event.data` to conditions and as an input source
-in its own format. No implementation of this AEP exists.
+Runtimes in progress pass the event payload to every step as context when no inputs are
+declared, because no expression can reach it in `v1alpha1`. No implementation of this AEP exists.
 
 ## Open questions
 

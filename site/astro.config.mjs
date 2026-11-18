@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 const site = 'https://agenticworkflowprotocol.org';
-const repo = 'https://github.com/open-agentix/agenticWorkflowProtocol.org';
+const repo = 'https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org';
 
 // Wraps every table in a focusable, horizontally scrolling region so wide tables never widen the page.
 function rehypeWrapTables() {

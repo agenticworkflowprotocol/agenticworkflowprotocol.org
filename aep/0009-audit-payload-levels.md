@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0009 |
 | **Title** | Audit payload levels and content retention |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha3`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, privacy reviewer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D11](../docs/alignment/decisions.md#d11-contentretention-is-mandatory-with-a-documented-default) (2026-10-10) |
+| **Owner decisions** | [D11](../docs/decisions.md#d11-contentretention-is-mandatory-with-a-documented-default) (2026-10-10) |
 | **Target API version** | `v1alpha3` |
 | **Profiles affected** | `audit` |
 | **Created** | 2026-10-09 |
@@ -141,9 +141,7 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) records metadata by default for new tenants, has an
-optional short retention window per tenant and salted payload digests for erasure, in its own
-audit format. No implementation of this AEP exists.
+No implementation of this AEP exists.
 
 ## Open questions
 
@@ -152,7 +150,7 @@ audit format. No implementation of this AEP exists.
 
 ## Decision
 
-Owner direction of 2026-10-10 (D11): `contentRetention` is mandatory when content capture is used, with the documented default `7d` that tools write explicitly ([conflict C4](../docs/alignment/decisions.md#c4-mandatory-field-with-a-default-value)). Not in the `v1alpha2` scope of D8; target `v1alpha3` ([conflict C3](../docs/alignment/decisions.md#c3-d10-and-d11-decide-details-but-not-the-target-version)). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10 (D11): `contentRetention` is mandatory when content capture is used, with the documented default `7d` that tools write explicitly ([conflict C4](../docs/decisions.md#c4-mandatory-field-with-a-default-value)). Not in the `v1alpha2` scope of D8; target `v1alpha3` ([conflict C3](../docs/decisions.md#c3-d10-and-d11-decide-details-but-not-the-target-version)). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 

@@ -9,7 +9,7 @@ conformance tests, in tooling or in the website of this repository.
 **Please do not open public issues for security problems.**
 
 Report privately via GitHub private vulnerability reporting:
-[Report a vulnerability](https://github.com/open-agentix/agenticWorkflowProtocol.org/security/advisories/new).
+[Report a vulnerability](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/security/advisories/new).
 
 Include a description, the affected section, file or version, and the impact you expect. We
 acknowledge reports within 3 working days and coordinate disclosure with you. We credit you in the
@@ -27,9 +27,7 @@ In scope:
 
 Out of scope:
 
-- vulnerabilities in a specific AWP implementation. Report them to that project; for the
-  OpenAgentix reference implementation see
-  [its security policy](https://github.com/open-agentix/open-agentix/security/policy).
+- vulnerabilities in a specific AWP implementation. Report them to that project.
 
 ## Supported versions
 

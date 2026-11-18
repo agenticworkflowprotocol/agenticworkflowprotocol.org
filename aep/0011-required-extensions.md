@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0011 |
 | **Title** | Required extensions (`metadata.requiredExtensions`) |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D3](../docs/alignment/decisions.md#d3-required-extensions-are-a-prerequisite-of-strategy-a) (2026-10-10) |
+| **Owner decisions** | [D3](../docs/decisions.md#d3-required-extensions-are-in-scope-for-v1alpha2) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-10-09 |
@@ -32,8 +32,8 @@ restriction (an argument check, a condition, an isolation requirement) is silent
 runtime that does not know it. The manifest then runs with fewer restrictions than its author
 intended, which is the outcome spec 3.3 item 2 wants to avoid for unknown core fields.
 
-Implementations need extensions while proposals are discussed (the [alignment
-matrix](../docs/alignment/openagentix-matrix.md) shows 11 such fields for one implementation). The
+Implementations need extensions while proposals are discussed (one implementation effort
+needed 11 such fields). The
 same pattern exists elsewhere: JOSE `crit` header parameters (RFC 7515 section 4.1.11) and critical
 X.509 extensions (RFC 5280 section 4.2).
 
@@ -150,9 +150,9 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-No implementation of this AEP exists. By owner decision D3, OpenAgentix will list its critical
-`x-openagentix-*` fields here and will not export manifests with critical extensions before this AEP
-is part of an API version it targets ([namespace](../docs/alignment/x-openagentix-extensions.md)).
+No implementation of this AEP exists. Implementations that export manifests with critical
+extensions should refuse to do so, or mark them as not portable, until this AEP is part of an API
+version they target.
 
 ## Open questions
 
@@ -161,7 +161,7 @@ is part of an API version it targets ([namespace](../docs/alignment/x-openagenti
 
 ## Decision
 
-Owner direction of 2026-10-10 (D3): a prerequisite of strategy A. Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10 (D3): in scope for `v1alpha2`. Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 

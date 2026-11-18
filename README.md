@@ -72,9 +72,9 @@ applicable regulatory requirements.
 
 | Implementation | Status |
 | -------------- | ------ |
-| [OpenAgentix](https://github.com/open-agentix/open-agentix) | Reference implementation: **built to the AWP schema, conformance in progress (alpha)**; not conformant to any profile |
+| - | No implementation has published a conformance statement yet. |
 
-**Call for implementations:** AWP is not tied to OpenAgentix. If you build a runtime, validator or
+**Call for implementations:** AWP is not tied to any runtime. If you build a runtime, validator or
 tool that implements AWP, open an issue or pull request to be listed here. Listing requires a
 public statement of the supported conformance profiles.
 
@@ -93,7 +93,7 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) (DCO s
 Conventional Commits) and the [Code of Conduct](CODE_OF_CONDUCT.md). How decisions are made is
 described in [GOVERNANCE.md](GOVERNANCE.md). Security issues: see [SECURITY.md](SECURITY.md).
 
-Questions and ideas: GitHub Issues and Discussions. Contact: info@openagentix.si
+Questions and ideas: GitHub Issues and Discussions. Contact: info@agenticworkflowprotocol.org
 
 ## License
 

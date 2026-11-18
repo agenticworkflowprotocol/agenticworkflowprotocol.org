@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0010 |
 | **Title** | Digest canonicalisation (JCS) for manifests |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer, language or schema reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | scope of `v1alpha2` ([decision log section 2](../docs/alignment/decisions.md#2-resulting-scope-of-v1alpha2)) (2026-10-10) |
+| **Owner decisions** | scope of `v1alpha2` ([decision log section 2](../docs/decisions.md#2-resulting-scope-of-v1alpha2)) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core`, `security` |
 | **Created** | 2026-10-09 |
@@ -146,8 +146,6 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 ## Implementation status
 
 The reference checker in this repository computes digests as described for parser output.
-OpenAgentix (in progress, not conformant) has a canonical JSON function that matches JCS for
-parser output, used today over its Markdown source rather than over a manifest.
 
 ## Open questions
 
@@ -156,7 +154,7 @@ parser output, used today over its Markdown source rather than over a manifest.
 
 ## Decision
 
-Owner direction of 2026-10-10: part of the `v1alpha2` scope and, with AEP-0011, on the critical path of strategy A. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10: part of the `v1alpha2` scope and, with AEP-0011, on the critical path of portable manifests with extensions. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 

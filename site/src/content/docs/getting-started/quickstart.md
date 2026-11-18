@@ -8,7 +8,7 @@ This page walks you through validating a manifest with the reference checker in 
 ## 1. Get the repository
 
 ```sh
-git clone https://github.com/open-agentix/agenticWorkflowProtocol.org
+git clone https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org
 cd agenticWorkflowProtocol.org
 ```
 

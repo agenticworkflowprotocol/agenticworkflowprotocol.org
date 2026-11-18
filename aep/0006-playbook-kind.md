@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0006 |
 | **Title** | Kind `Playbook`: recurring tasks with deterministic steps and checks |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D8](../docs/alignment/decisions.md#d8-and-question-17-prompt-and-playbook-are-in-v1alpha2) (2026-10-10) |
+| **Owner decisions** | [D8](../docs/decisions.md#d8-prompt-and-playbook-are-in-v1alpha2) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core`, `audit` |
 | **Created** | 2026-10-09 |
@@ -201,8 +201,7 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-No implementation of this AEP exists. OpenAgentix (in progress, not conformant) has development
-guidelines and toolbox images, which are related but not the same concept.
+No implementation of this AEP exists.
 
 ## Open questions
 

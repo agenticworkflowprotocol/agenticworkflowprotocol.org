@@ -1,4 +1,4 @@
-# Agent instructions for open-agentix
+# Agent instructions for agenticworkflowprotocol.org
 
 See README for other guidelines.
 

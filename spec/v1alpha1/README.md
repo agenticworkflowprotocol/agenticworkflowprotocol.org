@@ -13,8 +13,7 @@
 > field, every semantic rule and every conformance requirement in this document may change
 > incompatibly in a later alpha version (`v1alpha2`, ...). Implementations SHOULD NOT rely on
 > `v1alpha1` for production interoperability. Feedback is welcome as GitHub issues. No
-> implementation is conformant to this version at the time of writing; the reference
-> implementation (OpenAgentix) is in progress.
+> implementation is conformant to this version at the time of writing.
 
 > **Compliance.** AWP provides machine-readable governance primitives that can help
 > organizations implement and enforce their own compliance requirements. Using AWP does not make

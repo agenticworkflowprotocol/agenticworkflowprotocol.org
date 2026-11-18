@@ -5,7 +5,7 @@ banner:
   content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
 ---
 
-The normative text lives in the [`spec/`]( https://github.com/open-agentix/agenticWorkflowProtocol.org/tree/main/spec ) directory of the repository and is rendered on this site without copies.
+The normative text lives in the [`spec/`]( https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/spec ) directory of the repository and is rendered on this site without copies.
 
 | API version | Status | Text |
 | ----------- | ------ | ---- |
@@ -13,7 +13,7 @@ The normative text lives in the [`spec/`]( https://github.com/open-agentix/agent
 
 - [Glossary](/specification/v1alpha1/glossary/)
 - [Versioning](/specification/versioning/) and [changelog](/specification/changelog/)
-- [JSON Schema](/schema/awp.v1alpha1.json) (structural rules), [conformance suite](https://github.com/open-agentix/agenticWorkflowProtocol.org/tree/main/conformance) and [CLI output formats](/tooling/cli/)
+- [JSON Schema](/schema/awp.v1alpha1.json) (structural rules), [conformance suite](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/conformance) and [CLI output formats](/tooling/cli/)
 
 The specification text is licensed under CC BY 4.0. Examples, schemas and code are licensed under Apache-2.0.
 

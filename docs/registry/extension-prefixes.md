@@ -4,7 +4,7 @@
 | --- | --- |
 | **Status** | Informative. Not part of the specification and not a registry with legal or technical effect. |
 | **Applies to** | Extension fields (`x-...`) in AWP manifests of every API version ([spec 3.3](../../spec/v1alpha1/README.md#33-unknown-fields-and-extensions)) |
-| **Decided** | 2026-10-10 ([decision log D12](../alignment/decisions.md#d12-neutral-list-of-extension-prefixes)) |
+| **Decided** | 2026-10-10 ([decision log D12](../decisions.md#d12-neutral-list-of-extension-prefixes)) |
 
 AWP lets every implementation add **extension fields** whose names start with `x-`. Runtimes that
 do not interpret an extension ignore it (spec 3.3), unless the manifest lists it in
@@ -31,12 +31,19 @@ conformance or endorsement of an implementation, and an unlisted prefix is not i
 4. Extension values are covered by the manifest digest ([AEP-0010](../../aep/0010-digest-canonicalization.md)).
 5. Implementations document their fields in their own repositories. This page links to that
    documentation; it does not copy it.
+6. An extension field sits on the object it modifies (a step field on the step, an input field on
+   the input), not in one bag under `spec`. This keeps it next to the core field that would
+   replace it and lets [AEP-0011](../../aep/0011-required-extensions.md) name single fields.
+7. The documentation of each field says whether a runtime that ignores it runs the manifest with
+   the same or stricter restrictions (safe to ignore) or with fewer (critical), and names the AEP
+   or core field planned to replace it.
 
 ## 2. Listed prefixes
 
 | Prefix | Implementation | Documentation of the fields | Listed |
 | --- | --- | --- | --- |
-| `x-openagentix-` | [OpenAgentix](https://github.com/open-agentix/open-agentix) | Alignment description: [x-openagentix-extensions.md](../alignment/x-openagentix-extensions.md) (to move to the OpenAgentix repository with its extension schema) | 2026-10-10 |
+
+No prefix is listed yet.
 
 Reserved (not for implementations): `x-awp-`, `x-example-`.
 

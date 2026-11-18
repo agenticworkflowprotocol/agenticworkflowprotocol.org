@@ -7,7 +7,7 @@ as **semantic validation rules**; a validator that claims to accept exactly the 
 specification allows (spec section 11.1) must implement both layers.
 
 **The schema is normative for document structure**: field names, types, required fields, closed
-objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/alignment/decisions.md#d2-json-schema-is-normative-for-structure)).
+objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/decisions.md#d2-json-schema-is-normative-for-structure)).
 Whether a manifest is written as YAML or JSON does not matter; YAML is parsed into the JSON data
 model first. The specification text is normative for semantics and runtime behaviour, and the
 semantic rules below are normative where they cite a section of it. A discrepancy between schema

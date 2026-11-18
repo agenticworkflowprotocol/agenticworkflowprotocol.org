@@ -24,7 +24,7 @@ Central messages, in this order of importance:
 
 1. **MCP connects agents to tools. A2A connects agents to agents. AWP defines how agents work.**
    Sub-line: *A declarative, portable and policy-aware standard for agentic workflows.*
-2. **AWP is a specification, not a platform. OpenAgentix is one implementation.**
+2. **AWP is a specification, not a platform. Any runtime may implement it.**
 3. **Agents need contracts. Workflows need boundaries. Execution needs auditability. AWP defines
    the contract.**
 
@@ -39,9 +39,8 @@ These rules apply to every page and are checked in review.
   organizations implement and enforce their own compliance requirements."* and *"Compliance
   depends on the implementation, organizational controls and applicable regulatory
   requirements."* Every governance-related page carries this note.
-- **No claims of third-party support.** The implementations page lists only OpenAgentix
-  (reference implementation, in progress) plus a call for implementations, until another project
-  states its support publicly.
+- **No claims of third-party support.** The implementations page lists only projects that have
+  published a conformance statement, plus a call for implementations.
 - **No marketing superlatives** ("the future of AI is here", "revolutionary"). Technical,
   confident, short sentences.
 - **No chain-of-thought promises.** AWP standardizes events, inputs, outputs, decisions and policy
@@ -51,9 +50,8 @@ These rules apply to every page and are checked in review.
   possible, so the site and the specification cannot drift apart.
 - **Risk levels are presented as a possible governance model**, not as a regulatory
   classification.
-- **No personal data.** Contact: info@openagentix.si; questions via GitHub Discussions; security
+- **No personal data.** Contact: info@agenticworkflowprotocol.org; questions via GitHub Discussions; security
   reports via GitHub private vulnerability reporting.
-- The OpenAgentix tagline ("SuperIntelligence") does not appear on this site.
 
 ## 3. Navigation
 
@@ -68,15 +66,15 @@ Top navigation, left to right:
 | **Security** | `/security/` | Secrets, supply chain (digests, signatures, provenance), tamper-evident audit, threat model, fail-closed semantics |
 | **Integrations** | `/integrations/` | MCP, A2A, OpenTelemetry mapping (later), policy engines (later) |
 | **Examples** | `/examples/` | Annotated manifests (vulnerability fixer, invoice processing, data-residency policy, approval flow) |
-| **Implementations** | `/implementations/` | OpenAgentix (reference implementation, in progress), call for implementations, conformance profiles, "Build your own AWP runtime" |
+| **Implementations** | `/implementations/` | Listed implementations (none yet), call for implementations, conformance profiles, "Build your own AWP runtime" |
 | **GitHub** | external link to the repository | Icon plus label, `rel="noopener"` |
 
 Secondary elements: version switcher (`v1alpha1` only for now), theme toggle (light/dark/system),
 language switcher (EN only at launch; DE added later), search (local, see section 6).
 
 Footer: License (CC BY 4.0 for text, Apache-2.0 for code), Code of Conduct, Governance, Security
-policy, Contributing, Changelog, contact info@openagentix.si, "AWP is a specification, not a
-platform. OpenAgentix is one implementation."
+policy, Contributing, Changelog, contact info@agenticworkflowprotocol.org, "AWP is a specification,
+not a platform. Any runtime may implement it."
 
 ## 4. Page tree
 
@@ -236,27 +234,24 @@ ASCII fallback in `<pre>` (readable without CSS, screen-reader friendly via `ari
 - Headline: **Build your own AWP runtime.**
 - Profiles as a list: core, governance, audit, security, mcp, a2a, each with one sentence.
 - Snippet: the `conformance` declaration of an implementation.
-- Copy: AWP is not tied to OpenAgentix. Conformance tests will be public.
+- Copy: AWP is not tied to any runtime. Conformance tests will be public.
 
 ### 13. Open Source
 
 - Headline: **AWP is an open specification.**
-- Flow: Specification → Open Governance → Reference Implementation → Conformance Tests →
-  Ecosystem.
-- Implementations: OpenAgentix (reference implementation, in progress). "Call for
-  implementations" with a link to the implementation listing issue template.
+- Flow: Specification → Open Governance → Conformance Tests → Implementations → Ecosystem.
+- Implementations: listed implementations (none yet). "Call for implementations" with a link to the implementation listing issue template.
 - Licenses: specification text CC BY 4.0, code and schemas Apache-2.0.
-- Closing statement: **AWP is a specification, not a platform. OpenAgentix is one
-  implementation.**
+- Closing statement: **AWP is a specification, not a platform. Any runtime may implement it.**
 
 ### 14. GitHub CTA
 
 - Headline: **Help define the contract.**
 - Buttons: "Read the specification", "Open an issue", "Join the discussion" (GitHub Discussions).
-- Small print: contact info@openagentix.si.
+- Small print: contact info@agenticworkflowprotocol.org.
 
-The technical vision diagram from the brief (AWP on top of several runtimes - OpenAgentix,
-Kubernetes-based, custom - which use A2A and MCP) is placed on `/concepts/overview/` and at the
+The technical vision diagram from the brief (AWP on top of several runtimes - Kubernetes-based,
+serverless, custom - which use A2A and MCP) is placed on `/concepts/overview/` and at the
 end of section 13 as a compact version. The runtime boxes are labelled as **examples of possible
 runtimes**, not as existing implementations.
 

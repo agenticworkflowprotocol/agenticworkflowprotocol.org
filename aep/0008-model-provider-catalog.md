@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0008 |
 | **Title** | Model and provider catalog as policy input |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha3`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D10](../docs/alignment/decisions.md#d10-model-catalog-prices-in-an-own-kind-referenced-by-digest) (2026-10-10) |
+| **Owner decisions** | [D10](../docs/decisions.md#d10-model-catalog-prices-in-an-own-kind-referenced-by-digest) (2026-10-10) |
 | **Target API version** | `v1alpha3` |
 | **Profiles affected** | `governance`, `audit` |
 | **Created** | 2026-10-09 |
@@ -182,9 +182,7 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) uses a pinned, vendored snapshot of a public model
-catalog plus overrides for prices, and tenant-scoped provider connections, in its own format. No
-implementation of this AEP exists.
+No implementation of this AEP exists.
 
 ## Open questions
 
@@ -193,7 +191,7 @@ implementation of this AEP exists.
 
 ## Decision
 
-Owner direction of 2026-10-10 (D10): prices live in an own kind `ModelCatalog` that workflows reference by digest (the digest is therefore REQUIRED). Not in the `v1alpha2` scope of D8; target `v1alpha3` ([conflict C3](../docs/alignment/decisions.md#c3-d10-and-d11-decide-details-but-not-the-target-version)). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10 (D10): prices live in an own kind `ModelCatalog` that workflows reference by digest (the digest is therefore REQUIRED). Not in the `v1alpha2` scope of D8; target `v1alpha3` ([conflict C3](../docs/decisions.md#c3-d10-and-d11-decide-details-but-not-the-target-version)). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 

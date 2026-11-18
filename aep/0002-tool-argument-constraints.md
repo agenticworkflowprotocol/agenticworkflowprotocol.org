@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0002 |
 | **Title** | Argument constraints and call limits in tool permissions; action groups instead of prefix wildcards |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer, language or schema reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D4](../docs/alignment/decisions.md#d4-no-prefix-wildcards-in-permissions) (2026-10-10) |
+| **Owner decisions** | [D4](../docs/decisions.md#d4-no-prefix-wildcards-in-permissions) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-10-09 |
@@ -32,9 +32,8 @@ restrictions cannot be expressed portably: "only tickets matching `SEC-\d+`", "s
 three values", "comment at most 2000 characters", "at most one comment per execution". A runtime
 that cannot express them has two bad options: grant the whole tool, or refuse the use case.
 
-The OpenAgentix alignment ([matrix](../docs/alignment/openagentix-matrix.md)) found these the most
-frequent security-relevant losses: every example with tools uses argument constraints, and three of
-four use per-tool call limits.
+Implementation experience shows these as the most frequent security-relevant losses when
+manifests are moved between runtimes: argument constraints and per-tool call limits.
 
 ## Goals and non-goals
 
@@ -196,8 +195,8 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) enforces argument constraints, an `allowAdditionalArgs`
-flag and per-tool call limits in its own format. No implementation of this AEP exists.
+At least one runtime in progress enforces argument constraints, an `allowAdditionalArgs` flag and
+per-tool call limits in its own format. No implementation of this AEP exists.
 
 ## Open questions
 
@@ -212,4 +211,3 @@ Owner direction of 2026-10-10 (D4): no prefix wildcards inside a segment; famili
 ## References
 
 - Spec sections 5.5.3, 5.5.4, 7.5.
-- [Alignment matrix v2](../docs/alignment/openagentix-matrix.md), section 4.4.

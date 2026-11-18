@@ -4,15 +4,15 @@
 | --- | --- |
 | **AEP** | 0007 |
 | **Title** | MCP connection catalog (tool access classes, pinned tool definitions, authorization), aligned with the MCP specification |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, MCP practitioner, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D8](../docs/alignment/decisions.md#d8-and-question-17-prompt-and-playbook-are-in-v1alpha2), [D9](../docs/alignment/decisions.md#d9-mcp-catalog-in-the-mcp-profile-aligned-with-the-mcp-specification) (2026-10-10) |
+| **Owner decisions** | [D8](../docs/decisions.md#d8-prompt-and-playbook-are-in-v1alpha2), [D9](../docs/decisions.md#d9-mcp-catalog-in-the-mcp-profile-aligned-with-the-mcp-specification) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `mcp` (no new profile), `audit` (new event type) |
-| **MCP revision** | Terms checked against the Model Context Protocol specification, revision `2026-07-28` (read as reference data; [conflict C7](../docs/alignment/decisions.md#c7-mcp-terms-are-external-reference-data)) |
+| **MCP revision** | Terms checked against the Model Context Protocol specification, revision `2026-07-28` (read as reference data; [conflict C7](../docs/decisions.md#c7-mcp-terms-are-external-reference-data)) |
 | **Created** | 2026-10-09 |
 | **Discussion** | issue to be opened |
 | **Supersedes** | - |
@@ -317,10 +317,9 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) has connection-level tool access classes, named profiles
-expanded at publish time, a read-only step check, and a proposed design for pinned tool snapshots
-and OAuth 2.1 for MCP connections (its ADR 0016), in its own format. No implementation of this AEP
-exists.
+Runtimes in progress keep connection-level tool access classes (read or write) in their own
+catalog and derive per-call approval and network placement from them; a manifest that is moved to
+another runtime loses this information. No implementation of this AEP exists.
 
 ## Open questions
 

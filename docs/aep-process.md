@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **Status** | **Adopted** by decision of the project lead on 2026-10-10 ([decision log D1](alignment/decisions.md#d1-aep-process-adopted)); in force from the merge of the adopting pull request, after the public discussion period of [GOVERNANCE.md](../GOVERNANCE.md#decision-process) |
+| **Status** | **Adopted** by decision of the project lead on 2026-10-10 ([decision log D1](decisions.md#d1-aep-process-adopted)); in force from the merge of the adopting pull request, after the public discussion period of [GOVERNANCE.md](../GOVERNANCE.md#decision-process) |
 | **Scope** | Additions to [GOVERNANCE.md](../GOVERNANCE.md): AEP lifecycle, numbering and template; versioning of the specification; rules for a future conformance mark |
 | **Adoption** | Through the substantive change process of [GOVERNANCE.md](../GOVERNANCE.md#decision-process): public discussion of at least 5 working days, then lazy consensus of the maintainers. Later changes to this document need a `Process` AEP. |
 | **Template** | [`aep/0000-template.md`](../aep/0000-template.md) |
@@ -37,7 +37,7 @@ impact of a change.
 
 AEPs are written in English. They contain no personal data beyond what authors choose to share in
 their public GitHub profiles; the project contact for matters that cannot be discussed in public is
-info@openagentix.si, and security issues follow [SECURITY.md](../SECURITY.md).
+info@agenticworkflowprotocol.org, and security issues follow [SECURITY.md](../SECURITY.md).
 
 ## 2. When an AEP is required
 
@@ -121,9 +121,9 @@ Rules:
   breaks ties).
 - **Conflicts of interest**: a maintainer who works on an implementation discloses this in the
   AEP discussion when the AEP mainly benefits or burdens that implementation. Changes needed by
-  OpenAgentix go through the same process as everyone else's; OpenAgentix has no veto and no
-  fast track.
-- Text drafted by the project's agent account (agentix-zero) is reviewed by an independent
+  any implementation go through the same process as everyone else's; no implementation has a
+  veto or a fast track.
+- Text drafted by an AI agent on behalf of a maintainer is reviewed by an independent
   review agent before merge, as for every other change, and a status change is decided by the
   maintainers ([GOVERNANCE.md](../GOVERNANCE.md#how-changes-are-reviewed)). There is no guarantee
   that a human reads every change.
@@ -131,7 +131,7 @@ Rules:
 
 ### 5.1 Review before acceptance
 
-Decided on 2026-10-10 ([decision log D16](alignment/decisions.md#d16-external-reviewer-before-accepted)).
+Decided on 2026-10-10 ([decision log D16](decisions.md#d16-external-reviewer-before-accepted)).
 
 1. **No self-acceptance.** An AEP cannot move to `Accepted` on the decision of its author alone,
    and not on the decision of the project lead alone. This also applies to alpha API versions.
@@ -142,14 +142,14 @@ Decided on 2026-10-10 ([decision log D16](alignment/decisions.md#d16-external-re
    the text.
 3. **External reviewer while the project has one organisation.** As long as all maintainers belong
    to one organisation, the reviewer of rule 2 MUST be external: not a maintainer, not an author,
-   and not working on OpenAgentix. Agent accounts cannot be reviewers. For AEPs drafted by
-   agentix-zero, the project lead may act as shepherd (a human has to guide the AEP and the agent
+   and not working on an implementation that a maintainer works on. Agents cannot be reviewers. For
+   AEPs drafted by an agent, the project lead may act as shepherd (a human has to guide the AEP and the agent
    account has no decision rights) but cannot be the reviewer.
 4. **Roles per AEP.** Each AEP lists in its header the reviewer roles it needs. Roles used so far:
 
    | Role | Needed for |
    | --- | --- |
-   | Runtime implementer | Every `Specification` AEP: someone who builds or maintains an agent or workflow runtime other than OpenAgentix and can judge whether the text is implementable. |
+   | Runtime implementer | Every `Specification` AEP: someone who builds or maintains an agent or workflow runtime that no maintainer works on and can judge whether the text is implementable. |
    | Security reviewer | AEPs that change permissions, isolation, digests, extensions or audit integrity. |
    | Privacy reviewer | AEPs that change what audit events or handoffs contain or how long content is kept. |
    | MCP practitioner | AEPs that touch MCP servers, tools or authorization: someone familiar with the Model Context Protocol specification. |
@@ -295,7 +295,7 @@ separate decision of the project.
 4. The listing shows API version, profiles, implementation version, suite version and date. A
    mark always names the API version and the profiles, for example "AWP v1beta1 conformant:
    core, audit (self-certified)". A mark without profiles is not allowed.
-5. There is no fee. Every implementation, including OpenAgentix, follows the same steps; a
+5. There is no fee. Every implementation follows the same steps; a
    maintainer affiliated with the implementation does not review its listing.
 
 ### 7.3 Validity
@@ -320,7 +320,7 @@ separate decision of the project.
    published evidence is missing, incomplete or inconsistent; the mark is used against section
    7.4; or the listing has expired.
 2. **Report**: anyone can report a suspected violation in a public issue (or via
-   info@openagentix.si when the report cannot be public). Reports must contain reproducible
+   info@agenticworkflowprotocol.org when the report cannot be public). Reports must contain reproducible
    evidence.
 3. **Remediation**: the implementer is notified in the issue and has **30 days** to fix the
    implementation, correct the statement or withdraw the claim. The period can be extended once.

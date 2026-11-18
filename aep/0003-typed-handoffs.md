@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0003 |
 | **Title** | Typed handoffs between steps |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, language or schema reviewer, security reviewer, privacy reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | scope of `v1alpha2` ([decision log section 2](../docs/alignment/decisions.md#2-resulting-scope-of-v1alpha2)) (2026-10-10) |
+| **Owner decisions** | scope of `v1alpha2` ([decision log section 2](../docs/decisions.md#2-resulting-scope-of-v1alpha2)) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core`, `audit` |
 | **Created** | 2026-10-09 |
@@ -183,8 +183,8 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) has typed handovers with the same keyword subset and
-limits, with references of the form `#/schemas/<name>` relative to its own front matter. No
+Runtimes in progress validate step outputs against a JSON Schema in their own extension fields
+(object schemas, with a bounded number of correction turns before the step fails). No
 implementation of this AEP exists.
 
 ## Open questions
@@ -195,10 +195,9 @@ implementation of this AEP exists.
 
 ## Decision
 
-Owner direction of 2026-10-10: part of the `v1alpha2` scope ([decision log section 2](../docs/alignment/decisions.md#2-resulting-scope-of-v1alpha2)); the `event` source follows D7 (AEP-0004). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10: part of the `v1alpha2` scope ([decision log section 2](../docs/decisions.md#2-resulting-scope-of-v1alpha2)); the `event` source follows D7 (AEP-0004). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 
 - JSON Schema draft 2020-12.
 - Spec sections 3.9, 5.6, 10.4.
-- [Alignment matrix v2](../docs/alignment/openagentix-matrix.md), section 4.5.

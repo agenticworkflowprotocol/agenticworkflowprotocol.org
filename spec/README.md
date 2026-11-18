@@ -11,10 +11,10 @@ This directory contains the normative text of the Agentic Workflow Protocol (AWP
 
 ## Roadmap: proposed changes
 
-The following AWP Enhancement Proposals are in the status `Review` under the AEP process
+The following AWP Enhancement Proposals are in the status `Draft` or `Review` under the AEP process
 ([docs/aep-process.md](../docs/aep-process.md), adopted 2026-10-10). None is accepted and none
 changes `v1alpha1`. Target versions follow the owner's decisions of 2026-10-10
-([decision log](../docs/alignment/decisions.md)); an AEP is accepted only after an external review
+([decision log](../docs/decisions.md)); an AEP is accepted only after an external review
 and a Final Comment Period, and may still be moved to a later version or rejected.
 
 | AEP | Title | Status | Target |
@@ -30,6 +30,9 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0009](../aep/0009-audit-payload-levels.md) | Audit payload levels, mandatory content retention | Review | `v1alpha3` |
 | [0010](../aep/0010-digest-canonicalization.md) | Digest canonicalisation (JCS) | Review | `v1alpha2` |
 | [0011](../aep/0011-required-extensions.md) | Required extensions | Review | `v1alpha2` |
+| [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
+| [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
+| [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

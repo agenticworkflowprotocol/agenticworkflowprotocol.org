@@ -4,12 +4,12 @@
 | --- | --- |
 | **AEP** | 0001 |
 | **Title** | Conditional steps (`when`) with a restricted expression language |
-| **Authors** | @agentix-zero |
+| **Authors** | AI agent on behalf of @weisser-dev |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, language or schema reviewer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D5](../docs/alignment/decisions.md#d5-when-uses-the-openagentix-expression-grammar), [D6](../docs/alignment/decisions.md#d6-executions-may-succeed-with-condition-skips) (2026-10-10) |
+| **Owner decisions** | [D5](../docs/decisions.md#d5-when-uses-a-restricted-expression-grammar-not-cel), [D6](../docs/decisions.md#d6-executions-may-succeed-with-condition-skips) (2026-10-10) |
 | **Target API version** | `v1alpha2` |
 | **Profiles affected** | `core` (step semantics), `audit` (new event type) |
 | **Created** | 2026-10-09 |
@@ -33,8 +33,7 @@ finding is severe, deploy only from a release branch, publish a review only when
 only if every step succeeded (spec 5.6.3). Authors today either put the decision into the agent's
 instructions (so the model, not the runtime, decides whether a write step runs) or split workflows.
 
-At least one implementation effort has conditional steps with a restricted grammar (OpenAgentix
-`agents.md`, [alignment matrix](../docs/alignment/openagentix-matrix.md)); its manifests cannot be
+At least one implementation effort has conditional steps with a restricted grammar; its manifests cannot be
 expressed in AWP without losing the condition, and a runtime that drops the condition runs a step
 the author wanted skipped.
 
@@ -213,8 +212,8 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-OpenAgentix (in progress, not conformant) has a condition field with the same grammar over its own
-roots (`event`, `steps.<id>.output`) in its `agents.md` format. No implementation of this AEP exists.
+At least one runtime in progress has a condition field with the same grammar in its own format.
+No implementation of this AEP exists.
 
 ## Open questions
 
@@ -225,9 +224,8 @@ roots (`event`, `steps.<id>.output`) in its `agents.md` format. No implementatio
 
 ## Decision
 
-Owner direction of 2026-10-10: the grammar is based on the existing OpenAgentix expression grammar, not CEL (D5); an execution may succeed when steps are skipped by a condition (D6). Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
+Owner direction of 2026-10-10: the grammar is a restricted expression grammar defined in this AEP, not CEL (D5); an execution may succeed when steps are skipped by a condition (D6). Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 
 - Spec sections 3.9, 5.6, 10.4.
-- [Alignment matrix v2](../docs/alignment/openagentix-matrix.md), section 4.5.

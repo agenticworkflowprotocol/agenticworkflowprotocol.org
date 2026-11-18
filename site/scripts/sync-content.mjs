@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
-const GH = 'https://github.com/open-agentix/agenticWorkflowProtocol.org';
+const GH = 'https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org';
 
 const BANNER = 'Draft - v1alpha1. Fields and semantics may change before v1beta1.';
 

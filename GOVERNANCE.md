@@ -1,15 +1,14 @@
 # Governance
 
 The Agentic Workflow Protocol (AWP) is an open specification developed in the open in the GitHub
-repository [`open-agentix/agenticWorkflowProtocol.org`](https://github.com/open-agentix/agenticWorkflowProtocol.org).
+repository [`agenticworkflowprotocol/agenticworkflowprotocol.org`](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org).
 
 ## Principles
 
 - **AWP is a specification, not a platform.** The specification must remain implementable by
   anyone, without a dependency on a specific vendor, runtime, model provider or hosting service.
-- **OpenAgentix is one implementation.** The [OpenAgentix](https://github.com/open-agentix/open-agentix)
-  project develops a reference implementation. It has no special rights over the specification:
-  changes needed by OpenAgentix go through the same process as everyone else's.
+- **No implementation has special rights.** Changes needed by any implementation, including one
+  that a maintainer works on, go through the same process as everyone else's.
 - **Open process.** Proposals, discussions and decisions happen in public issues, discussions and
   pull requests.
 - **Honesty.** The project does not claim support by third parties that have not stated it
@@ -17,9 +16,9 @@ repository [`open-agentix/agenticWorkflowProtocol.org`](https://github.com/open-
 
 ## Transparency: written with an agent
 
-Much of the text and tooling is drafted by **agentix-zero**, the project's AI agent account.
-The maintainers stay accountable and own the decisions. agentix-zero has no decision rights of
-its own.
+Much of the text and tooling is drafted by AI agents working on behalf of the maintainers.
+The maintainers stay accountable and own the decisions. Agents have no decision rights of their
+own.
 
 ### How changes are reviewed
 
@@ -51,8 +50,7 @@ keeps the review comments; the AEPs in [`aep/`](aep/) record specification decis
 
 | Maintainer   | GitHub              | Areas |
 | ------------ | ------------------- | ----- |
-| Project lead | via `@agentix-zero` | all (owns decisions) |
-| agentix-zero | `@agentix-zero`     | all (agent account, drafts changes, no own decision rights) |
+| Project lead | `@weisser-dev`      | all (owns decisions) |
 
 The project explicitly seeks maintainers from independent implementations. A contributor with a
 track record of substantial contributions over at least three months can be nominated by any
@@ -67,13 +65,13 @@ that no single organization holds a majority of maintainers once the specificati
   at least 5 working days of public discussion, then lazy consensus of the maintainers.
 - **Alpha waiver.** While the project is in alpha and no third party depends on it, the project owner
   may waive the 5-day discussion period for a specific change. Every waiver is recorded in the pull
-  request and in `docs/alignment/decisions.md`. A waiver never changes an AEP's lifecycle status: the
+  request and in `docs/decisions.md`. A waiver never changes an AEP's lifecycle status: the
   external review required by `docs/aep-process.md` still applies before an AEP is `Accepted`.
 - Larger changes use **AWP Enhancement Proposals (AEPs)**: a numbered Markdown document in
   `aep/` with motivation, specification text, alternatives, compatibility and conformance impact.
   The process is [docs/aep-process.md](docs/aep-process.md) with the template
   [aep/0000-template.md](aep/0000-template.md), adopted on 2026-10-10
-  ([decision log](docs/alignment/decisions.md)). An AEP is never accepted by its author or by the
+  ([decision log](docs/decisions.md)). An AEP is never accepted by its author or by the
   project lead alone: it needs a reviewer who is not an author and, while all maintainers belong to
   one organisation, an external one ([aep-process 5.1](docs/aep-process.md#51-review-before-acceptance)).
 - If consensus cannot be reached, the maintainers decide by simple majority; the project lead
