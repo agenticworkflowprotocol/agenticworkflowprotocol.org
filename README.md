@@ -92,13 +92,13 @@ applicable regulatory requirements.
 
 ## Validate, view and edit a manifest
 
-- **Editor and viewer:** [editor.agenticworkflowprotocol.org](https://editor.agenticworkflowprotocol.org) shows a manifest as step
+- **Editor and viewer** ([`@agenticworkflowprotocol/editor`](https://www.npmjs.com/package/@agenticworkflowprotocol/editor)): [editor.agenticworkflowprotocol.org](https://editor.agenticworkflowprotocol.org) shows a manifest as step
   graph, agents, tools and permissions, approvals and budgets, next to a YAML editor with live
   validation. [awp-editor](https://github.com/agenticworkflowprotocol/awp-editor) provides both as Web Components (`<awp-viewer>`,
   `<awp-editor>`) to embed in applications and documentation, like Swagger UI for OpenAPI.
 - **Online:** [validator.agenticworkflowprotocol.org](https://validator.agenticworkflowprotocol.org) checks a manifest in the browser
   (YAML rules, JSON Schema, semantic rules, per conformance profile); nothing is uploaded.
-- **CLI and library:** [awp-validator](https://github.com/agenticworkflowprotocol/awp-validator) provides `awp validate` and a library for Node.js
+- **CLI and library** ([`@agenticworkflowprotocol/validator`](https://www.npmjs.com/package/@agenticworkflowprotocol/validator)): [awp-validator](https://github.com/agenticworkflowprotocol/awp-validator) provides `awp validate` and a library for Node.js
   and the browser, to validate manifests in CI or inside a runtime. It is built on the schema and
   conformance suite of this repository, pinned by commit.
 - **In this repository:** `node conformance/awp-check.mjs check <file>` (see
