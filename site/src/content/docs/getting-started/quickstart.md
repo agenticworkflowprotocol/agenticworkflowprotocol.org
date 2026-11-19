@@ -3,6 +3,8 @@ title: Quickstart
 description: Validate an AWP manifest with the reference conformance checker in five steps.
 ---
 
+To check a manifest without installing anything, paste it into the [online validator](https://validator.agenticworkflowprotocol.org/). For CI and for use inside an application, install the [validator package](https://github.com/agenticworkflowprotocol/awp-validator) (`awp validate`, Node.js and browser library).
+
 This page walks you through validating a manifest with the reference checker in the repository. The checker is development tooling for the specification, not a runtime and not a product. You need Node.js 20 or newer and Git.
 
 ## 1. Get the repository

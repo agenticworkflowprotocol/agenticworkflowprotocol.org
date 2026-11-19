@@ -68,6 +68,16 @@ enforce their own compliance requirements. AWP itself does not make any system c
 law or regulation. Compliance depends on the implementation, organizational controls and
 applicable regulatory requirements.
 
+## Validate a manifest
+
+- **Online:** [validator.agenticworkflowprotocol.org](https://validator.agenticworkflowprotocol.org) checks a manifest in the browser
+  (YAML rules, JSON Schema, semantic rules, per conformance profile); nothing is uploaded.
+- **CLI and library:** [awp-validator](https://github.com/agenticworkflowprotocol/awp-validator) provides `awp validate` and a library for Node.js
+  and the browser, to validate manifests in CI or inside a runtime. It is built on the schema and
+  conformance suite of this repository, pinned by commit.
+- **In this repository:** `node conformance/awp-check.mjs check <file>` (see
+  [conformance/README.md](conformance/README.md)).
+
 ## Implementations
 
 | Implementation | Status |

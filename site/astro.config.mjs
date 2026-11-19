@@ -60,6 +60,7 @@ export default defineConfig({
         { label: 'Get started', items: [
           { label: 'Introduction', link: '/' },
           { label: 'Quickstart', slug: 'getting-started/quickstart' },
+          { label: 'Online validator', link: 'https://validator.agenticworkflowprotocol.org/', attrs: { rel: 'noopener' } },
         ] },
         { label: 'Learn', items: [
           { label: 'Concepts', collapsed: true, items: [{ autogenerate: { directory: 'concepts' } }] },
