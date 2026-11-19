@@ -81,7 +81,7 @@ spec:
                   x-kubernetes-preserve-unknown-fields: true
                 classification:
                   description: Data class (spec 7.2).
-                  enum:
+                  enum: &a2
                     - public
                     - internal
                     - confidential
@@ -504,6 +504,52 @@ spec:
                         additionalProperties:
                           x-kubernetes-preserve-unknown-fields: true
                     x-kubernetes-preserve-unknown-fields: true
+                humanInput:
+                  description: Lets an agent ask a person during its step (spec 5.8).
+                  required:
+                    - answerers
+                  type: object
+                  properties:
+                    answerers:
+                      minItems: 1
+                      type: array
+                      items:
+                        description: Exactly one of role or user (spec 7.6).
+                        type: object
+                        properties:
+                          role:
+                            minLength: 1
+                            type: string
+                          user:
+                            minLength: 1
+                            type: string
+                          extensions:
+                            description: "Extension fields (spec 3.3): keys start with x-, values are opaque to AWP. Replaces the x- fields of v1alpha1, which a Kubernetes structural schema cannot express."
+                            type: object
+                            additionalProperties:
+                              x-kubernetes-preserve-unknown-fields: true
+                        x-kubernetes-preserve-unknown-fields: true
+                    timeout:
+                      description: Duration greater than zero (spec 3.6).
+                      type: string
+                    onTimeout:
+                      enum:
+                        - return
+                        - fail
+                      type: string
+                    maxRequests:
+                      minimum: 1
+                      type: integer
+                    classification:
+                      description: Data class (spec 7.2).
+                      enum: *a2
+                      type: string
+                    extensions:
+                      description: "Extension fields (spec 3.3): keys start with x-, values are opaque to AWP. Replaces the x- fields of v1alpha1, which a Kubernetes structural schema cannot express."
+                      type: object
+                      additionalProperties:
+                        x-kubernetes-preserve-unknown-fields: true
+                  x-kubernetes-preserve-unknown-fields: true
                 extensions:
                   description: "Extension fields (spec 3.3): keys start with x-, values are opaque to AWP. Replaces the x- fields of v1alpha1, which a Kubernetes structural schema cannot express."
                   type: object

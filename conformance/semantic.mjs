@@ -5,8 +5,9 @@
 // Runs on documents that already passed the structural schema.
 
 import { createHash } from 'node:crypto';
+import { checkInputStep } from './human-input.mjs';
 
-export const KNOWN_PROFILES = ['core', 'governance', 'audit', 'security', 'mcp', 'a2a'];
+export const KNOWN_PROFILES = ['core', 'governance', 'audit', 'security', 'mcp', 'a2a', 'interaction'];
 
 const EXPR_RE = /\$\{\{([\s\S]*?)\}\}/g;
 const SECRET_FIELD_NAMES = new Set(['token', 'password', 'apiKey', 'secret', 'privateKey']);
@@ -200,6 +201,7 @@ export function semanticCheck(doc, opts = {}) {
     checkToolSources(spec.tools, ['spec', 'tools']);
     checkPermissions(spec.permissions, ['spec', 'permissions']);
     checkDate(spec.model?.approval?.expires, '/spec/model/approval/expires');
+    if (spec.humanInput) needProfile('interaction', 'spec.humanInput', '/spec/humanInput', '3.3');
   }
 
   if (kind === 'Policy') {
@@ -227,6 +229,7 @@ export function semanticCheck(doc, opts = {}) {
       }
       if (!a.ref && !a.protocol) checkToolSources(a.tools, ['spec', 'agents', i, 'tools']);
       if (!a.ref && !a.protocol) checkDate(a.model?.approval?.expires, ptr('spec', 'agents', i, 'model', 'approval', 'expires'));
+      if (a.humanInput) needProfile('interaction', 'agents with humanInput', ptr('spec', 'agents', i, 'humanInput'), '3.3');
       checkPermissions(a.permissions, ['spec', 'agents', i, 'permissions']);
     });
     checkPermissions(spec.permissions, ['spec', 'permissions']);
@@ -251,6 +254,10 @@ export function semanticCheck(doc, opts = {}) {
         err('step.unknown-agent', '5.6.3', ptr('spec', 'workflow', i, 'agent'), `step names non-existent agent "${s.agent}"`);
       }
       if (s.type === 'approval') needProfile('governance', 'step with type: approval', ptr('spec', 'workflow', i), '3.3');
+      if (s.type === 'input') {
+        needProfile('interaction', 'step with type: input', ptr('spec', 'workflow', i), '3.3');
+        checkInputStep(s.input, ['spec', 'workflow', i, 'input'], err, ptr);
+      }
       if (profiles.has('security') && s.type === 'command' && typeof s.image === 'string' && !/@(sha256:[0-9a-f]{64}|sha384:[0-9a-f]{96}|sha512:[0-9a-f]{128})$/.test(s.image)) {
         err('security.image-not-pinned', '9.4', ptr('spec', 'workflow', i, 'image'), 'command step image MUST be pinned by digest under the security profile');
       }
@@ -284,7 +291,8 @@ export function semanticCheck(doc, opts = {}) {
 
     // 3.9 / 5.6.3: expression references
     const inputNames = new Set((spec.inputs ?? []).map(i => i.name));
-    const outputsOf = new Map(steps.map(s => [s.id, new Set((s.outputs ?? []).map(o => o.name))]));
+    // an input step always provides the output `answer` (5.8)
+    const outputsOf = new Map(steps.map(s => [s.id, new Set([...(s.outputs ?? []).map(o => o.name), ...(s.type === 'input' ? ['answer'] : [])])]));
     const checkExpr = (str, path, stepId) => {
       if (typeof str !== 'string') return;
       for (const m of str.matchAll(EXPR_RE)) {
@@ -306,6 +314,7 @@ export function semanticCheck(doc, opts = {}) {
       checkExpr(s.task, ptr(...base, 'task'), s.id);
       for (const [k, v] of Object.entries(s.env ?? {})) checkExpr(v, ptr(...base, 'env', k), s.id);
       checkExpr(s.approval?.message, ptr(...base, 'approval', 'message'), s.id);
+      checkExpr(s.input?.message, ptr(...base, 'input', 'message'), s.id);
       if (typeof s.command === 'string' && s.command.includes('${{')) {
         warn('lint.command-expression', '5.6.2', ptr(...base, 'command'), 'command is not expression-enabled; ${{ }} is passed literally. Use env.');
       }

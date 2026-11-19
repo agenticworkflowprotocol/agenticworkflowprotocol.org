@@ -111,8 +111,11 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `input.pattern-invalid` | 5.3 | An input `pattern` is a valid ECMA-262 regular expression. |
 | `date.invalid` | 3.7 | Dates exist in the calendar. |
 | `digest.mismatch`, `digest.unsupported-algorithm` | 9.1 | With digest verification enabled, `metadata.integrity.digest` equals the digest over the RFC 8785 serialization of the manifest without `metadata.integrity`, `metadata.signature` and `metadata.provenance`. |
-| `profile.unsupported` | 3.3 | A field of a profile the validator does not support is rejected, naming field and profile (table in spec 3.3, plus `kind: Policy` for the governance profile). |
+| `profile.unsupported` | 3.3 | A field of a profile the validator does not support is rejected, naming field and profile (table in spec 3.3, plus `kind: Policy` for the governance profile). In `v1alpha2` this includes the `interaction` profile (input steps, `humanInput`). |
 | `governance.classification-required` | 7.1 | Under the governance profile `Workflow` and `Agent` have `metadata.classification` (`owner.team` is structurally required). |
+| `input.required-unknown-field` | 5.8 (v1alpha2) | `answerSchema.required` names fields of `answerSchema.properties`. |
+| `input.enum-not-string` | 5.8 (v1alpha2) | `enum` is only used on answer fields of type `string`. |
+| `input.default-mismatch` | 5.8 (v1alpha2) | The `default` of an input step is a valid answer: a string without `answerSchema`, otherwise an object that matches it. |
 | `security.image-not-pinned` | 9.4 | Under the security profile `mcpServers[].image` and command step `image` are pinned by digest. |
 
 ### Warnings

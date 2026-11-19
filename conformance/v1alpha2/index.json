@@ -10,7 +10,8 @@
       "audit",
       "security",
       "mcp",
-      "a2a"
+      "a2a",
+      "interaction"
     ],
     "verifyDigest": false
   },
@@ -206,6 +207,23 @@
       "profiles": [
         "core",
         "mcp"
+      ]
+    },
+    {
+      "id": "3.3-profile-interaction-step",
+      "file": "invalid/3.3-profile-interaction-step.yaml",
+      "section": "3.3",
+      "rule": "Steps with type input belong to the interaction profile.",
+      "expect": "invalid",
+      "code": "profile.unsupported",
+      "path": "/spec/workflow/1",
+      "profiles": [
+        "core",
+        "governance",
+        "audit",
+        "security",
+        "mcp",
+        "a2a"
       ]
     },
     {
@@ -564,6 +582,15 @@
       "path": "/spec/owner"
     },
     {
+      "id": "5.2-concurrency-policy-on-event-trigger",
+      "file": "invalid/5.2-concurrency-policy-on-event-trigger.yaml",
+      "section": "5.2",
+      "rule": "concurrencyPolicy and startingDeadline belong to schedule triggers only.",
+      "expect": "invalid",
+      "code": "schema.not",
+      "path": "/spec/triggers/2"
+    },
+    {
       "id": "5.2-cron-not-five-fields",
       "file": "invalid/5.2-cron-not-five-fields.yaml",
       "section": "5.2",
@@ -582,6 +609,15 @@
       "path": "/spec/triggers/0"
     },
     {
+      "id": "5.2-invalid-concurrency-policy",
+      "file": "invalid/5.2-invalid-concurrency-policy.yaml",
+      "section": "5.2",
+      "rule": "concurrencyPolicy is allow, forbid or replace.",
+      "expect": "invalid",
+      "code": "schema.enum",
+      "path": "/spec/triggers/1/concurrencyPolicy"
+    },
+    {
       "id": "5.2-schedule-without-cron",
       "file": "invalid/5.2-schedule-without-cron.yaml",
       "section": "5.2",
@@ -589,6 +625,15 @@
       "expect": "invalid",
       "code": "schema.required",
       "path": "/spec/triggers/0"
+    },
+    {
+      "id": "5.2-starting-deadline-not-duration",
+      "file": "invalid/5.2-starting-deadline-not-duration.yaml",
+      "section": "5.2",
+      "rule": "startingDeadline is a duration.",
+      "expect": "invalid",
+      "code": "schema.pattern",
+      "path": "/spec/triggers/1/startingDeadline"
     },
     {
       "id": "5.2-unknown-trigger-type",
@@ -1021,6 +1066,78 @@
       "expect": "invalid",
       "code": "schema.minimum",
       "path": "/spec/budget/maxSteps"
+    },
+    {
+      "id": "5.8-agent-invalid-on-timeout",
+      "file": "invalid/5.8-agent-invalid-on-timeout.yaml",
+      "section": "5.8",
+      "rule": "humanInput.onTimeout is return or fail.",
+      "expect": "invalid",
+      "code": "schema.enum",
+      "path": "/spec/agents/0/humanInput/onTimeout"
+    },
+    {
+      "id": "5.8-answer-field-nested-object",
+      "file": "invalid/5.8-answer-field-nested-object.yaml",
+      "section": "5.8",
+      "rule": "Answer fields are primitive (string, number, integer, boolean).",
+      "expect": "invalid",
+      "code": "schema.enum",
+      "path": "/spec/workflow/1/input/answerSchema/properties/targets/type"
+    },
+    {
+      "id": "5.8-default-mismatch",
+      "file": "invalid/5.8-default-mismatch.yaml",
+      "section": "5.8",
+      "rule": "default matches answerSchema.",
+      "expect": "invalid",
+      "code": "input.default-mismatch",
+      "path": "/spec/workflow/1/input/default"
+    },
+    {
+      "id": "5.8-input-step-with-agent",
+      "file": "invalid/5.8-input-step-with-agent.yaml",
+      "section": "5.8",
+      "rule": "An input step has no agent.",
+      "expect": "invalid",
+      "code": "schema.not",
+      "path": "/spec/workflow/1"
+    },
+    {
+      "id": "5.8-input-step-without-input",
+      "file": "invalid/5.8-input-step-without-input.yaml",
+      "section": "5.8",
+      "rule": "An input step REQUIRES input.",
+      "expect": "invalid",
+      "code": "schema.required",
+      "path": "/spec/workflow/1"
+    },
+    {
+      "id": "5.8-input-without-answerers",
+      "file": "invalid/5.8-input-without-answerers.yaml",
+      "section": "5.8",
+      "rule": "answerers is REQUIRED; nobody else may answer.",
+      "expect": "invalid",
+      "code": "schema.required",
+      "path": "/spec/workflow/1/input"
+    },
+    {
+      "id": "5.8-required-unknown-field",
+      "file": "invalid/5.8-required-unknown-field.yaml",
+      "section": "5.8",
+      "rule": "required names fields of answerSchema.properties.",
+      "expect": "invalid",
+      "code": "input.required-unknown-field",
+      "path": "/spec/workflow/1/input/answerSchema/required/0"
+    },
+    {
+      "id": "5.8-use-default-without-default",
+      "file": "invalid/5.8-use-default-without-default.yaml",
+      "section": "5.8",
+      "rule": "onTimeout useDefault REQUIRES default.",
+      "expect": "invalid",
+      "code": "schema.required",
+      "path": "/spec/workflow/1/input"
     },
     {
       "id": "6-agent-instructions-and-prompt-ref",
@@ -1506,6 +1623,13 @@
       ]
     },
     {
+      "id": "5.2-schedule-concurrency-and-deadline",
+      "file": "valid/5.2-schedule-concurrency-and-deadline.yaml",
+      "section": "5.2",
+      "rule": "A schedule trigger may set concurrencyPolicy and startingDeadline.",
+      "expect": "valid"
+    },
+    {
       "id": "5.2-triggers",
       "file": "valid/5.2-triggers.yaml",
       "section": "5.2",
@@ -1559,6 +1683,34 @@
       "file": "valid/5.7-nested-budgets.yaml",
       "section": "5.7",
       "rule": "Budgets on workflow, agent and step; retries do not exceed maxRetries.",
+      "expect": "valid"
+    },
+    {
+      "id": "5.8-agent-human-input",
+      "file": "valid/5.8-agent-human-input.yaml",
+      "section": "5.8",
+      "rule": "An agent with humanInput may ask a person during its step.",
+      "expect": "valid"
+    },
+    {
+      "id": "5.8-agent-manifest-human-input",
+      "file": "valid/5.8-agent-manifest-human-input.yaml",
+      "section": "5.8",
+      "rule": "humanInput is also allowed in an Agent manifest.",
+      "expect": "valid"
+    },
+    {
+      "id": "5.8-input-step-free-text",
+      "file": "valid/5.8-input-step-free-text.yaml",
+      "section": "5.8",
+      "rule": "Without answerSchema the answer is free text.",
+      "expect": "valid"
+    },
+    {
+      "id": "5.8-input-step",
+      "file": "valid/5.8-input-step.yaml",
+      "section": "5.8",
+      "rule": "An input step asks named answerers, waits up to its timeout and provides the output answer.",
       "expect": "valid"
     },
     {

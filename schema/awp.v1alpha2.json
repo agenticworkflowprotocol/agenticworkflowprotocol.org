@@ -735,6 +735,9 @@
         "budget": {
           "$ref": "#/$defs/Budget"
         },
+        "humanInput": {
+          "$ref": "#/$defs/HumanInput"
+        },
         "extensions": {
           "$ref": "#/$defs/Extensions"
         }
@@ -917,6 +920,16 @@
             "type": "string"
           }
         },
+        "concurrencyPolicy": {
+          "enum": [
+            "allow",
+            "forbid",
+            "replace"
+          ]
+        },
+        "startingDeadline": {
+          "$ref": "#/$defs/Duration"
+        },
         "extensions": {
           "$ref": "#/$defs/Extensions"
         }
@@ -963,6 +976,16 @@
                 {
                   "required": [
                     "filter"
+                  ]
+                },
+                {
+                  "required": [
+                    "concurrencyPolicy"
+                  ]
+                },
+                {
+                  "required": [
+                    "startingDeadline"
                   ]
                 }
               ]
@@ -1031,6 +1054,16 @@
                 {
                   "required": [
                     "timezone"
+                  ]
+                },
+                {
+                  "required": [
+                    "concurrencyPolicy"
+                  ]
+                },
+                {
+                  "required": [
+                    "startingDeadline"
                   ]
                 }
               ]
@@ -1230,7 +1263,8 @@
           "enum": [
             "agent",
             "command",
-            "approval"
+            "approval",
+            "input"
           ]
         },
         "dependsOn": {
@@ -1304,6 +1338,9 @@
         "approval": {
           "$ref": "#/$defs/ApprovalStep"
         },
+        "input": {
+          "$ref": "#/$defs/InputStep"
+        },
         "extensions": {
           "$ref": "#/$defs/Extensions"
         }
@@ -1341,6 +1378,11 @@
             {
               "required": [
                 "approval"
+              ]
+            },
+            {
+              "required": [
+                "input"
               ]
             }
           ]
@@ -1392,42 +1434,108 @@
                 "required": [
                   "workingDir"
                 ]
+              },
+              {
+                "required": [
+                  "input"
+                ]
               }
             ]
           }
         },
         "else": {
-          "required": [
-            "agent"
-          ],
-          "not": {
-            "anyOf": [
-              {
-                "required": [
-                  "command"
-                ]
-              },
-              {
-                "required": [
-                  "image"
-                ]
-              },
-              {
-                "required": [
-                  "env"
-                ]
-              },
-              {
-                "required": [
-                  "workingDir"
-                ]
-              },
-              {
-                "required": [
-                  "approval"
-                ]
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "input"
               }
-            ]
+            }
+          },
+          "then": {
+            "required": [
+              "input"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "agent"
+                  ]
+                },
+                {
+                  "required": [
+                    "task"
+                  ]
+                },
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "image"
+                  ]
+                },
+                {
+                  "required": [
+                    "env"
+                  ]
+                },
+                {
+                  "required": [
+                    "workingDir"
+                  ]
+                },
+                {
+                  "required": [
+                    "approval"
+                  ]
+                }
+              ]
+            }
+          },
+          "else": {
+            "required": [
+              "agent"
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "command"
+                  ]
+                },
+                {
+                  "required": [
+                    "image"
+                  ]
+                },
+                {
+                  "required": [
+                    "env"
+                  ]
+                },
+                {
+                  "required": [
+                    "workingDir"
+                  ]
+                },
+                {
+                  "required": [
+                    "approval"
+                  ]
+                },
+                {
+                  "required": [
+                    "input"
+                  ]
+                }
+              ]
+            }
           }
         }
       }
@@ -2192,6 +2300,9 @@
             "$ref": "#/$defs/Secret"
           }
         },
+        "humanInput": {
+          "$ref": "#/$defs/HumanInput"
+        },
         "extensions": {
           "$ref": "#/$defs/Extensions"
         }
@@ -2913,6 +3024,188 @@
       "type": "string",
       "maxLength": 63,
       "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+    },
+    "AnswerField": {
+      "description": "One field of an answer schema (spec 5.8): a primitive value, as in MCP elicitation.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "format": {
+          "enum": [
+            "email",
+            "uri",
+            "date",
+            "date-time"
+          ]
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "AnswerSchema": {
+      "description": "Schema of a structured answer (spec 5.8): a flat object of primitive fields, the requested-schema subset of MCP elicitation.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "const": "object"
+        },
+        "properties": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[a-zA-Z][a-zA-Z0-9_]{0,62}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/AnswerField"
+          }
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "type",
+        "properties"
+      ],
+      "additionalProperties": false
+    },
+    "InputStep": {
+      "description": "Payload of an input step (spec 5.8): ask a person and wait for the answer.",
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/$defs/Expression"
+        },
+        "answerSchema": {
+          "$ref": "#/$defs/AnswerSchema"
+        },
+        "answerers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Approver"
+          }
+        },
+        "timeout": {
+          "$ref": "#/$defs/Duration"
+        },
+        "onTimeout": {
+          "enum": [
+            "fail",
+            "useDefault"
+          ]
+        },
+        "default": {},
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "message",
+        "answerers"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "onTimeout": {
+            "const": "useDefault"
+          }
+        },
+        "required": [
+          "onTimeout"
+        ]
+      },
+      "then": {
+        "required": [
+          "default"
+        ]
+      }
+    },
+    "HumanInput": {
+      "description": "Lets an agent ask a person during its step (spec 5.8).",
+      "type": "object",
+      "properties": {
+        "answerers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Approver"
+          }
+        },
+        "timeout": {
+          "$ref": "#/$defs/Duration"
+        },
+        "onTimeout": {
+          "enum": [
+            "return",
+            "fail"
+          ]
+        },
+        "maxRequests": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification"
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "answerers"
+      ],
+      "additionalProperties": false
     }
   }
 }

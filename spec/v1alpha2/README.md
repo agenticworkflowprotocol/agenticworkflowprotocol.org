@@ -13,7 +13,9 @@
 > starts from `v1alpha1` and aligns the document model with the Kubernetes resource model, as
 > proposed by [AEP-0000](../../aep/0000-kubernetes-resource-model.md) (not accepted): governance
 > fields move from `metadata` to `spec`, extension fields move into `extensions` objects, and
-> `status` is reserved for runtimes. Every field, every semantic rule and every conformance
+> `status` is reserved for runtimes. It also contains the schedule semantics and the human input
+> proposed in [aep/0000-schedule-semantics.md](../../aep/0000-schedule-semantics.md) and
+> [aep/0000-human-input.md](../../aep/0000-human-input.md) (Draft, not accepted). Every field, every semantic rule and every conformance
 > requirement in this document may change incompatibly in a later alpha version. Implementations
 > SHOULD NOT rely on `v1alpha2` for production interoperability. No implementation is conformant
 > to this version at the time of writing. Changes from `v1alpha1` are listed in
@@ -204,6 +206,7 @@ a manifest read back from an object store stays valid. `status` is not covered b
    | `security` | `spec.signature` |
    | `mcp` | `spec.mcpServers`, tool sources with `type: mcp` |
    | `a2a` | agents with `protocol: a2a` |
+   | `interaction` | steps with `type: input`, agents with `humanInput`, `spec.humanInput` of an `Agent` |
 
    All other fields, including `spec.owner`, `spec.classification`, `spec.risk` with
    `level` `low` or `medium`, `spec.permissions`, `spec.secrets` and `spec.integrity`, belong
@@ -430,6 +433,42 @@ triggers:
 - A `schedule` trigger supplies no input values: an execution it starts uses the `default` of
   each input ([section 5.3](#53-inputs)). A workflow with a required input therefore cannot be
   started by its `schedule` triggers.
+**Schedule semantics.** A `schedule` trigger has these additional fields:
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `concurrencyPolicy` | string | no | What happens at a tick while an execution started by this trigger is still running: `forbid` (default) skips the tick, `allow` starts another execution, `replace` cancels the running execution and starts a new one. |
+| `startingDeadline` | duration | no | How late an execution for a missed tick may still start. Absent: missed ticks are skipped. |
+
+```yaml
+triggers:
+  - type: schedule
+    cron: "0 */2 * * *"
+    timezone: Europe/Berlin
+    concurrencyPolicy: forbid
+    startingDeadline: 15m
+```
+
+- A **tick** is a point in time matched by `cron` in `timezone`. Each tick starts at most one
+  execution. The runtime MUST use the tick time, not the start time, as `scheduledAt` in the
+  `trigger` data of `workflow.started`.
+- `concurrencyPolicy` only considers executions started by the same trigger entry of the same
+  workflow (`kind`, `metadata.namespace`, `metadata.name`), regardless of their version. Manual and
+  event-triggered executions are not considered. With `replace`, the runtime MUST cancel the
+  running execution as if an actor of type `system` had cancelled it, emit `workflow.cancelled`
+  with `reason: replaced`, and start the new execution only after the cancellation has completed.
+  The default is `forbid` because agent executions often run longer than a cron interval.
+- A tick is **missed** when the runtime could not start an execution at the tick time, for
+  example because it was not running. Without `startingDeadline` the runtime MUST NOT start
+  executions for missed ticks. With `startingDeadline` the runtime MAY start one execution for the
+  latest missed tick if the current time is at most `startingDeadline` after that tick; it MUST
+  NOT start executions for older missed ticks and MUST NOT start more than one execution to catch
+  up.
+- For every tick that does not start an execution (skipped by `forbid`, missed, or past
+  `startingDeadline`) the runtime MUST emit `trigger.skipped` with the tick time and the reason
+  ([section 10.4](#104-event-types)). A runtime that cannot determine individual missed ticks (for
+  example after a long outage) MAY emit one `trigger.skipped` event with the first and the last
+  missed tick.
 - An execution started by `schedule` or `event` has the actor type `system`; an execution started
   by `manual` has the actor type `human` (see [section 10.3](#103-event-envelope)).
 
@@ -469,6 +508,7 @@ triggers:
 | `tools` | list | no | Tool sources ([section 5.5](#55-tools-and-action-identifiers)). Default: no tools. |
 | `permissions` | object | no | Agent-level permissions ([section 7.5](#75-tool-governance-permissions)). |
 | `budget` | object | no | Agent-level budget ([section 5.7](#57-budgets-and-resources)). |
+| `humanInput` | object | no | Lets the agent ask a person during its step ([section 5.8.2](#582-agent-requests)). |
 
 ```yaml
 agents:
@@ -665,7 +705,7 @@ actionGroups:
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
 | `id` | string | yes | Step identifier, unique within the workflow. |
-| `type` | string | no | `agent`, `command` or `approval`. Default: `agent`. |
+| `type` | string | no | `agent`, `command`, `approval` or `input`. Default: `agent`. |
 | `dependsOn` | list of string | no | Step identifiers that MUST complete successfully before this step starts. |
 | `timeout` | duration | no | Maximum wall-clock time of the step. |
 | `retries` | integer | no | Number of retries after a failure. Default `0`. MUST NOT exceed `budget.resources.maxRetries` if set. |
@@ -679,6 +719,7 @@ Fields per type:
 | `agent` | `agent` (REQUIRED, id of an entry in `spec.agents`), `task` (OPTIONAL, expression-enabled string: the task for this step) |
 | `command` | `command` (REQUIRED, string), `image` (OPTIONAL, container image), `env` (OPTIONAL, map of expression-enabled strings), `workingDir` (OPTIONAL) |
 | `approval` | `approval` (REQUIRED, object with `approvers`, `minApprovals`, `timeout`, `onTimeout`, `message`; see [section 7.6](#76-human-approval)) |
+| `input` | `input` (REQUIRED, object with `message`, `answerSchema`, `answerers`, `timeout`, `onTimeout`, `default`, `classification`; see [section 5.8](#58-human-input)) |
 
 ```yaml
 workflow:
@@ -779,6 +820,138 @@ budget:
   SHOULD use a configured price instead of zero.
 - Runtimes MAY enforce stricter limits than the manifest declares (for example tenant quotas).
 
+### 5.8 Human input
+
+An execution can ask a person for information and wait for the answer: an input step asks a
+question defined in the manifest, and an agent with `humanInput` may ask questions of its own
+during its step. Human input is close to elicitation in the Model Context Protocol: a message, a
+flat schema for a structured answer, and the outcomes *answered*, *declined* and *expired*.
+Human input belongs to the `interaction` profile.
+
+An answer is information, not a decision. It never grants an approval
+([section 7.6](#76-human-approval)), never changes permissions, policies or budgets, and never
+changes the manifest of a running execution.
+
+#### 5.8.1 Input steps
+
+A step with `type: input` asks the question in its `input` object:
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `message` | string | yes | Expression-enabled question shown to the answerers. |
+| `answerSchema` | object | no | Schema of a structured answer ([section 5.8.3](#583-answer-schema)). Absent: the answer is free text (a string). |
+| `answerers` | list | yes | Who may answer: entries with exactly one of `role` or `user`, matched like approvers ([section 7.6](#76-human-approval)). |
+| `timeout` | duration | no | Time after which the open request expires. Default: no timeout (the step timeout and `maxDuration` still apply). |
+| `onTimeout` | string | no | `fail` (default) fails the step; `useDefault` completes the step with `default` as the answer. |
+| `default` | any | cond. | REQUIRED with `onTimeout: useDefault`. MUST be a valid answer. |
+| `classification` | string | no | Data class of the answer ([section 7.2](#72-data-classification)). Default: `spec.classification`. |
+
+```yaml
+workflow:
+  - id: ask-targets
+    type: input
+    dependsOn:
+      - analyze
+    input:
+      message: "Which environment should ${{ steps.analyze.outputs.report }} be applied to?"
+      answerSchema:
+        type: object
+        properties:
+          environment:
+            type: string
+            enum: [staging, production]
+        required: [environment]
+      answerers:
+        - role: release-manager
+      timeout: 4h
+      onTimeout: useDefault
+      default:
+        environment: staging
+  - id: apply
+    agent: worker
+    task: "Apply the fix to ${{ steps.ask-targets.outputs.answer }}."
+    dependsOn:
+      - ask-targets
+```
+
+- An input step has the implicit output `answer`: the validated answer (a string, or an object
+  that matches `answerSchema`). It is referenced as `steps.<id>.outputs.answer`.
+- The step succeeds when an answerer provides a valid answer, or on expiry with `onTimeout:
+  useDefault`. It fails when an answerer declines or when it expires with `onTimeout: fail`.
+- The first valid answer completes the request; later answers MUST be rejected.
+
+#### 5.8.2 Agent requests
+
+An agent with a `humanInput` object (inline agents and `Agent` manifests) may ask questions during
+its step. The runtime offers the agent a built-in tool for this; the agent supplies a message and
+optionally an answer schema, and receives the answer, or the information that the request was
+declined or expired, as the tool result.
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `answerers` | list | yes | Who may answer, as for input steps. |
+| `timeout` | duration | no | Expiry of each request. Default: no timeout. |
+| `onTimeout` | string | no | `return` (default) returns the expiry to the agent, which continues; `fail` fails the step. |
+| `maxRequests` | integer | no | Maximum number of requests per step. Default: unlimited. |
+| `classification` | string | no | Data class of the answers. Default: `spec.classification`. |
+
+```yaml
+agents:
+  - id: fixer
+    model:
+      provider: example-provider
+      name: example-model
+    humanInput:
+      answerers:
+        - role: maintainer
+      timeout: 30m
+      maxRequests: 3
+```
+
+- The runtime MUST validate the schema supplied by the agent against
+  [section 5.8.3](#583-answer-schema) and MUST reject the request (as a tool error) if it is
+  invalid or if `maxRequests` is reached.
+- A request of an agent is not an action and is not subject to permissions. The message is
+  composed by the model; the runtime MUST apply the data policy to it as to any output shown to a
+  person, and MUST show answerers that the question comes from an agent.
+- An agent without `humanInput` has no such tool. If an MCP server of the agent requests
+  elicitation, the runtime MUST decline it unless the agent has `humanInput`; with `humanInput` the
+  runtime MAY present it as a request of this section and MUST decline elicitation requests whose
+  schema does not conform to [section 5.8.3](#583-answer-schema).
+
+#### 5.8.3 Answer schema
+
+`answerSchema` is the requested-schema subset of MCP elicitation: an object with `type: object`,
+`properties` and optional `required`. Every property is a primitive field:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `type` | string | `string`, `number`, `integer` or `boolean` (REQUIRED). |
+| `title`, `description` | string | Label and help text. |
+| `enum` | list of string | Allowed values (only for `string`). |
+| `format` | string | `email`, `uri`, `date` or `date-time` (only for `string`). |
+| `minLength`, `maxLength` | integer | Length bounds for `string`. |
+| `minimum`, `maximum` | number | Bounds for `number` and `integer`. |
+
+- `required` MUST name fields of `properties`.
+- The runtime MUST validate every answer against the schema and MUST NOT accept an invalid answer.
+- Answer schemas MUST NOT ask for secrets or credentials. Secrets are declared in `spec.secrets`
+  ([section 7.9](#79-secrets)).
+
+#### 5.8.4 Answerers and lifecycle
+
+- An answer MUST come from an authenticated human actor that matches `answerers`. Agents MUST NOT
+  be able to answer, also not through tools or remote agents. Answers delivered through a chat or
+  messaging integration count only if the runtime can attribute them to such an actor.
+- When a request is created, the runtime MUST emit `input.requested`; when it is answered,
+  declined or expires, `input.provided`, `input.declined` or `input.expired`
+  ([section 10.4](#104-event-types)).
+- The answer is data of the class `classification`. Data and model policies apply to it like to
+  any other input of a model. In audit events the answer content follows the `payload` rules
+  ([section 10.2](#102-audit-configuration)): with `payload: metadata` events carry a digest of the
+  answer, not its content.
+- Waiting for an answer counts against the step `timeout` and `budget.maxDuration`.
+
 ---
 
 ## 6. Kind `Agent`
@@ -797,6 +970,7 @@ An `Agent` manifest defines a reusable agent that workflows reference with `ref`
 | `permissions` | object | no | Permissions ([section 7.5](#75-tool-governance-permissions)). |
 | `budget` | object | no | Default limits for every use of the agent. |
 | `secrets` | list | no | Secrets the agent needs ([section 7.9](#79-secrets)). |
+| `humanInput` | object | no | Lets the agent ask a person during its step ([section 5.8.2](#582-agent-requests)). |
 
 Example: [examples/invoice-extractor.agent.yaml](examples/invoice-extractor.agent.yaml).
 
@@ -1063,6 +1237,8 @@ approval:
   decision record if one exists ([section 10.6](#106-decision-trace)).
 - An **approval step** (`type: approval`) gates the steps that depend on it. It succeeds when
   approved and fails when rejected or expired.
+- An answer to a human input request ([section 5.8](#58-human-input)) MUST NOT be treated as an
+  approval, even if it comes from an approver.
 - Agents MUST NOT be able to grant approvals. An approval MUST be granted by an authenticated
   human actor.
 
@@ -1432,8 +1608,8 @@ Every audit event is an object with these fields:
 | `id` | string | yes | Unique event identifier (ULID RECOMMENDED). |
 | `type` | string | yes | Event type ([section 10.4](#104-event-types)). |
 | `time` | string | yes | RFC 3339 timestamp. |
-| `executionId` | string | yes | Execution identifier. |
-| `workflow` | object | cond. | `name`, `version`, `digest` (if known). REQUIRED in `workflow.started`. |
+| `executionId` | string | cond. | Execution identifier. REQUIRED in every event except `trigger.skipped`, which belongs to no execution. |
+| `workflow` | object | cond. | `name`, `version`, `digest` (if known). REQUIRED in `workflow.started` and `trigger.skipped`. |
 | `stepId` | string | cond. | REQUIRED for events that belong to a step. |
 | `actor` | object | yes | `type` (`agent`, `human`, `runtime`, `system`) and `id`. |
 | `environment` | string | cond. | REQUIRED in `workflow.started`. |
@@ -1451,10 +1627,10 @@ Example stream: [examples/audit-events.yaml](examples/audit-events.yaml).
 
 | Type | When | Required `data` |
 | ---- | ---- | --------------- |
-| `workflow.started` | Execution started. | `trigger`, `inputs` (values or digests per `payload`) |
+| `workflow.started` | Execution started. | `trigger` (for schedule triggers with `scheduledAt`), `inputs` (values or digests per `payload`) |
 | `workflow.completed` | All steps succeeded. | `status: succeeded`, `usage` |
 | `workflow.failed` | Execution failed. | `status: failed`, `reason`, `usage`; for budgets: `reason: budgetExceeded`, `limit` |
-| `workflow.cancelled` | Execution cancelled by an actor. | `usage` |
+| `workflow.cancelled` | Execution cancelled by an actor. | `usage`; `reason: replaced` when a schedule trigger with `concurrencyPolicy: replace` cancelled it |
 | `agent.started` | Agent step started. | `agentId`, `model` (`provider`, `name`, `version` if known) |
 | `agent.completed` | Agent step finished. | `agentId`, `status`, `usage` |
 | `agent.failed` | Agent step failed. | `agentId`, `reason` |
@@ -1469,6 +1645,11 @@ Example stream: [examples/audit-events.yaml](examples/audit-events.yaml).
 | `approval.expired` | Request expired. | `requestId` |
 | `artifact.created` | A step produced an output or artifact. | `name`, `stepId`, `classification`, `digest` or `uri`, `declassified` (boolean) |
 | `artifact.modified` | An action changed an existing artifact (for example a file in a repository). | `name` or `uri`, `digest` (if known) |
+| `trigger.skipped` | A schedule tick did not start an execution ([section 5.2](#52-triggers)). | `trigger` (index and type), `scheduledAt` (or `firstScheduledAt` and `lastScheduledAt`), `reason` (`concurrencyForbidden`, `missed`, `startingDeadlineExceeded`) |
+| `input.requested` | A human input request was created ([section 5.8](#58-human-input)). | `requestId`, `stepId`, `agentId` (agent requests), `answerers`, `expiresAt`, `message` and `answerSchema` (content or digest per `payload`) |
+| `input.provided` | An answerer provided a valid answer. | `requestId`, `answerer`, `answer` (content or digest per `payload`) |
+| `input.declined` | An answerer declined to answer. | `requestId`, `answerer` |
+| `input.expired` | The request expired. | `requestId`, `outcome` (`failed`, `defaultUsed`, `returned`) |
 
 - Under the audit profile, runtimes MUST emit all event types of this table when the
   corresponding situation occurs, in causal order within an execution.
@@ -1481,7 +1662,8 @@ AWP defines the semantics of audit events; implementations may provide tamper-ev
 
 - `hash-chain`: every event's `integrity.hash` is the digest over the JCS serialization of the
   event without `integrity.hash`, including `integrity.prev`, which is the `hash` of the previous
-  event of the same execution (empty string for the first event). Runtimes MUST provide a way to
+  event of the same execution (empty string for the first event). Events without `executionId`
+  (`trigger.skipped`) form one chain per workflow. Runtimes MUST provide a way to
   verify a chain.
 - `signed`: as `hash-chain`, and the runtime signs the chain (for example per event or per
   checkpoint) in an implementation-documented format.
@@ -1566,6 +1748,7 @@ deterministic; AWP does not require identical results on re-execution.
 | `security` | `core` | Section 9 and the security-related requirements of sections 5.6.2, 7.5 and 7.9: digest verification, at least one signature format, image pinning, isolation of command steps, network and filesystem restrictions, secret redaction. |
 | `mcp` | `core` | Sections 5.5.1-5.5.4 for `type: mcp`: MCP server declaration and resolution, tool filtering, action identifiers per tool call, `tool.*` events per MCP call. |
 | `a2a` | `core` | Section 5.4.4: remote agents, agent card verification, the action `a2a.<id>.send`, data policy checks for remote agents. |
+| `interaction` | `core` | Section 5.8: input steps, agent requests with `humanInput`, answer validation, answerer identity, `input.*` events, declining MCP elicitation that is not allowed. |
 
 ### 11.3 Conformance statement
 
@@ -1618,6 +1801,9 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
   remote agents as external parties for data policies.
 - **Secrets.** Secrets are referenced, scoped and redacted ([section 7.9](#79-secrets)); scope
   them to the smallest set of consumers.
+- **Human input.** A question composed by a model can carry data to the answerer, and an answer
+  is untrusted input to the next model invocation, like a tool result. Answers never grant
+  approvals ([section 5.8](#58-human-input)); limit agent requests with `maxRequests`.
 - **Approval fatigue.** Approval requests must carry enough context (section 7.6) for a
   meaningful decision; too many approvals reduce their value.
 - **Audit trail integrity.** Hash chains detect modification but not deletion of a whole chain;
@@ -1630,6 +1816,8 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
   retention and access model.
 - `owner.contact` and approver identities are personal data in some jurisdictions; prefer role
   and team addresses.
+- Answers to human input requests may contain personal data; set `classification` accordingly.
+  Under `payload: metadata` audit events carry only a digest of the answer.
 - Long retention periods (`retention.duration`) and data minimization requirements may conflict;
   organizations must decide based on their own requirements.
 
@@ -1654,6 +1842,8 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
 | `x-` fields in any object | Keys of an `extensions` object on the same object ([section 3.3](#33-unknown-fields-and-extensions)). |
 | `owner` as a string (shorthand for `owner.team`) | `owner` is always an object. |
 | Policy conditions: a plain value means `equals` | Always an operator object, for example `action: {equals: git.push}` ([section 8.3](#83-conditions)). |
+| `schedule` trigger: `cron` and `timezone` only | Adds `concurrencyPolicy` (default `forbid`), `startingDeadline`, rules for missed ticks and the event `trigger.skipped` ([section 5.2](#52-triggers)). |
+| Approvals are the only human interaction | Human input: input steps, agent requests, profile `interaction`, events `input.*` ([section 5.8](#58-human-input)). |
 | Digest over the whole manifest without integrity, signature and provenance | Digest over `apiVersion`, `kind`, `metadata.name` and `spec` without integrity, signature and provenance ([section 9.1](#91-manifest-digest)). |
 
 The reference checker converts a `v1alpha1` manifest mechanically:
