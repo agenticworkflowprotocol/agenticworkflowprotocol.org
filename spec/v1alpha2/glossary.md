@@ -15,6 +15,7 @@ Status: draft / alpha, non-normative. Normative definitions are in the
 | **Approval** | A decision by an authenticated human that allows a gated action or approval step to proceed. |
 | **Audit event** | A structured record of something that happened in an execution, with a standard envelope and type (`workflow.*`, `agent.*`, `tool.*`, `policy.*`, `approval.*`, `artifact.*`). |
 | **Budget** | Limits on cost, steps, duration, tokens, tool calls, retries and concurrency. |
+| **Condition** | An entry of `status.conditions` in the shape of Kubernetes `metav1.Condition` (`type`, `status`, `reason`, `message`, `lastTransitionTime`). AWP reserves `Valid`, `Ready`, `Accepted` and `Succeeded`. |
 | **Conformance profile** | A named set of requirements a runtime can implement: `core`, `governance`, `audit`, `security`, `mcp`, `a2a`. |
 | **Conformance statement** | A document published by a runtime declaring the API version and profiles it conforms to and its limitations. |
 | **Data class** | One of `public`, `internal`, `confidential`, `personal`, `restricted`, `sensitive`, `secret`; an organizational vocabulary, not a legal definition. |
@@ -22,14 +23,15 @@ Status: draft / alpha, non-normative. Normative definitions are in the
 | **Decision record** | A structured explanation of a consequential action in terms of evidence and policy checks. Not chain-of-thought. |
 | **Digest** | `<algorithm>:<hex>` hash, for manifests computed over the JCS serialization without integrity, signature and provenance fields. |
 | **Environment** | The organizational context of an execution (for example `development`, `staging`, `production`) with its own autonomy level. |
-| **Execution** | One run of a workflow, identified by an execution identifier (`awp-exec-<ULID>`). |
+| **Execution** | One run of a workflow, identified by an execution identifier (`awp-exec-<ULID>`). Exposed as a `WorkflowRun` by runtimes with an object store. |
 | **Expression** | `${{ ... }}` reference to an input, a step output or execution facts in expression-enabled fields. |
 | **Fail closed** | Rejecting or denying when something cannot be verified or determined, instead of proceeding. |
-| **Kind** | The type of a manifest: `Workflow`, `Agent` or `Policy`. |
+| **Kind** | The type of an object: the manifest kinds `Workflow`, `Agent` and `Policy`, and the execution object `WorkflowRun`. |
 | **Manifest** | An AWP document with `apiVersion`, `kind`, `metadata`, `spec` and, when read from an object store, `status`. |
 | **Object store** | A store that holds manifests as objects identified by API group, kind, namespace and name, for example the Kubernetes API server or a database of a runtime. |
 | **MCP** | Model Context Protocol for connecting agents to tools and resources. AWP references MCP servers as tool sources. |
 | **Permissions** | The `permissions` object that grants or denies actions and restricts network, filesystem, secrets and environments. Permissions grant; policies only restrict. |
+| **Pinning** | An execution uses the workflow, agent and policy manifests it resolved at its start until it ends; later changes do not affect it. |
 | **Policy** | A rule set that denies operations or requires approval under conditions. Also the kind `Policy`. |
 | **Policy shorthand** | Well-known policy settings in `spec.policies` (`git`, `pullRequest`, `merge`, `production`) that expand to deny rules. |
 | **Remote agent** | An agent run by another system and reached through A2A. |
@@ -39,6 +41,8 @@ Status: draft / alpha, non-normative. Normative definitions are in the
 | **Secret reference** | `secretRef: <name>`: a pointer to a secret declared in `spec.secrets`. Secret values never appear in manifests. |
 | **Separation of duties** | Rules that prevent the same human from both initiating or performing and approving an action. |
 | **Step** | A node of the workflow graph: `agent`, `command` or `approval`. |
+| **Step output** | A declared value a step produces: a file in `$AWP_OUTPUTS` for command steps, a parameter of `complete_step` for agent steps. |
 | **Tool source** | An entry in an agent's `tools`: an MCP server (`type: mcp`) or a runtime built-in (`type: builtin`). |
 | **Well-known action** | Reserved action identifiers with defined meaning, for example `git.merge`, `production.deploy`, `external.communication`. |
 | **Workflow** | The kind `Workflow`: agents, tools, steps, limits and governance of a unit of agentic work. |
+| **WorkflowRun** | The kind for one execution as an object: a request with `workflowRef`, inputs and environment, and a status written by the runtime. Not covered by digests or signatures. |

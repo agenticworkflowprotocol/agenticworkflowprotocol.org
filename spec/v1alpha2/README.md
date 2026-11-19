@@ -15,7 +15,11 @@
 > fields move from `metadata` to `spec`, extension fields move into `extensions` objects, and
 > `status` is reserved for runtimes. It also contains the schedule semantics and the human input
 > proposed in [aep/0000-schedule-semantics.md](../../aep/0000-schedule-semantics.md) and
-> [aep/0000-human-input.md](../../aep/0000-human-input.md) (Draft, not accepted). Every field, every semantic rule and every conformance
+> [aep/0000-human-input.md](../../aep/0000-human-input.md), the step output interface of
+> [aep/0000-step-outputs.md](../../aep/0000-step-outputs.md), the kind `WorkflowRun` and status
+> conditions of [aep/0000-workflow-run-and-status.md](../../aep/0000-workflow-run-and-status.md) and
+> the pinning of executions of [aep/0000-execution-pinning.md](../../aep/0000-execution-pinning.md)
+> (all Draft, not accepted). Every field, every semantic rule and every conformance
 > requirement in this document may change incompatibly in a later alpha version. Implementations
 > SHOULD NOT rely on `v1alpha2` for production interoperability. No implementation is conformant
 > to this version at the time of writing. Changes from `v1alpha1` are listed in
@@ -131,7 +135,7 @@ YAML documents separated by `---`; each document is an independent manifest.
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
 | `apiVersion` | string | yes | MUST be `awp.agenticworkflowprotocol.org/v1alpha2` for this version. |
-| `kind` | string | yes | One of `Workflow`, `Agent`, `Policy`. |
+| `kind` | string | yes | One of `Workflow`, `Agent`, `Policy`, `WorkflowRun`. |
 | `metadata` | object | yes | Object identity: name, namespace, labels and annotations ([section 4.1](#41-metadata)). |
 | `spec` | object | yes | Desired state written by the author: the common fields of [section 4.2](#42-common-spec-fields) and the kind-specific content. |
 | `status` | object | no | Observed state, written by a runtime or an object store. Reserved. |
@@ -139,6 +143,11 @@ YAML documents separated by `---`; each document is an independent manifest.
 A manifest has no other top-level fields. This is the structure of a Kubernetes resource, so that
 a manifest can be stored unchanged as a Kubernetes custom resource or in any other object store
 ([section 3.10](#310-object-stores-and-kubernetes)).
+
+`Workflow`, `Agent` and `Policy` are written by authors, versioned and covered by digests and
+signatures. `WorkflowRun` is an execution object ([section 10.8](#108-kind-workflowrun)): it
+requests and reports one execution, has none of the common spec fields of
+[section 4.2](#42-common-spec-fields), and is not covered by digests or signatures.
 
 ```yaml
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
@@ -166,7 +175,7 @@ MUST reject a manifest whose `kind` they do not support.
 `status` is reserved for the runtime or object store that holds the manifest. Authors do not write
 it. Validators MUST ignore `status` and MUST NOT reject a manifest because of its content, so that
 a manifest read back from an object store stays valid. `status` is not covered by the digest
-([section 9.1](#91-manifest-digest)). Runtimes MUST NOT derive a governance decision from the
+([section 9.1](#91-manifest-digest)). Its shape is described in [section 3.11](#311-status). Runtimes MUST NOT derive a governance decision from the
 `status` of a manifest that they did not write themselves.
 
 ### 3.3 Unknown fields and extensions
@@ -286,7 +295,7 @@ with Kubernetes semantics.
   and ignore these fields. They are not covered by the digest.
 - **Kubernetes binding.** Each kind is a namespaced custom resource of the API group
   `awp.agenticworkflowprotocol.org`, version `v1alpha2`, with the plural names `workflows`,
-  `agents` and `policies` and a `status` subresource. The repository publishes
+  `agents`, `policies` and `workflowruns` and a `status` subresource. The repository publishes
   CustomResourceDefinitions generated from the JSON Schema ([schema/crd/](../../schema/crd/)).
   The JSON Schema stays normative.
 - A Kubernetes structural schema cannot express every rule of the JSON Schema (conditional fields,
@@ -301,6 +310,51 @@ with Kubernetes semantics.
   author instead of being stored or dropped.
 - A runtime MUST NOT modify the `spec` of a manifest. Observed state belongs in `status` or in
   other objects.
+
+### 3.11 Status
+
+`status` is optional. A runtime that writes it SHOULD use the shapes of this section and of
+[section 10.8](#108-kind-workflowrun), so that tools can read the state of any runtime in the same
+way. The JSON Schema defines them as `StatusCondition`, `ManifestStatus` and `WorkflowRunStatus`.
+Validators still ignore `status` ([section 3.2](#32-top-level-structure)).
+
+**Conditions.** `status.conditions` is a list of objects in the shape of Kubernetes
+`metav1.Condition`. The `type` of each entry is unique within the list.
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `type` | string | yes | Condition type in CamelCase, optionally with a DNS subdomain prefix (`runtime.example.com/Bound`). |
+| `status` | string | yes | `True`, `False` or `Unknown`. |
+| `reason` | string | yes | Machine-readable reason in CamelCase, for example `SchemaInvalid`. |
+| `message` | string | yes | Human-readable detail; MAY be empty. MUST NOT contain secret values. |
+| `lastTransitionTime` | timestamp | yes | When `status` last changed. |
+| `observedGeneration` | integer | no | The `metadata.generation` the condition was computed for. |
+
+**Manifest status.** On `Workflow`, `Agent` and `Policy`, a runtime SHOULD write:
+
+- `observedGeneration`: the `metadata.generation` it last processed, where the object store has
+  generations.
+- `digest`: the digest it computed for the manifest ([section 9.1](#91-manifest-digest)).
+- Condition `Valid`: `True` with reason `Validated` if the manifest passed every rule of this
+  document that applies to the runtime's supported profiles; otherwise `False` with one of the
+  reasons `ApiVersionUnsupported`, `SchemaInvalid`, `SemanticInvalid`, `ProfileUnsupported`,
+  `DigestMismatch` or `SignatureInvalid`. The message SHOULD name the first diagnostic (code and
+  path).
+- Condition `Ready`: `True` if the object can be used now: for a `Workflow`, executions can start
+  (valid, references resolved, policies loaded, triggers registered); for an `Agent` or `Policy`,
+  workflows can use it. Otherwise `False` with a reason, for example `Invalid`,
+  `ReferenceUnresolved`, `PolicyUnavailable` or `EnvironmentNotAllowed`.
+
+Rules:
+
+- The condition types `Valid`, `Ready`, `Accepted` and `Succeeded` without prefix are reserved for
+  AWP. Other condition types of a runtime MUST carry a DNS subdomain prefix that the runtime
+  controls.
+- `status` is a view for people and tools. It is not an audit record (the events of
+  [section 10](#10-execution-audit-and-traceability) are), and runtimes MUST NOT derive a
+  governance decision from a `status` they did not write ([section 3.2](#32-top-level-structure)).
+- The generated CustomResourceDefinitions type `status` with these shapes and show `Valid` and
+  `Ready` as columns of `kubectl get`.
 
 ---
 
@@ -709,7 +763,7 @@ actionGroups:
 | `dependsOn` | list of string | no | Step identifiers that MUST complete successfully before this step starts. |
 | `timeout` | duration | no | Maximum wall-clock time of the step. |
 | `retries` | integer | no | Number of retries after a failure. Default `0`. MUST NOT exceed `budget.resources.maxRetries` if set. |
-| `outputs` | list | no | Declared outputs: `name` (REQUIRED), `classification` (OPTIONAL), `description` (OPTIONAL). |
+| `outputs` | list | no | Declared outputs: `name` (REQUIRED, `^[A-Za-z_][A-Za-z0-9_]{0,62}$`, also the file name of [section 5.6.4](#564-step-outputs)), `classification` (OPTIONAL), `description` (OPTIONAL). |
 | `budget` | object | no | Step-level limits; can only restrict the workflow budget. |
 
 Fields per type:
@@ -771,16 +825,81 @@ workflow:
 3. Ready steps MAY run concurrently, limited by `budget.resources.maxConcurrency` (default `1`).
    When several steps are ready and concurrency is limited, the runtime SHOULD start them in the
    order in which they appear in `spec.workflow`.
-4. Step statuses are `pending`, `running`, `waitingForApproval`, `succeeded`, `failed`,
-   `skipped` and `cancelled`. If a step fails (after its retries), all steps that depend on it
+4. Step statuses are `pending`, `running`, `waitingForApproval`, `waitingForInput`, `succeeded`,
+   `failed`, `skipped` and `cancelled`. If a step fails (after its retries), all steps that depend on it
    directly or transitively MUST get the status `skipped`.
-5. An **agent step** runs the agent with its task until the agent signals completion, a limit is
+5. An **agent step** runs the agent with its task until the agent signals completion
+   ([section 5.6.4](#564-step-outputs)), a limit is
    reached or the step times out. During the step, the agent MAY call the tools exposed to it;
    each call is an action.
 6. An execution **succeeds** if every step has the status `succeeded`. Otherwise it fails. An
    execution is **cancelled** if it was stopped by an actor before completion.
 7. Outputs of a step are available to dependent steps through expressions. Outputs that are not
-   declared in `outputs` MUST NOT be referenced.
+   declared in `outputs` MUST NOT be referenced. How steps produce outputs is defined in
+   [section 5.6.4](#564-step-outputs).
+
+#### 5.6.4 Step outputs
+
+A step produces the values of its declared `outputs` in a way that does not depend on the
+runtime, so that a command image or an agent prompt works on every runtime.
+
+**Command steps.**
+
+- Before the command starts, the runtime creates an empty directory that only this attempt of the
+  step can write, and passes its absolute path in the environment variable `AWP_OUTPUTS`. The
+  directory is writable even if `permissions.filesystem` does not list it.
+- To produce an output, the command writes a regular file named exactly like the output into that
+  directory, for example `"$AWP_OUTPUTS/report"`. The value is the content of the file as UTF-8
+  text; one trailing line feed is removed. A file that is not valid UTF-8 fails the step with the
+  reason `outputInvalid`.
+- After the command has exited with status `0`, the runtime reads the files of the declared
+  outputs. It MUST NOT follow symbolic links. Files and directories with other names are ignored;
+  the runtime SHOULD warn about them.
+- The runtime also sets `AWP_EXECUTION_ID` ([section 10.1](#101-execution-identity)), `AWP_STEP_ID`
+  and `AWP_ATTEMPT` (starting at `1`). Names with the prefix `AWP_` are reserved for the runtime;
+  `env` MUST NOT define them.
+- Standard output and standard error are logs, not outputs.
+
+```yaml
+- id: count
+  type: command
+  image: registry.example.com/tools/diff@sha256:...
+  command: ./diff.sh > "$AWP_OUTPUTS/new" && wc -l < "$AWP_OUTPUTS/new" > "$AWP_OUTPUTS/count"
+  dependsOn:
+    - collect
+  outputs:
+    - name: new
+    - name: count
+```
+
+**Agent steps.**
+
+- The runtime MUST offer the agent a way to end its step together with the values of the declared
+  outputs. It SHOULD be a built-in tool named `complete_step` with one string parameter per
+  declared output, described by the output's `description`. Like the tool for human input
+  ([section 5.8.2](#582-agent-requests)), it is not an action: permissions and policies do not
+  apply to it and it is not listed in `tools`.
+- If an agent step declares outputs and the agent ends without completing the step, the step fails
+  with the reason `notCompleted`. A step without outputs is also completed when the agent ends its
+  turn without a tool call.
+- A runtime MAY accept other completion formats (for example a structured final message) and
+  documents them; prompts that rely on them are not portable.
+
+**Input steps** provide the output `answer` ([section 5.8](#58-human-input)). Approval steps
+produce no outputs.
+
+**All steps.**
+
+- A runtime MUST accept outputs of at least 256 KiB each and 1 MiB per step in total. It MAY
+  accept more and states its limits in the conformance statement
+  ([section 11.3](#113-conformance-statement)). A larger output fails the step with the reason
+  `outputTooLarge`; the runtime MUST NOT truncate it.
+- A declared output that the step did not produce has no value. Referencing it is an evaluation
+  error; the step that did not produce it still succeeds.
+- Outputs of an attempt that fails, times out or is cancelled are discarded. Only the outputs of
+  the successful attempt are available to dependent steps.
+- Each produced output is recorded as `artifact.created` with its digest, and with its content only
+  under `payload: full` ([section 10.4](#104-event-types)).
 
 ### 5.7 Budgets and resources
 
@@ -1577,6 +1696,29 @@ The dependencies of a workflow are: referenced `Agent` and `Policy` manifests, p
 Every execution MUST have an execution identifier that is unique within the runtime. It SHOULD
 have the form `awp-exec-<ULID>`.
 
+**Pinning.** An execution is pinned to the manifests it started with:
+
+- When an execution starts, the runtime resolves the workflow manifest, every referenced `Agent`
+  manifest ([section 5.4.2](#542-agent-references)) and every `Policy` that applies
+  ([section 8.2](#82-kind-policy)), validates them and computes the workflow digest
+  ([section 9.1](#91-manifest-digest)). The execution uses exactly these versions until it ends,
+  including retries and steps that wait for an approval or an answer.
+- A change or deletion of one of these manifests MUST NOT change a running execution: it neither
+  picks up new content nor mixes old and new versions. The runtime MUST keep the pinned manifests,
+  or be able to retrieve them by digest, until the execution ends.
+- A runtime MAY cancel running executions when a pinned manifest changes or is deleted, for example
+  to apply a tightened policy at once. It cancels as actor `system` with `workflow.cancelled` and
+  `reason: manifestChanged`.
+- `workflow.started` MUST carry `workflow.digest` ([section 10.3](#103-event-envelope)). The
+  reproducibility record ([section 10.7](#107-reproducibility-record)) lists the digests of all
+  pinned manifests.
+- A new execution, including one started by the next schedule tick, uses the manifests that are
+  current when it starts.
+- A request MAY assert the version it expects: if a `WorkflowRun`
+  ([section 10.8](#108-kind-workflowrun)) names `workflowRef.version` or `workflowRef.digest` and
+  the current workflow does not match, the runtime MUST reject the request with the reason
+  `versionMismatch` or `digestMismatch` instead of running another version.
+
 ### 10.2 Audit configuration
 
 ```yaml
@@ -1609,7 +1751,7 @@ Every audit event is an object with these fields:
 | `type` | string | yes | Event type ([section 10.4](#104-event-types)). |
 | `time` | string | yes | RFC 3339 timestamp. |
 | `executionId` | string | cond. | Execution identifier. REQUIRED in every event except `trigger.skipped`, which belongs to no execution. |
-| `workflow` | object | cond. | `name`, `version`, `digest` (if known). REQUIRED in `workflow.started` and `trigger.skipped`. |
+| `workflow` | object | cond. | `name`, `version`, `digest`. REQUIRED in `workflow.started` (with `digest`, [section 10.1](#101-execution-identity)) and in `trigger.skipped` (`digest` if known). |
 | `stepId` | string | cond. | REQUIRED for events that belong to a step. |
 | `actor` | object | yes | `type` (`agent`, `human`, `runtime`, `system`) and `id`. |
 | `environment` | string | cond. | REQUIRED in `workflow.started`. |
@@ -1630,7 +1772,7 @@ Example stream: [examples/audit-events.yaml](examples/audit-events.yaml).
 | `workflow.started` | Execution started. | `trigger` (for schedule triggers with `scheduledAt`), `inputs` (values or digests per `payload`) |
 | `workflow.completed` | All steps succeeded. | `status: succeeded`, `usage` |
 | `workflow.failed` | Execution failed. | `status: failed`, `reason`, `usage`; for budgets: `reason: budgetExceeded`, `limit` |
-| `workflow.cancelled` | Execution cancelled by an actor. | `usage`; `reason: replaced` when a schedule trigger with `concurrencyPolicy: replace` cancelled it |
+| `workflow.cancelled` | Execution cancelled by an actor. | `usage`; `reason: replaced` when a schedule trigger with `concurrencyPolicy: replace` cancelled it; `reason: manifestChanged` when a pinned manifest changed ([section 10.1](#101-execution-identity)) |
 | `agent.started` | Agent step started. | `agentId`, `model` (`provider`, `name`, `version` if known) |
 | `agent.completed` | Agent step finished. | `agentId`, `status`, `usage` |
 | `agent.failed` | Agent step failed. | `agentId`, `reason` |
@@ -1726,6 +1868,89 @@ Example: [examples/execution-record.yaml](examples/execution-record.yaml).
 Reproducibility here means *traceability of what ran*. Model outputs are in general not
 deterministic; AWP does not require identical results on re-execution.
 
+### 10.8 Kind `WorkflowRun`
+
+A `WorkflowRun` is one execution of a workflow as an object. Clients request an execution and read
+its state in the same object store as the manifests, for example with `kubectl create` and
+`kubectl get workflowruns`. A runtime that exposes executions as objects MUST use this kind; a
+runtime without an object store MAY offer the same shape through its API. The audit events of this
+section remain the record of what happened; a `WorkflowRun` is a view of it.
+
+```yaml
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+kind: WorkflowRun
+metadata:
+  generateName: vulnerability-fixer-
+  namespace: security
+spec:
+  workflowRef:
+    name: vulnerability-fixer
+    version: 0.1.0
+  inputs:
+    cve: CVE-2026-12345
+    repository: example-org/web-shop
+  environment: development
+```
+
+A complete example with the status written by a runtime:
+[examples/vulnerability-fixer.run.yaml](examples/vulnerability-fixer.run.yaml).
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `metadata` | object | yes | As in [section 4.1](#41-metadata); a client MAY set `generateName` (prefix of a name the object store generates) instead of `name`. |
+| `spec.workflowRef` | object | yes | `name` (REQUIRED) of a `Workflow` in the same namespace; `version` and `digest` (OPTIONAL) are assertions ([section 10.1](#101-execution-identity)), not selectors. |
+| `spec.inputs` | object | no | Input values ([section 5.3](#53-inputs)). |
+| `spec.environment` | string | no | Target environment ([section 7.10](#710-environments)). |
+| `spec.cancel` | boolean | no | `true` requests cancellation of the execution. |
+| `spec.extensions` | object | no | Extension fields ([section 3.3](#33-unknown-fields-and-extensions)). |
+| `status` | object | no | Written by the runtime, see below. |
+
+A `WorkflowRun` has none of the common spec fields of [section 4.2](#42-common-spec-fields) and no
+digest or signature: governance belongs to the workflow it runs.
+
+Rules:
+
+- **Starting.** A `WorkflowRun` created by a client is a `manual` start
+  ([section 5.2](#52-triggers)). Every rule for manual starts applies: the workflow MUST allow
+  manual starts, inputs are validated, environment rules and policies apply. The actor is the
+  identity that created the object. The runtime MUST take this identity from an authenticated
+  source (for example the request information of a validating admission webhook or the audit log
+  of the object store), never from a field the client wrote; if it cannot determine it, it MUST
+  reject the request.
+- A `WorkflowRun` starts at most one execution. Changes to `spec` after the start have no effect,
+  except `cancel`; runtimes SHOULD reject them on write.
+- **Runtime-created runs.** For `schedule` and `event` triggers, a runtime that exposes executions
+  as objects creates the `WorkflowRun` itself and records the trigger in `status.trigger`.
+- **Rejection.** If a request cannot start (for example invalid inputs, a version mismatch, no
+  `manual` trigger, a policy denial), the runtime sets `status.phase: rejected` with a reason and
+  starts nothing. A rejected request emits no `workflow.started`.
+- **Cancellation.** `spec.cancel: true` cancels the execution on behalf of the identity that set
+  it, determined as for starting. Deleting a running `WorkflowRun` SHOULD cancel the execution (for
+  example through a finalizer); it MUST NOT delete audit events.
+- **Retention.** A runtime MAY delete finished `WorkflowRun` objects after a documented time. Audit
+  retention ([section 10.2](#102-audit-configuration)) does not depend on it.
+
+**Status.** A runtime writes `status` in this shape (`WorkflowRunStatus` in the JSON Schema):
+
+| Field | Description |
+| ----- | ----------- |
+| `executionId` | Execution identifier ([section 10.1](#101-execution-identity)). |
+| `phase` | `pending`, `running`, `succeeded`, `failed`, `cancelled` or `rejected`. |
+| `reason`, `message` | Why the execution ended or was rejected, for example `budgetExceeded` or `versionMismatch`. |
+| `actor` | Who started it: `type` and `id` as in [section 10.3](#103-event-envelope). |
+| `trigger` | `type`, `index` of the trigger entry, `scheduledAt` for schedule triggers. |
+| `environment` | Effective environment. |
+| `workflow` | `name`, `version` and `digest` of the pinned manifest ([section 10.1](#101-execution-identity)). |
+| `startedAt`, `finishedAt` | Timestamps. |
+| `steps` | Per step: `id`, `status` ([section 5.6.3](#563-execution-model)), `attempts`, `startedAt`, `finishedAt`, `reason`, `message`, `outputs` (`name`, `digest`, `size`, `classification`; never the value). |
+| `usage` | As in `workflow.completed` ([section 10.4](#104-event-types)). |
+| `conditions` | Conditions ([section 3.11](#311-status)): `Accepted` (request validated and admitted) and `Succeeded` (`Unknown` while running). |
+| `observedGeneration` | As in [section 3.11](#311-status). |
+
+- Everyone who can read the object can read `status` and `spec.inputs`. `status` MUST NOT contain
+  secret values or the content of outputs, prompts or tool results. Classified input values SHOULD
+  be passed as references.
+
 ---
 
 ## 11. Conformance
@@ -1742,7 +1967,7 @@ deterministic; AWP does not require identical results on re-execution.
 
 | Profile | Depends on | Requirements |
 | ------- | ---------- | ------------ |
-| `core` | - | Sections 3, 4, 5 (except 5.4.4 and the MCP-specific parts of 5.5), 6, 7.5 (permissions, incl. resource scopes), 7.9 (secrets), 9.1 (manifest digest), 10.1. Parse and validate manifests, fail closed on unknown fields and unsupported profiles, validate inputs, execute the step graph, enforce budgets and permissions, support the `manual` trigger, emit `workflow.*` events to a log. |
+| `core` | - | Sections 3, 4, 5 (except 5.4.4 and the MCP-specific parts of 5.5), 6, 7.5 (permissions, incl. resource scopes), 7.9 (secrets), 9.1 (manifest digest), 10.1 (including pinning), 10.8 (if executions are exposed as objects). Parse and validate manifests, fail closed on unknown fields and unsupported profiles, validate inputs, execute the step graph, enforce budgets and permissions, support the `manual` trigger, emit `workflow.*` events to a log. |
 | `governance` | `core` | Sections 7.1-7.4, 7.6-7.8, 7.10 and 8: ownership and classification rules, data classification and residency, model policy, human approval, risk levels, separation of duties, environments, policy shorthands, `Policy` manifests and the decision algorithm. |
 | `audit` | `core` | Section 10: event envelope, all event types, `payload` modes, integrity modes `none` and `hash-chain`, decision records, reproducibility records. |
 | `security` | `core` | Section 9 and the security-related requirements of sections 5.6.2, 7.5 and 7.9: digest verification, at least one signature format, image pinning, isolation of command steps, network and filesystem restrictions, secret redaction. |
@@ -1767,8 +1992,16 @@ conformance:
     - audit
   limitations:
     - "audit: integrity mode signed is not supported; hash-chain only"
+  limits:
+    outputSize: 1MiB
+    stepOutputSize: 4MiB
+  executionObjects: true
 ```
 
+- `limits` (OPTIONAL) states limits above the minimums of this document: `outputSize` and
+  `stepOutputSize` ([section 5.6.4](#564-step-outputs)).
+- `executionObjects` (OPTIONAL, default `false`) states that the runtime exposes executions as
+  `WorkflowRun` objects ([section 10.8](#108-kind-workflowrun)).
 - `limitations` MUST list every OPTIONAL feature of a claimed profile that is not supported.
 - `testedWith` (OPTIONAL) names the conformance test suite, its version and the date of the run.
 - A runtime MUST NOT claim a profile of which it does not meet every MUST requirement.
@@ -1804,6 +2037,16 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
 - **Human input.** A question composed by a model can carry data to the answerer, and an answer
   is untrusted input to the next model invocation, like a tool result. Answers never grant
   approvals ([section 5.8](#58-human-input)); limit agent requests with `maxRequests`.
+- **Starting executions through objects.** Whoever can create `WorkflowRun` objects can start
+  executions within the limits of the workflow's `manual` trigger; restrict it with the access
+  control of the object store. The actor is the authenticated creator, never a field of the object
+  ([section 10.8](#108-kind-workflowrun)).
+- **Changes during an execution.** Executions are pinned to the manifests they started with
+  ([section 10.1](#101-execution-identity)), so a deployment tool that syncs a manifest cannot
+  change a running execution. A tightened policy applies to running executions only if the runtime
+  cancels them.
+- **Output files.** Runtimes read output files as text with a size limit and do not follow
+  symbolic links ([section 5.6.4](#564-step-outputs)).
 - **Approval fatigue.** Approval requests must carry enough context (section 7.6) for a
   meaningful decision; too many approvals reduce their value.
 - **Audit trail integrity.** Hash chains detect modification but not deletion of a whole chain;
@@ -1816,6 +2059,8 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
   retention and access model.
 - `owner.contact` and approver identities are personal data in some jurisdictions; prefer role
   and team addresses.
+- Input values in `WorkflowRun.spec.inputs` and the status of a `WorkflowRun` are readable by
+  everyone who can read the object; pass classified values as references.
 - Answers to human input requests may contain personal data; set `classification` accordingly.
   Under `payload: metadata` audit events carry only a digest of the answer.
 - Long retention periods (`retention.duration`) and data minimization requirements may conflict;
@@ -1844,6 +2089,9 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
 | Policy conditions: a plain value means `equals` | Always an operator object, for example `action: {equals: git.push}` ([section 8.3](#83-conditions)). |
 | `schedule` trigger: `cron` and `timezone` only | Adds `concurrencyPolicy` (default `forbid`), `startingDeadline`, rules for missed ticks and the event `trigger.skipped` ([section 5.2](#52-triggers)). |
 | Approvals are the only human interaction | Human input: input steps, agent requests, profile `interaction`, events `input.*` ([section 5.8](#58-human-input)). |
+| `outputs[].name`: any string; how a step produces outputs is undefined | Names match `^[A-Za-z_][A-Za-z0-9_]{0,62}$`; command steps write files to `$AWP_OUTPUTS`, agent steps complete with `complete_step`, minimum sizes, outputs of failed attempts are discarded ([section 5.6.4](#564-step-outputs)). |
+| Executions are not objects; the shape of `status` is undefined | Kind `WorkflowRun` ([section 10.8](#108-kind-workflowrun)), status conditions `Valid` and `Ready` ([section 3.11](#311-status)), step status `waitingForInput`. |
+| No rule for manifest changes during an execution | Executions are pinned to their manifests; `workflow.digest` is REQUIRED in `workflow.started` ([section 10.1](#101-execution-identity)). |
 | Digest over the whole manifest without integrity, signature and provenance | Digest over `apiVersion`, `kind`, `metadata.name` and `spec` without integrity, signature and provenance ([section 9.1](#91-manifest-digest)). |
 
 The reference checker converts a `v1alpha1` manifest mechanically:

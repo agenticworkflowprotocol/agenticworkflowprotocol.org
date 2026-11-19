@@ -38,6 +38,9 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0000](../aep/0000-kubernetes-resource-model.md) | Kubernetes resource model alignment (number to be assigned) | Draft | proposed for `v1alpha2` |
 | [0000](../aep/0000-schedule-semantics.md) | Schedule semantics: overlap and missed ticks (number to be assigned) | Draft | proposed for `v1alpha2` |
 | [0000](../aep/0000-human-input.md) | Human input during an execution (number to be assigned) | Draft | proposed for `v1alpha2` |
+| [0000](../aep/0000-step-outputs.md) | Step output interface (number to be assigned) | Draft | proposed for `v1alpha2` |
+| [0000](../aep/0000-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions (number to be assigned) | Draft | proposed for `v1alpha2` |
+| [0000](../aep/0000-execution-pinning.md) | Pinning an execution to its manifests (number to be assigned) | Draft | proposed for `v1alpha2` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

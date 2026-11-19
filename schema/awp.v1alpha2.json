@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://agenticworkflowprotocol.org/schema/awp.v1alpha2.json",
   "title": "Agentic Workflow Protocol manifest (v1alpha2)",
-  "description": "Structural rules of AWP v1alpha2 (spec/v1alpha2/README.md). Rules that JSON Schema cannot express are listed in schema/README.md as semantic validation rules. Per-kind entry points: #/$defs/Workflow, #/$defs/Agent, #/$defs/Policy.",
+  "description": "Structural rules of AWP v1alpha2 (spec/v1alpha2/README.md). Rules that JSON Schema cannot express are listed in schema/README.md as semantic validation rules. Per-kind entry points: #/$defs/Workflow, #/$defs/Agent, #/$defs/Policy, #/$defs/WorkflowRun.",
   "type": "object",
   "required": [
     "kind"
@@ -12,7 +12,8 @@
       "enum": [
         "Workflow",
         "Agent",
-        "Policy"
+        "Policy",
+        "WorkflowRun"
       ]
     }
   },
@@ -60,6 +61,21 @@
       },
       "then": {
         "$ref": "#/$defs/Policy"
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "WorkflowRun"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "$ref": "#/$defs/WorkflowRun"
       }
     }
   ],
@@ -1286,8 +1302,9 @@
             "type": "object",
             "properties": {
               "name": {
+                "description": "Output name (spec 5.6.1). Also the file name in $AWP_OUTPUTS (spec 5.6.4).",
                 "type": "string",
-                "minLength": 1
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,62}$"
               },
               "classification": {
                 "$ref": "#/$defs/Classification"
@@ -2941,7 +2958,7 @@
           "$ref": "#/$defs/WorkflowSpec"
         },
         "status": {
-          "description": "Reserved for the runtime or object store (spec 3.2). Ignored by validators and excluded from the digest.",
+          "description": "Written by the runtime or object store (shape: ManifestStatus, spec 3.11). Ignored by validators and excluded from the digest (spec 3.2).",
           "type": "object"
         }
       },
@@ -2970,7 +2987,7 @@
           "$ref": "#/$defs/AgentSpec"
         },
         "status": {
-          "description": "Reserved for the runtime or object store (spec 3.2). Ignored by validators and excluded from the digest.",
+          "description": "Written by the runtime or object store (shape: ManifestStatus, spec 3.11). Ignored by validators and excluded from the digest (spec 3.2).",
           "type": "object"
         }
       },
@@ -2999,7 +3016,7 @@
           "$ref": "#/$defs/PolicySpec"
         },
         "status": {
-          "description": "Reserved for the runtime or object store (spec 3.2). Ignored by validators and excluded from the digest.",
+          "description": "Written by the runtime or object store (shape: ManifestStatus, spec 3.11). Ignored by validators and excluded from the digest (spec 3.2).",
           "type": "object"
         }
       },
@@ -3204,6 +3221,410 @@
       },
       "required": [
         "answerers"
+      ],
+      "additionalProperties": false
+    },
+    "Timestamp": {
+      "description": "RFC 3339 timestamp (spec 3.7).",
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?([Zz]|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "StatusCondition": {
+      "description": "A status condition in the shape of Kubernetes metav1.Condition (spec 3.11).",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "maxLength": 316,
+          "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
+        },
+        "status": {
+          "enum": [
+            "True",
+            "False",
+            "Unknown"
+          ]
+        },
+        "observedGeneration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "lastTransitionTime": {
+          "description": "When status last changed (RFC 3339).",
+          "$ref": "#/$defs/Timestamp"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1024,
+          "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 32768
+        }
+      },
+      "required": [
+        "type",
+        "status",
+        "lastTransitionTime",
+        "reason",
+        "message"
+      ]
+    },
+    "ManifestStatus": {
+      "description": "Status a runtime writes on a Workflow, Agent or Policy (spec 3.11). Validators ignore it (spec 3.2).",
+      "type": "object",
+      "properties": {
+        "observedGeneration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "digest": {
+          "description": "Digest of the manifest as the runtime validated it (spec 9.1).",
+          "$ref": "#/$defs/Digest"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatusCondition"
+          }
+        }
+      }
+    },
+    "WorkflowRunStatus": {
+      "description": "Status a runtime writes on a WorkflowRun (spec 10.8). Validators ignore it (spec 3.2).",
+      "type": "object",
+      "properties": {
+        "observedGeneration": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "executionId": {
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "pending",
+            "running",
+            "succeeded",
+            "failed",
+            "cancelled",
+            "rejected"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "human",
+                "system",
+                "runtime",
+                "agent"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "trigger": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "manual",
+                "schedule",
+                "event"
+              ]
+            },
+            "index": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "scheduledAt": {
+              "description": "Tick time for schedule triggers.",
+              "$ref": "#/$defs/Timestamp"
+            }
+          }
+        },
+        "environment": {
+          "type": "string"
+        },
+        "workflow": {
+          "description": "The manifest the execution is pinned to (spec 10.1).",
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/ObjectName"
+            },
+            "version": {
+              "$ref": "#/$defs/SemVer"
+            },
+            "digest": {
+              "$ref": "#/$defs/Digest"
+            }
+          }
+        },
+        "startedAt": {
+          "description": "Start of the execution.",
+          "$ref": "#/$defs/Timestamp"
+        },
+        "finishedAt": {
+          "description": "End of the execution.",
+          "$ref": "#/$defs/Timestamp"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/Identifier"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "running",
+                  "waitingForApproval",
+                  "waitingForInput",
+                  "succeeded",
+                  "failed",
+                  "skipped",
+                  "cancelled"
+                ]
+              },
+              "attempts": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "startedAt": {
+                "description": "Start of the first attempt.",
+                "$ref": "#/$defs/Timestamp"
+              },
+              "finishedAt": {
+                "description": "End of the last attempt.",
+                "$ref": "#/$defs/Timestamp"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "outputs": {
+                "description": "Produced outputs. Values are not stored in status, only references.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "digest": {
+                      "$ref": "#/$defs/Digest"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "classification": {
+                      "$ref": "#/$defs/Classification"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        "usage": {
+          "description": "Usage as in workflow.completed (spec 5.7, 10.4).",
+          "type": "object"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatusCondition"
+          }
+        }
+      }
+    },
+    "RunMetadata": {
+      "description": "Metadata of a WorkflowRun (spec 10.8): as Metadata, but a client MAY set generateName instead of name.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/ObjectName"
+        },
+        "namespace": {
+          "$ref": "#/$defs/ObjectName"
+        },
+        "labels": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?[A-Za-z0-9]([-A-Za-z0-9_.]{0,61}[A-Za-z0-9])?$",
+            "maxLength": 316
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?$",
+            "maxLength": 63
+          }
+        },
+        "annotations": {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?[A-Za-z0-9]([-A-Za-z0-9_.]{0,61}[A-Za-z0-9])?$",
+            "maxLength": 316
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "uid": {
+          "type": "string"
+        },
+        "resourceVersion": {
+          "type": "string"
+        },
+        "generation": {
+          "type": "integer"
+        },
+        "creationTimestamp": {
+          "type": "string"
+        },
+        "deletionTimestamp": {
+          "type": "string"
+        },
+        "deletionGracePeriodSeconds": {
+          "type": "integer"
+        },
+        "finalizers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownerReferences": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "managedFields": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "generateName": {
+          "type": "string",
+          "maxLength": 58,
+          "pattern": "^[a-z0-9]([-a-z0-9]*)?$"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "name"
+          ]
+        },
+        {
+          "required": [
+            "generateName"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "WorkflowRunSpec": {
+      "description": "Request for one execution of a workflow (spec 10.8).",
+      "type": "object",
+      "properties": {
+        "workflowRef": {
+          "description": "The workflow to run, in the namespace of the WorkflowRun. version and digest are assertions, not selectors.",
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/ObjectName"
+            },
+            "version": {
+              "$ref": "#/$defs/SemVer"
+            },
+            "digest": {
+              "$ref": "#/$defs/Digest"
+            },
+            "extensions": {
+              "$ref": "#/$defs/Extensions"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false
+        },
+        "inputs": {
+          "description": "Input values (spec 5.3).",
+          "type": "object"
+        },
+        "environment": {
+          "description": "Environment name (spec 7.10).",
+          "type": "string",
+          "minLength": 1
+        },
+        "cancel": {
+          "description": "Request to cancel the execution (spec 10.8).",
+          "type": "boolean"
+        },
+        "extensions": {
+          "$ref": "#/$defs/Extensions"
+        }
+      },
+      "required": [
+        "workflowRef"
+      ],
+      "additionalProperties": false
+    },
+    "WorkflowRun": {
+      "description": "An execution of a workflow as an object (spec 10.8).",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "const": "awp.agenticworkflowprotocol.org/v1alpha2"
+        },
+        "kind": {
+          "const": "WorkflowRun"
+        },
+        "metadata": {
+          "$ref": "#/$defs/RunMetadata"
+        },
+        "spec": {
+          "$ref": "#/$defs/WorkflowRunSpec"
+        },
+        "status": {
+          "description": "Written by the runtime (shape: WorkflowRunStatus). Ignored by validators (spec 3.2).",
+          "type": "object"
+        }
+      },
+      "required": [
+        "apiVersion",
+        "kind",
+        "metadata",
+        "spec"
       ],
       "additionalProperties": false
     }

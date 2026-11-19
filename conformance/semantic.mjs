@@ -258,6 +258,10 @@ export function semanticCheck(doc, opts = {}) {
         needProfile('interaction', 'step with type: input', ptr('spec', 'workflow', i), '3.3');
         checkInputStep(s.input, ['spec', 'workflow', i, 'input'], err, ptr);
       }
+      // 5.6.4: the runtime owns AWP_* variables of command steps
+      for (const k of Object.keys(s.env ?? {})) {
+        if (k.startsWith('AWP_')) err('step.reserved-env', '5.6.4', ptr('spec', 'workflow', i, 'env', k), `environment variable "${k}" is reserved for the runtime (AWP_ prefix)`);
+      }
       if (profiles.has('security') && s.type === 'command' && typeof s.image === 'string' && !/@(sha256:[0-9a-f]{64}|sha384:[0-9a-f]{96}|sha512:[0-9a-f]{128})$/.test(s.image)) {
         err('security.image-not-pinned', '9.4', ptr('spec', 'workflow', i, 'image'), 'command step image MUST be pinned by digest under the security profile');
       }

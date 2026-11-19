@@ -24,7 +24,8 @@ from the schema, not the other way round.
 | `schema/awp.v1alpha1.json#/$defs/Agent` | A manifest of kind `Agent`. |
 | `schema/awp.v1alpha1.json#/$defs/Policy` | A manifest of kind `Policy`. |
 | `schema/awp.v1alpha2.json` (and the same `$defs`) | Manifests of `awp.agenticworkflowprotocol.org/v1alpha2` ([specification](../spec/v1alpha2/README.md), working draft). |
-| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions for `v1alpha2`, generated from `awp.v1alpha2.json` (see below). |
+| `schema/awp.v1alpha2.json#/$defs/WorkflowRun` | An execution object of kind `WorkflowRun` (spec v1alpha2 section 10.8). `ManifestStatus` and `WorkflowRunStatus` describe the `status` a runtime writes; validators ignore `status`. |
+| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions for `v1alpha2` (`workflows`, `agents`, `policies`, `workflowruns`), generated from `awp.v1alpha2.json` (see below). |
 
 YAML manifests are parsed first (YAML 1.2 core schema; custom tags and non-string keys rejected,
 spec 3.1) and the resulting JSON value is validated. Every document of a multi-document file is
@@ -79,6 +80,10 @@ checks types and the remaining constraints, and unknown or misplaced fields stay
 AWP validator in the runtime or an admission webhook (spec v1alpha2 section 3.10). `npm test`
 fails when the generated files are stale; regenerate them with `node conformance/crd.mjs write`.
 
+`status` is typed with `ManifestStatus` or `WorkflowRunStatus`, so that the API server checks what
+a runtime writes, and the columns of `kubectl get` show the conditions `Valid` and `Ready` (for
+runs: workflow and phase).
+
 The semantic rules below apply to both versions. In `v1alpha2` their paths use `spec` where
 `v1alpha1` uses `metadata` (for example `/spec/risk/level`), and `extensions` objects are skipped
 where `v1alpha1` skips `x-` fields.
@@ -116,6 +121,7 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `input.required-unknown-field` | 5.8 (v1alpha2) | `answerSchema.required` names fields of `answerSchema.properties`. |
 | `input.enum-not-string` | 5.8 (v1alpha2) | `enum` is only used on answer fields of type `string`. |
 | `input.default-mismatch` | 5.8 (v1alpha2) | The `default` of an input step is a valid answer: a string without `answerSchema`, otherwise an object that matches it. |
+| `step.reserved-env` | 5.6.4 (v1alpha2) | `env` of a step defines no variable with the prefix `AWP_`; the runtime sets `AWP_OUTPUTS`, `AWP_EXECUTION_ID`, `AWP_STEP_ID` and `AWP_ATTEMPT`. |
 | `security.image-not-pinned` | 9.4 | Under the security profile `mcpServers[].image` and command step `image` are pinned by digest. |
 
 ### Warnings

@@ -11,6 +11,10 @@ conformance:
     - audit
   limitations:
     - "audit: integrity mode signed is not supported; hash-chain only"
+  limits:
+    outputSize: 1MiB
+    stepOutputSize: 4MiB
+  executionObjects: true
   testedWith:
     suite: awp-conformance
     version: 0.1.0

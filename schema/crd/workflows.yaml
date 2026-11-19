@@ -26,6 +26,12 @@ spec:
         - name: Owner
           type: string
           jsonPath: .spec.owner.team
+        - name: Valid
+          type: string
+          jsonPath: .status.conditions[?(@.type=="Valid")].status
+        - name: Ready
+          type: string
+          jsonPath: .status.conditions[?(@.type=="Ready")].status
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
@@ -773,7 +779,8 @@ spec:
                           type: object
                           properties:
                             name:
-                              minLength: 1
+                              description: Output name (spec 5.6.1). Also the file name in $AWP_OUTPUTS (spec 5.6.4).
+                              pattern: ^[A-Za-z_][A-Za-z0-9_]{0,62}$
                               type: string
                             classification:
                               description: Data class (spec 7.2).
@@ -1529,5 +1536,51 @@ spec:
                     x-kubernetes-preserve-unknown-fields: true
               x-kubernetes-preserve-unknown-fields: true
             status:
+              description: Status a runtime writes on a Workflow, Agent or Policy (spec 3.11). Validators ignore it (spec 3.2).
               type: object
+              properties:
+                observedGeneration:
+                  minimum: 0
+                  type: integer
+                digest:
+                  description: Digest of the manifest as the runtime validated it (spec 9.1).
+                  type: string
+                conditions:
+                  type: array
+                  items:
+                    description: A status condition in the shape of Kubernetes metav1.Condition (spec 3.11).
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    type: object
+                    properties:
+                      type:
+                        maxLength: 316
+                        pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                        type: string
+                      status:
+                        enum:
+                          - "True"
+                          - "False"
+                          - Unknown
+                        type: string
+                      observedGeneration:
+                        minimum: 0
+                        type: integer
+                      lastTransitionTime:
+                        description: When status last changed (RFC 3339).
+                        pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?([Zz]|[+-][0-9]{2}:[0-9]{2})$
+                        type: string
+                      reason:
+                        minLength: 1
+                        maxLength: 1024
+                        pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                        type: string
+                      message:
+                        maxLength: 32768
+                        type: string
+                    x-kubernetes-preserve-unknown-fields: true
               x-kubernetes-preserve-unknown-fields: true

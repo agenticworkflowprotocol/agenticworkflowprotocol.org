@@ -49,6 +49,42 @@
       "path": "/spec/audit/retention/duration"
     },
     {
+      "id": "10.8-workflow-ref-version-not-semver",
+      "file": "invalid/10.8-workflow-ref-version-not-semver.yaml",
+      "section": "10.8",
+      "rule": "workflowRef.version is a semantic version.",
+      "expect": "invalid",
+      "code": "schema.pattern",
+      "path": "/spec/workflowRef/version"
+    },
+    {
+      "id": "10.8-workflow-run-governance-field",
+      "file": "invalid/10.8-workflow-run-governance-field.yaml",
+      "section": "10.8",
+      "rule": "A WorkflowRun has no governance fields; they belong to the workflow.",
+      "expect": "invalid",
+      "code": "schema.additionalProperties",
+      "path": "/spec"
+    },
+    {
+      "id": "10.8-workflow-run-without-name",
+      "file": "invalid/10.8-workflow-run-without-name.yaml",
+      "section": "10.8",
+      "rule": "metadata has name or generateName.",
+      "expect": "invalid",
+      "code": "schema.anyOf",
+      "path": "/metadata"
+    },
+    {
+      "id": "10.8-workflow-run-without-workflow-ref",
+      "file": "invalid/10.8-workflow-run-without-workflow-ref.yaml",
+      "section": "10.8",
+      "rule": "spec.workflowRef is REQUIRED.",
+      "expect": "invalid",
+      "code": "schema.required",
+      "path": "/spec"
+    },
+    {
       "id": "3.1-custom-tag",
       "file": "invalid/3.1-custom-tag.yaml",
       "section": "3.1",
@@ -951,6 +987,15 @@
       "path": "/spec/workflow/0/retries"
     },
     {
+      "id": "5.6.1-output-name-with-dot",
+      "file": "invalid/5.6.1-output-name-with-dot.yaml",
+      "section": "5.6.1",
+      "rule": "Output names match ^[A-Za-z_][A-Za-z0-9_]{0,62}$, so that they are file names and expression keys.",
+      "expect": "invalid",
+      "code": "schema.pattern",
+      "path": "/spec/workflow/2/outputs/0/name"
+    },
+    {
       "id": "5.6.1-retries-exceed-max-retries",
       "file": "invalid/5.6.1-retries-exceed-max-retries.yaml",
       "section": "5.6.1",
@@ -1030,6 +1075,15 @@
       "expect": "invalid",
       "code": "step.unknown-agent",
       "path": "/spec/workflow/0/agent"
+    },
+    {
+      "id": "5.6.4-reserved-env",
+      "file": "invalid/5.6.4-reserved-env.yaml",
+      "section": "5.6.4",
+      "rule": "Environment variables with the prefix AWP_ are reserved for the runtime.",
+      "expect": "invalid",
+      "code": "step.reserved-env",
+      "path": "/spec/workflow/2/env/AWP_OUTPUTS"
     },
     {
       "id": "5.7-negative-cost",
@@ -1547,6 +1601,20 @@
       "expect": "valid"
     },
     {
+      "id": "10.8-workflow-run-with-status",
+      "file": "valid/10.8-workflow-run-with-status.yaml",
+      "section": "10.8",
+      "rule": "A WorkflowRun may use generateName; validators ignore status written by the runtime.",
+      "expect": "valid"
+    },
+    {
+      "id": "10.8-workflow-run",
+      "file": "valid/10.8-workflow-run.yaml",
+      "section": "10.8",
+      "rule": "A WorkflowRun requests one execution of a workflow with inputs and an environment.",
+      "expect": "valid"
+    },
+    {
       "id": "3.1-json-serialization",
       "file": "valid/3.1-json-serialization.json",
       "section": "3.1",
@@ -1676,6 +1744,13 @@
       "file": "valid/5.6.3-transitive-step-reference.yaml",
       "section": "5.6.3",
       "rule": "A step may reference outputs of steps it depends on transitively.",
+      "expect": "valid"
+    },
+    {
+      "id": "5.6.4-command-step-outputs",
+      "file": "valid/5.6.4-command-step-outputs.yaml",
+      "section": "5.6.4",
+      "rule": "A command step declares outputs whose names are valid file names in $AWP_OUTPUTS.",
       "expect": "valid"
     },
     {

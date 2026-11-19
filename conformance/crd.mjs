@@ -21,10 +21,31 @@ const VERSION = 'v1alpha2';
 const GROUP = 'awp.agenticworkflowprotocol.org';
 const OUT_DIR = path.join(root, 'schema', 'crd');
 
+const condition = type => `.status.conditions[?(@.type=="${type}")].status`;
+const MANIFEST_COLUMNS = [
+  { name: 'Version', type: 'string', jsonPath: '.spec.version' },
+  { name: 'Owner', type: 'string', jsonPath: '.spec.owner.team' },
+  { name: 'Valid', type: 'string', jsonPath: condition('Valid') },
+  { name: 'Ready', type: 'string', jsonPath: condition('Ready') },
+  { name: 'Age', type: 'date', jsonPath: '.metadata.creationTimestamp' },
+];
+
 export const KINDS = [
-  { kind: 'Workflow', plural: 'workflows', specDef: 'WorkflowSpec' },
-  { kind: 'Agent', plural: 'agents', specDef: 'AgentSpec' },
-  { kind: 'Policy', plural: 'policies', specDef: 'PolicySpec' },
+  { kind: 'Workflow', plural: 'workflows', specDef: 'WorkflowSpec', statusDef: 'ManifestStatus', columns: MANIFEST_COLUMNS },
+  { kind: 'Agent', plural: 'agents', specDef: 'AgentSpec', statusDef: 'ManifestStatus', columns: MANIFEST_COLUMNS },
+  { kind: 'Policy', plural: 'policies', specDef: 'PolicySpec', statusDef: 'ManifestStatus', columns: MANIFEST_COLUMNS },
+  {
+    kind: 'WorkflowRun',
+    plural: 'workflowruns',
+    specDef: 'WorkflowRunSpec',
+    statusDef: 'WorkflowRunStatus',
+    columns: [
+      { name: 'Workflow', type: 'string', jsonPath: '.spec.workflowRef.name' },
+      { name: 'Phase', type: 'string', jsonPath: '.status.phase' },
+      { name: 'Started', type: 'date', jsonPath: '.status.startedAt' },
+      { name: 'Age', type: 'date', jsonPath: '.metadata.creationTimestamp' },
+    ],
+  },
 ];
 
 // Keywords that only validate values and have no structural equivalent; full validation of these
@@ -91,8 +112,10 @@ function convertObject(schema, node, out, seen) {
   }
 }
 
-export function crdFor(schema, { kind, plural, specDef }) {
+export function crdFor(schema, { kind, plural, specDef, statusDef, columns }) {
   const spec = convert(schema, { $ref: `#/$defs/${specDef}` });
+  // status is typed so that the API server checks runtime writes; unknown fields are kept
+  const status = { ...convert(schema, { $ref: `#/$defs/${statusDef}` }), 'x-kubernetes-preserve-unknown-fields': true };
   return {
     apiVersion: 'apiextensions.k8s.io/v1',
     kind: 'CustomResourceDefinition',
@@ -106,11 +129,7 @@ export function crdFor(schema, { kind, plural, specDef }) {
         served: true,
         storage: true,
         subresources: { status: {} },
-        additionalPrinterColumns: [
-          { name: 'Version', type: 'string', jsonPath: '.spec.version' },
-          { name: 'Owner', type: 'string', jsonPath: '.spec.owner.team' },
-          { name: 'Age', type: 'date', jsonPath: '.metadata.creationTimestamp' },
-        ],
+        additionalPrinterColumns: columns,
         schema: {
           openAPIV3Schema: {
             description: `AWP ${kind} (${GROUP}/${VERSION}). Generated from schema/awp.${VERSION}.json; the JSON Schema is normative.`,
@@ -121,7 +140,7 @@ export function crdFor(schema, { kind, plural, specDef }) {
               kind: { type: 'string' },
               metadata: { type: 'object' },
               spec,
-              status: { type: 'object', 'x-kubernetes-preserve-unknown-fields': true },
+              status,
             },
           },
         },
