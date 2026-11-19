@@ -23,6 +23,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 ### Added
 
 - Proposed (Draft, not accepted) AEPs from implementation experience with `v1alpha1` (decision D18): `aep/0012` tool steps (a step that performs one declared action without a model), `aep/0013` runtime clarifications (metering of budgets known only after a call, rendering of non-string values in expressions, the outcome of a rejected action approval, the minimum events of `core`), `aep/0014` input examples and object schemas. They do not change `v1alpha1`.
+- AWP logo: brand assets in light and dark (`site/public/brand/`, served at `/brand/`), logo in the site header and the README, new favicons and social preview image.
 - Website header: links to the validator, the editor and the viewer next to GitHub; footer link to the viewer.
 - Links to the AWP editor and viewer ([online](https://editor.agenticworkflowprotocol.org), [Web Components](https://github.com/agenticworkflowprotocol/awp-editor)) in the README, the introduction, the Quickstart, the sidebar and the footer.
 - Links to the reference validator ([online](https://validator.agenticworkflowprotocol.org), [CLI and library](https://github.com/agenticworkflowprotocol/awp-validator)) in the README, the introduction, the Quickstart, "Build your own AWP runtime", the sidebar and the footer.

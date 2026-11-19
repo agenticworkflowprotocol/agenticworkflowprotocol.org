@@ -442,3 +442,7 @@ mobile-starlight-toc a {
   align-items: center;
   min-height: 2.75rem;
 }
+
+/* Logo next to the title: a bit larger and closer than the Starlight default. */
+.site-title { gap: 0.55rem; }
+.site-title img { height: 2.25rem; width: auto; }

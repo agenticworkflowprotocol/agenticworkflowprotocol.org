@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/agenticworkflowprotocol/agenticworkflowprotocol.org/main/site/public/brand/awp-wordmark-horizontal-dark.svg">
+    <img src="https://raw.githubusercontent.com/agenticworkflowprotocol/agenticworkflowprotocol.org/main/site/public/brand/awp-wordmark-horizontal-light.svg" alt="AWP – Agentic Workflow Protocol" width="520">
+  </picture>
+</p>
+
 # AWP - Agentic Workflow Protocol
 
 **An open, declarative standard for defining, governing, executing and auditing agentic workflows.**

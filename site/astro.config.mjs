@@ -34,6 +34,7 @@ export default defineConfig({
       description:
         'The Agentic Workflow Protocol (AWP) is an open, declarative specification for defining, governing, executing and auditing agentic workflows.',
       favicon: '/favicon.svg',
+      logo: { light: './src/assets/awp-icon-light.svg', dark: './src/assets/awp-icon-dark.svg' },
       // English only for now. Adding German later means adding a `de` entry here and a `src/content/docs/de/` tree.
       defaultLocale: 'root',
       locales: { root: { label: 'English', lang: 'en' } },
@@ -47,11 +48,13 @@ export default defineConfig({
       head: [
         // Scrollable code blocks must be reachable by keyboard (WCAG 2.1.1, axe: scrollable-region-focusable).
         { tag: 'script', content: "document.addEventListener('DOMContentLoaded',function(){document.querySelectorAll('pre').forEach(function(p){p.setAttribute('tabindex','0')})})" },
+        { tag: 'link', attrs: { rel: 'icon', href: '/brand/favicon-dark.svg', type: 'image/svg+xml', media: '(prefers-color-scheme: dark)' } },
+        { tag: 'link', attrs: { rel: 'icon', href: '/favicon.ico', sizes: '48x48' } },
         { tag: 'meta', attrs: { property: 'og:site_name', content: 'Agentic Workflow Protocol' } },
         { tag: 'meta', attrs: { property: 'og:image', content: `${site}/og.png` } },
         { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
         { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
-        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'AWP - Define. Govern. Execute.' } },
+        { tag: 'meta', attrs: { property: 'og:image:alt', content: 'AWP – Agentic Workflow Protocol' } },
         { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
         { tag: 'meta', attrs: { name: 'twitter:image', content: `${site}/og.png` } },
         { tag: 'meta', attrs: { name: 'color-scheme', content: 'light dark' } },
