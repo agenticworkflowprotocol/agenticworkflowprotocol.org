@@ -215,7 +215,7 @@ Proposed rules:
 
 ### 6.2 Published versions are frozen
 
-- An API version is a **draft** while its text carries the draft status (today: `v1alpha1`).
+- An API version is a **draft** while its text carries the draft status (today: `v1alpha1` and `v1alpha2`).
   Drafts may change through AEPs and editorial pull requests.
 - When an API version is **published** (a repository release marks it as published), its
   normative text, JSON Schema `$id` and conformance requirements are frozen. Afterwards only

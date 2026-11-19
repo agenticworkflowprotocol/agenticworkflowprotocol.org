@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-// Reference checker for AWP v1alpha1 manifests and the conformance suite.
+// Reference checker for AWP manifests (v1alpha1, v1alpha2) and the conformance suite.
 //
 //   node conformance/awp-check.mjs check [--profiles core,governance] [--verify-digest] [--json] <file...>
 //   node conformance/awp-check.mjs run   [--json]
 //
-// Layers: yaml (spec 3.1) -> schema (schema/awp.v1alpha1.json) -> semantic (conformance/semantic.mjs).
+// Layers: yaml (spec 3.1) -> schema of the document's apiVersion (schema/awp.<version>.json)
+// -> semantic (conformance/semantic.mjs). A document with an unknown or missing apiVersion is
+// checked against the latest schema, which rejects it at /apiVersion (spec 3.2).
 // Dependencies: ajv and yaml, both pinned in package-lock.json (development use only).
 
 import fs from 'node:fs';
@@ -16,10 +18,19 @@ import { semanticCheck, KNOWN_PROFILES } from './semantic.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const schema = JSON.parse(fs.readFileSync(path.join(root, 'schema', 'awp.v1alpha1.json'), 'utf8'));
+/** API versions of this repository, oldest first; the last one is the latest draft. */
+export const API_VERSIONS = ['v1alpha1', 'v1alpha2'];
+const API_GROUP = 'awp.agenticworkflowprotocol.org';
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false });
-const validateSchema = ajv.compile(schema);
+const validators = new Map(API_VERSIONS.map(v => {
+  const schema = JSON.parse(fs.readFileSync(path.join(root, 'schema', `awp.${v}.json`), 'utf8'));
+  return [`${API_GROUP}/${v}`, ajv.compile(schema)];
+}));
+const latest = validators.get(`${API_GROUP}/${API_VERSIONS.at(-1)}`);
+
+/** Structural validator for a document: its own apiVersion, else the latest. */
+const schemaFor = value => validators.get(value?.apiVersion) ?? latest;
 
 /** Parse a file into manifests, enforcing the YAML restrictions of spec 3.1. */
 export function loadManifests(text) {
@@ -68,6 +79,7 @@ export function validateText(text, file = '<input>', opts = {}) {
     };
     diags.forEach(push);
     if (value === undefined) return;
+    const validateSchema = schemaFor(value);
     if (!validateSchema(value)) {
       const seen = new Set();
       for (const e of validateSchema.errors) {
@@ -141,21 +153,23 @@ function runSuite({ json }) {
     }
   }
 
-  // the examples of the specification must validate
-  const exDir = path.join(root, 'spec', 'v1alpha1', 'examples');
+  // the examples of every API version of the specification must validate
   const nonManifests = new Set(index.nonManifestExamples ?? []);
-  for (const f of fs.readdirSync(exDir).sort()) {
-    if (!/\.ya?ml$|\.json$/.test(f)) continue;
-    const id = `example:${f}`;
-    const file = `spec/v1alpha1/examples/${f}`;
-    if (nonManifests.has(f)) { results.push({ id, file, section: 'examples', expect: 'skipped', ok: true, detail: 'not a manifest (event stream, record or statement)' }); continue; }
-    const errs = errorsOf(validateFile(path.join(exDir, f)));
-    results.push({ id, file, section: 'examples', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' });
+  for (const version of API_VERSIONS) {
+    const exDir = path.join(root, 'spec', version, 'examples');
+    for (const f of fs.readdirSync(exDir).sort()) {
+      if (!/\.ya?ml$|\.json$/.test(f)) continue;
+      const id = `example:${version}/${f}`;
+      const file = `spec/${version}/examples/${f}`;
+      if (nonManifests.has(f)) { results.push({ id, file, section: 'examples', expect: 'skipped', ok: true, detail: 'not a manifest (event stream, record or statement)' }); continue; }
+      const errs = errorsOf(validateFile(path.join(exDir, f)));
+      results.push({ id, file, section: 'examples', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' });
+    }
   }
 
   const failed = results.filter(r => !r.ok);
   if (json) {
-    console.log(JSON.stringify({ awp: 'v1alpha1', suite: index.suite, version: index.version, total: results.length, passed: results.length - failed.length, failed: failed.length, results }, null, 2));
+    console.log(JSON.stringify({ awp: API_VERSIONS, suite: index.suite, version: index.version, total: results.length, passed: results.length - failed.length, failed: failed.length, results }, null, 2));
   } else {
     for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.id}${r.detail && !r.ok ? `\n      ${r.detail}` : ''}`);
     console.log(`\n${results.length - failed.length}/${results.length} passed, ${failed.length} failed`);
