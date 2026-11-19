@@ -21,7 +21,8 @@
 
 An execution uses the workflow, agent and policy manifests it resolved at its start until it ends.
 Changes or deletions in the object store do not change a running execution; a runtime may cancel
-it instead (`reason: manifestChanged`). `workflow.started` must carry the workflow digest, and a
+it instead (`reason: manifestChanged`). Container images referenced by tag are resolved to digests
+at start and pinned the same way, so authors may use tags and every execution is still traceable. `workflow.started` must carry the workflow digest, and a
 `WorkflowRun` may assert the version or digest it expects. The text is applied in
 [spec/v1alpha2 section 10.1](../spec/v1alpha2/README.md#101-execution-identity).
 
@@ -59,6 +60,14 @@ summarised:
 5. New executions, including the next schedule tick, use the current manifests.
 6. A `WorkflowRun` with `workflowRef.version` or `workflowRef.digest` that does not match the
    current workflow is rejected (`versionMismatch`, `digestMismatch`).
+7. **Images.** At start the runtime resolves every image reference (command steps, `stdio` MCP
+   servers) to a digest, for multi-platform images the digest of the image index. All steps and
+   attempts use it; a moved tag does not affect a running execution. The reproducibility record
+   lists reference and resolved digest. Outside the security profile tags are allowed; under it,
+   digests stay mandatory (spec 9.4), optionally after a tag (`tools:1.4@sha256:...`).
+8. **No substitute environment.** A command step with `image` runs in that image. A runtime that
+   cannot run container images rejects such a workflow instead of running the command elsewhere
+   (spec 5.6.2).
 
 ## Examples
 
@@ -77,7 +86,9 @@ None for manifests. `WorkflowRun.spec.workflowRef.version` and `digest` and
 - `core`: pinning. `audit`: `workflow.digest` in `workflow.started`, `reason: manifestChanged`.
 - Runtime tests, once a runtime suite exists: change a manifest while an execution waits and
   check that the step graph, permissions and policies of the execution are unchanged; delete the
-  manifest and check the same; a version assertion that does not match is rejected.
+  manifest and check the same; a version assertion that does not match is rejected; move an
+  image tag while an execution runs and check that retries use the digest resolved at start; a
+  runtime without container support rejects a command step with `image`.
 
 ## Compatibility and migration
 
@@ -93,6 +104,13 @@ conformant in `v1alpha2`.
   configure the runtime to cancel on change; mixing versions is never allowed, because it makes
   the audit trail wrong.
 - Version assertions let a client or a pipeline make sure that the reviewed version runs.
+- Resolving tags at start does not make tags as safe as digests: the reviewed manifest names a
+  tag, and what it pointed to at review time is not recorded. It does make every execution
+  traceable and consistent. Organisations that need the reviewed image to be the executed image
+  use the security profile, which requires digests.
+- Running a command outside its image would execute untrusted tooling in an unreviewed
+  environment and break the network and filesystem assumptions of the step, so a runtime without
+  containers must refuse instead.
 
 ## Privacy considerations
 
@@ -111,6 +129,10 @@ enforce their own compliance requirements. This proposal makes no compliance pro
   as runtime configuration.
 - **Select versions in `WorkflowRun`**: requires keeping old versions in the object store; the
   assertion covers the review case without that.
+- **Require digests for all images**: fully reproducible, but forces authors and packaging tools
+  (Helm charts, Kustomize) to maintain digests, and is often done wrong for multi-platform images.
+  Resolving at start gives traceability without that burden; the security profile keeps the
+  strict rule.
 
 ## Implementation status
 
@@ -130,4 +152,4 @@ start.
 
 ## References
 
-- Runtime feedback: [docs/runtime-feedback.md](../docs/runtime-feedback.md), entry G08.
+- Runtime feedback: [docs/runtime-feedback.md](../docs/runtime-feedback.md), entries G08 and G40.

@@ -99,6 +99,10 @@ An execution keeps the workflow, agent and policy versions it started with. Othe
 during a long execution (waiting for approval, for example) would change the step graph or the
 policies halfway, and the audit trail would name a version that never ran. A runtime may cancel
 instead (`manifestChanged`), never mix. `workflow.digest` becomes REQUIRED in `workflow.started`.
+Container images referenced by tag are resolved to digests (of the image index, so it works on
+every architecture) at start and pinned the same way. Authors and Helm charts can keep tags; only
+the security profile requires digests. A runtime without containers must reject a command step
+with `image` instead of running it elsewhere.
 
 ### 3.7 Extension model (AEP-0021, concept)
 

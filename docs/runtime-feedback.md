@@ -32,7 +32,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | Status | Entries |
 | --- | --- |
-| AEP drafted and applied to the `v1alpha2` draft (Draft, not accepted) | G01, G07, G08; partly G14, G15 |
+| AEP drafted and applied to the `v1alpha2` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22 |
 | Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G39, K |
 
@@ -135,6 +135,7 @@ the collector only works because a command step now parses structured sources de
 | G37 | minor | Whether command steps need `shell.execute` and whether that is checked statically. | Command steps require `shell.execute`, checked at validation. | open |
 | G38 | minor | `maxDuration` on an agent is ambiguous when the agent serves several steps; the runtime rejects it. | Only workflow and step level, or cumulative step time. | open |
 | G39 | should | Runtime neutrality has only been tested on Kubernetes. The `WorkflowRun` draft defines conditions as `metav1.Condition` and names an admission webhook as the source of the actor. Related to G26. | Define conditions as plain JSON (`type`, `status`, `reason`, `message`, `lastTransitionTime`) with `metav1.Condition` as the Kubernetes mapping; keep "actor from an authenticated source" normative and the webhook as a non-normative example; mark Kubernetes-only text as informative. A run of the same workflow without a cluster is planned. | open |
+| G40 | should | Command step `image`: what a runtime without containers does with it (ignoring it runs the command in an unreviewed environment), and whether digests are needed. Digests made Helm charts hard to maintain, and digests of single platforms break multi-architecture use. | A runtime that cannot run the image rejects the workflow; tags are allowed outside the security profile and resolved to the image index digest at start, pinned for the execution and recorded. | applied in the AEP-0020 draft (spec 5.6.2, 9.4, 10.1, 10.7) |
 
 ## 8. Questions for the project lead
 

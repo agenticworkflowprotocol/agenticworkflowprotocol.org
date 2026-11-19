@@ -813,6 +813,11 @@ workflow:
   command injection vulnerability.
 - Implementations MUST execute command steps in an isolated environment (for example a
   container or sandbox) and MUST apply `permissions.network` and `permissions.filesystem` to it.
+- If a command step names an `image`, the command MUST run in that image (resolved and pinned as
+  described in [section 10.1](#101-execution-identity)). A runtime that cannot run container
+  images MUST reject such a workflow; it MUST NOT run the command in another environment. Without
+  `image`, the runtime chooses the environment, and the step is portable only between runtimes
+  that provide the same tools.
 - The step succeeds if the command exits with status `0`.
 
 #### 5.6.3 Execution model
@@ -1681,7 +1686,11 @@ The dependencies of a workflow are: referenced `Agent` and `Policy` manifests, p
 (`promptRef`), MCP servers (`image`, `url`, `version`), command step images and remote agents.
 
 - Under the security profile, container images (`mcpServers[].image`, command step `image`) MUST
-  be pinned by digest, and references SHOULD carry digests.
+  be pinned by digest, and references SHOULD carry digests. For an image with several platforms
+  the digest is that of the image index, not of one platform. A tag MAY precede the digest for
+  readability (`tools:1.4@sha256:...`); the digest decides.
+- Outside the security profile, images MAY be referenced by tag. The runtime resolves tags to
+  digests when an execution starts and pins them ([section 10.1](#101-execution-identity)).
 - Runtimes SHOULD support trusted registries: a configurable allowlist of sources from which
   manifests, images and MCP servers may be loaded.
 - Runtimes SHOULD be able to output the resolved dependency set of a workflow (SBOM-like
@@ -1712,8 +1721,16 @@ have the form `awp-exec-<ULID>`.
 - `workflow.started` MUST carry `workflow.digest` ([section 10.3](#103-event-envelope)). The
   reproducibility record ([section 10.7](#107-reproducibility-record)) lists the digests of all
   pinned manifests.
+- **Images.** When an execution starts, the runtime also resolves every container image reference
+  of the workflow (command step `image`, `mcpServers[].image`) to a digest; for an image with
+  several platforms this is the digest of the image index, so the pin holds on every architecture.
+  All steps and attempts of the execution use these digests, even if a tag is moved while the
+  execution runs. An image that cannot be resolved fails the execution before any step runs. The
+  reproducibility record lists each reference with its resolved digest. Authors may therefore
+  use tags outside the security profile ([section 9.4](#94-dependencies)) and still get a
+  traceable execution.
 - A new execution, including one started by the next schedule tick, uses the manifests that are
-  current when it starts.
+  current when it starts, and resolves tags again.
 - A request MAY assert the version it expects: if a `WorkflowRun`
   ([section 10.8](#108-kind-workflowrun)) names `workflowRef.version` or `workflowRef.digest` and
   the current workflow does not match, the runtime MUST reject the request with the reason
@@ -1858,7 +1875,7 @@ reproducibility record that identifies everything the execution depended on:
 | `workflow` | `name`, `version`, `digest`. |
 | `agents` | Per agent: `id`, reference (`name`, `version`, `digest`) if any, `model` (`provider`, `name`, `version` as actually used), prompt/instructions version or digest. |
 | `tools` | Per MCP server: `server`, `version`, `url` or `image` digest. |
-| `images` | Command step images with digests. |
+| `images` | Command step images: the reference as written and the digest resolved at start. |
 | `policies` | Policies applied, with versions and digests. |
 | `inputs` | Input references or digests. |
 | `artifacts` | Outputs and artifacts with digests or URIs. |
