@@ -9,7 +9,7 @@ This page walks you through validating a manifest with the reference checker in 
 
 ```sh
 git clone https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org
-cd agenticWorkflowProtocol.org
+cd agenticworkflowprotocol.org
 ```
 
 ## 2. Install the pinned dependencies

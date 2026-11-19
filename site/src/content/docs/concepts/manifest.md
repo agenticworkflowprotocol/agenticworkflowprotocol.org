@@ -19,7 +19,7 @@ spec: {}                # kind-specific
 ```
 
 - `kind` is one of `Workflow`, `Agent` (a reusable agent definition) or `Policy` (a reusable rule set).
-- Unknown fields are rejected. Extensions use the `x-` prefix. See [Unknown fields and extensions](/specification/v1alpha1/#33-unknown-fields-and-extensions).
+- Unknown fields are rejected. Extensions use the `x-` prefix. See [Unknown fields and extensions](/specification/v1alpha1/#33-unknown-fields-and-extensions) and [Extending AWP](/concepts/extending-awp/).
 - Names, versions, durations, timestamps and digests have fixed formats ([Document model](/specification/v1alpha1/#3-document-model)).
 - A [JSON Schema](/schema/awp.v1alpha1.json) expresses the structural rules; the specification lists the semantic rules the schema cannot express.
 
