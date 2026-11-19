@@ -1,8 +1,8 @@
-# AEP-0000: Kubernetes resource model alignment
+# AEP-0015: Kubernetes resource model alignment
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0015 |
 | **Title** | Kubernetes resource model alignment |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |

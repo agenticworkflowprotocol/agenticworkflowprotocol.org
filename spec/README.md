@@ -35,12 +35,12 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
 | [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
 | [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-kubernetes-resource-model.md) | Kubernetes resource model alignment (number to be assigned) | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-schedule-semantics.md) | Schedule semantics: overlap and missed ticks (number to be assigned) | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-human-input.md) | Human input during an execution (number to be assigned) | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-step-outputs.md) | Step output interface (number to be assigned) | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions (number to be assigned) | Draft | proposed for `v1alpha2` |
-| [0000](../aep/0000-execution-pinning.md) | Pinning an execution to its manifests (number to be assigned) | Draft | proposed for `v1alpha2` |
+| [0015](../aep/0015-kubernetes-resource-model.md) | Kubernetes resource model alignment | Draft | proposed for `v1alpha2` |
+| [0016](../aep/0016-schedule-semantics.md) | Schedule semantics: overlap and missed ticks | Draft | proposed for `v1alpha2` |
+| [0017](../aep/0017-human-input.md) | Human input during an execution | Draft | proposed for `v1alpha2` |
+| [0018](../aep/0018-step-outputs.md) | Step output interface | Draft | proposed for `v1alpha2` |
+| [0019](../aep/0019-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions | Draft | proposed for `v1alpha2` |
+| [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha2` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

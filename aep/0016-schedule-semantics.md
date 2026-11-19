@@ -1,8 +1,8 @@
-# AEP-0000: Schedule semantics: overlap and missed ticks
+# AEP-0016: Schedule semantics: overlap and missed ticks
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0016 |
 | **Title** | Schedule semantics: overlap and missed ticks |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |

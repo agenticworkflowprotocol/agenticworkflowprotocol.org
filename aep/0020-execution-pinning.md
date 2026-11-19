@@ -1,8 +1,8 @@
-# AEP-0000: Pinning an execution to its manifests
+# AEP-0020: Pinning an execution to its manifests
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0020 |
 | **Title** | Pinning an execution to its manifests |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
@@ -70,7 +70,7 @@ starts `1.3.0`. The audit events of the first execution name the digest of `1.2.
 ## Schema changes
 
 None for manifests. `WorkflowRun.spec.workflowRef.version` and `digest` and
-`WorkflowRunStatus.workflow` come from the `WorkflowRun` AEP.
+`WorkflowRunStatus.workflow` come from AEP-0019.
 
 ## Conformance impact
 

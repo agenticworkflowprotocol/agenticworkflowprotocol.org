@@ -1,8 +1,8 @@
-# AEP-0000: Step output interface
+# AEP-0018: Step output interface
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0018 |
 | **Title** | Step output interface |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |

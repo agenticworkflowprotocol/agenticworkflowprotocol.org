@@ -11,14 +11,14 @@
 
 > **Status of this document.** This is a working draft of the second alpha version of AWP. It
 > starts from `v1alpha1` and aligns the document model with the Kubernetes resource model, as
-> proposed by [AEP-0000](../../aep/0000-kubernetes-resource-model.md) (not accepted): governance
+> proposed by [AEP-0015](../../aep/0015-kubernetes-resource-model.md) (not accepted): governance
 > fields move from `metadata` to `spec`, extension fields move into `extensions` objects, and
 > `status` is reserved for runtimes. It also contains the schedule semantics and the human input
-> proposed in [aep/0000-schedule-semantics.md](../../aep/0000-schedule-semantics.md) and
-> [aep/0000-human-input.md](../../aep/0000-human-input.md), the step output interface of
-> [aep/0000-step-outputs.md](../../aep/0000-step-outputs.md), the kind `WorkflowRun` and status
-> conditions of [aep/0000-workflow-run-and-status.md](../../aep/0000-workflow-run-and-status.md) and
-> the pinning of executions of [aep/0000-execution-pinning.md](../../aep/0000-execution-pinning.md)
+> proposed in [aep/0016-schedule-semantics.md](../../aep/0016-schedule-semantics.md) and
+> [aep/0017-human-input.md](../../aep/0017-human-input.md), the step output interface of
+> [aep/0018-step-outputs.md](../../aep/0018-step-outputs.md), the kind `WorkflowRun` and status
+> conditions of [aep/0019-workflow-run-and-status.md](../../aep/0019-workflow-run-and-status.md) and
+> the pinning of executions of [aep/0020-execution-pinning.md](../../aep/0020-execution-pinning.md)
 > (all Draft, not accepted). Every field, every semantic rule and every conformance
 > requirement in this document may change incompatibly in a later alpha version. Implementations
 > SHOULD NOT rely on `v1alpha2` for production interoperability. No implementation is conformant

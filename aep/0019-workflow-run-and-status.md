@@ -1,8 +1,8 @@
-# AEP-0000: Kind `WorkflowRun` and status conditions
+# AEP-0019: Kind `WorkflowRun` and status conditions
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0019 |
 | **Title** | Kind `WorkflowRun` and status conditions |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
@@ -41,7 +41,7 @@ could not work across runtimes. Runtimes without Kubernetes need the same shape 
 - Goals: a portable way to start an execution and read its state through an object store; one
   status shape for manifests; conditions that existing Kubernetes tools understand.
 - Non-goals: replacing audit events (they remain the record), storing output values or logs in
-  objects, scheduling objects (a `Schedule` kind may follow, see AEP schedule semantics), a
+  objects, scheduling objects (a `Schedule` kind may follow, see AEP-0016), a
   mandatory object store for runtimes without Kubernetes.
 
 ## Specification

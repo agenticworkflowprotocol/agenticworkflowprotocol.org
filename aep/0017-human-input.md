@@ -1,8 +1,8 @@
-# AEP-0000: Human input during an execution
+# AEP-0017: Human input during an execution
 
 | | |
 | --- | --- |
-| **AEP** | 0000 (assigned by a maintainer) |
+| **AEP** | 0017 |
 | **Title** | Human input during an execution |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |

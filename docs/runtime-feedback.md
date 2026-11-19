@@ -40,14 +40,14 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | ID | Sev. | Gap | Proposal from the runtime | Status |
 | --- | --- | --- | --- | --- |
-| G01 | must | How a step produces its declared outputs is undefined; command images and agent prompts only work on the runtime they were written for. | Command steps write files to `$AWP_OUTPUTS`; agent steps get a completion mechanism. | AEP drafted: [step outputs](../aep/0000-step-outputs.md), spec 5.6.4; open question 4 there: non-string values in `complete_step` as JSON until AEP-0003 |
+| G01 | must | How a step produces its declared outputs is undefined; command images and agent prompts only work on the runtime they were written for. | Command steps write files to `$AWP_OUTPUTS`; agent steps get a completion mechanism. | AEP drafted: [step outputs](../aep/0018-step-outputs.md), spec 5.6.4; open question 4 there: non-string values in `complete_step` as JSON until AEP-0003 |
 | G02 | must | Outputs are untyped: a runtime cannot ask the model for structured output or check it before the next step. | `outputs[].type` and `schema`. | [AEP-0003](../aep/0003-typed-handoffs.md) and [AEP-0014](../aep/0014-input-examples-and-schemas.md), not applied |
 | G03 | must | No state across executions ("already reported"). Solved with a volume from the runtime binding, invisible to AWP: no data class, no retention. | `spec.state` (name, classification, retention), provided as a directory or key-value store. | open |
 | G05 | must | Secrets of command steps are too coarse: `scope: [command]` gives a secret to every command step; the variable name is undefined. | Step ids as `scope` entries; a secret is exposed as an environment variable with its name. | open |
 | G12 | should | Where the code of a command step comes from is undefined (scripts in the image; an example runs `npm test` without a checkout). | `workspace` (for example a Git repository and revision) or explicitly implementation-defined. | open |
-| G14 | should | No size limit for outputs. | A minimum every runtime accepts and a rule for larger outputs. | in the step outputs AEP (256 KiB per output, 1 MiB per step) |
-| G15 | should | Undefined whether outputs of a failed command step are valid. | They are discarded. | in the step outputs AEP |
-| G16 | should | No standard failure reasons for steps (model refusal, token limit, not completed, timeout, missing outputs). | A reason vocabulary for step failure events. | open; the step outputs AEP introduces `notCompleted`, `outputTooLarge`, `outputInvalid` |
+| G14 | should | No size limit for outputs. | A minimum every runtime accepts and a rule for larger outputs. | in AEP-0018 (256 KiB per output, 1 MiB per step) |
+| G15 | should | Undefined whether outputs of a failed command step are valid. | They are discarded. | in AEP-0018 |
+| G16 | should | No standard failure reasons for steps (model refusal, token limit, not completed, timeout, missing outputs). | A reason vocabulary for step failure events. | open; AEP-0018 introduces `notCompleted`, `outputTooLarge`, `outputInvalid` |
 | G17 | should | No grace period when a step is cancelled or times out. | Termination signal and grace period with a runtime default. | open |
 | G18 | minor | Tool results are text only. | Structured tool results. | open |
 | G19 | minor | Standard input of commands is undefined. | Standard input is empty. | open |
@@ -58,7 +58,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | --- | --- | --- | --- | --- |
 | G04 | must | No conditional steps: the expensive rating step runs daily even when nothing is new (about 1.50 USD a month for nothing). `v1alpha2` expressions have no operators. | AEP-0001 in `v1alpha2` with a minimal comparison. | [AEP-0001](../aep/0001-conditional-steps.md), not applied |
 | G06 | must | Side effects of commands are invisible to governance: sending a message is only `shell.execute`, so rules on `external.communication` do not apply. | Tool steps. | [AEP-0012](../aep/0012-tool-steps.md), not applied |
-| G08 | must | No rule that an execution keeps the manifest version it started with; a GitOps sync can change a manifest mid-run. | MUST, with the digest in `workflow.started`. | AEP drafted: [execution pinning](../aep/0000-execution-pinning.md), spec 10.1 |
+| G08 | must | No rule that an execution keeps the manifest version it started with; a GitOps sync can change a manifest mid-run. | MUST, with the digest in `workflow.started`. | AEP drafted: [execution pinning](../aep/0020-execution-pinning.md), spec 10.1 |
 | G13 | should | No step that runs after a failure ("notify me when the run fails"). | `finally` or `onFailure` steps. | open |
 | G20 | should | Expressions have no date or time; a step has to write the fetch date into an output. | `execution.startedAt` as a reference. | open |
 | G21 | should | Input values cannot be set per environment or deployment; scheduled executions use defaults. | Inputs per environment (7.10) or inputs supplied by the runtime binding for schedule triggers. | open |
@@ -71,7 +71,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | ID | Sev. | Gap | Proposal from the runtime | Status |
 | --- | --- | --- | --- | --- |
-| G07 | must | No execution object and no status shape; `kubectl get workflows` cannot show validity. | A run kind; standard conditions in `metav1.Condition` shape with printer columns. | AEP drafted: [WorkflowRun and status](../aep/0000-workflow-run-and-status.md), spec 3.11 and 10.8 |
+| G07 | must | No execution object and no status shape; `kubectl get workflows` cannot show validity. | A run kind; standard conditions in `metav1.Condition` shape with printer columns. | AEP drafted: [WorkflowRun and status](../aep/0019-workflow-run-and-status.md), spec 3.11 and 10.8 |
 | G09 | should | Unknown `spec` fields pass `kubectl apply --validate=strict` (the CRDs keep unknown fields); only `status` shows the error, and GitOps tools report "synced". | Ship the validator as an admission webhook image or a ValidatingAdmissionPolicy for common rules. | open; the `Valid` condition of G07 makes the error visible in `kubectl get` |
 | G10 | should | Host-based network permissions cannot be enforced with NetworkPolicy. | Informative note: egress proxy or FQDN policies of the network plugin, otherwise a declared limitation. | open |
 | G26 | should | `metadata.namespace` and `secrets[].source: kubernetes` tie a manifest to one runtime. | Namespace is deployment data; `source` names an abstract store that the runtime resolves. | open |
@@ -124,7 +124,7 @@ the collector only works because a command step now parses structured sources de
 | G27 | should | `permissions.default` has no default; the runtime denies unlisted actions. | State the default (`deny`), or require `default` when tools or network are present. | open |
 | G28 | should | Input type `artifact` is undefined (reference, digest, where the step finds it); the runtime rejects it. | Artifact reference (URI and digest) and placement, together with G01 and G12. | open |
 | G29 | should | `execution.id` has no format or scope; the runtime used different values in expressions, `AWP_EXECUTION_ID` and audit events. | Opaque, globally unique, the same value everywhere. | open; spec 10.1 recommends `awp-exec-<ULID>`, the `WorkflowRun` draft adds `status.executionId` |
-| G30 | should | Retry semantics: what an attempt is, how timeouts apply, how `retries` relates to `maxRetries`. | Define attempts; `maxRetries` caps retries at each level. | open; outputs of failed attempts are covered by the step outputs AEP |
+| G30 | should | Retry semantics: what an attempt is, how timeouts apply, how `retries` relates to `maxRetries`. | Define attempts; `maxRetries` caps retries at each level. | open; outputs of failed attempts are covered by AEP-0018 |
 | G31 | should | What `maxSteps` counts is unclear; the runtime counts model calls and command attempts. | Rename (`maxModelCalls`, `maxAttempts`) or define the unit. | open |
 | G32 | should | No defaults for step timeout (and runtimes differ on concurrency); the runtime uses 30 minutes. | Define defaults or require runtimes to state them. | open; `maxConcurrency` defaults to `1` in spec 5.6.3 |
 | G33 | minor | Manual start with only schedule or event triggers is not stated. | Say so in 5.2. | open; spec 5.2 covers absent `triggers`, and the `WorkflowRun` draft requires a manual start to be allowed |
