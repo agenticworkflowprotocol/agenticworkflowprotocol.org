@@ -37,6 +37,7 @@ metadata:
   version: 0.1.0
   owner:
     team: security-team
+  classification: internal
 spec:
   triggers:
     - type: manual
@@ -44,6 +45,10 @@ spec:
     maxCostUsd: 2.00
     maxSteps: 30
     maxDuration: 15m
+  mcpServers:
+    - name: github
+      transport: streamable-http
+      url: https://mcp.example.com/github
   agents:
     - id: fixer
       model:
@@ -52,6 +57,7 @@ spec:
       tools:
         - type: mcp
           server: github
+          tools: [get_file_contents, push_files]
   workflow:
     - id: fix
       agent: fixer
@@ -59,6 +65,15 @@ spec:
       type: command
       command: npm test
       dependsOn: [fix]
+  permissions:
+    default: deny
+    tools:
+      github.get_file_contents:
+        allow: true
+      github.push_files:
+        allow: true
+      shell.execute:
+        allow: true
 ```
 
 ## Compliance

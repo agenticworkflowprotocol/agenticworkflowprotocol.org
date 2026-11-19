@@ -10,6 +10,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Changed
 
+- README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).
 - The repository is implementation-neutral (decision D17): implementation-specific alignment documents, mappings and the single implementation page were removed, the AEPs describe prior art without naming products, the extension prefix list starts empty, and the project contact is info@agenticworkflowprotocol.org. Repository links point to `agenticworkflowprotocol/agenticworkflowprotocol.org`.
 - Extension prefix list: two more conventions (a field sits on the object it modifies; each field is documented as safe to ignore or critical, with its planned successor).
 - AEP process adopted (`docs/aep-process.md`, owner decision of 2026-10-10, in force with the merge after the 5-working-day discussion period): AEPs need a reviewer who is not an author and, while all maintainers belong to one organisation, an external one (new section 5.1); no self-acceptance, also during alpha. New section 7.0 defines when an implementation may say "AWP `<version>` schema conformant (alpha)": the conformance suite passes against its validator and its real exports in public CI; until then the wording is "built to the AWP schema, conformance in progress (alpha)".
@@ -22,6 +23,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 ### Added
 
 - Proposed (Draft, not accepted) AEPs from implementation experience with `v1alpha1` (decision D18): `aep/0012` tool steps (a step that performs one declared action without a model), `aep/0013` runtime clarifications (metering of budgets known only after a call, rendering of non-string values in expressions, the outcome of a rejected action approval, the minimum events of `core`), `aep/0014` input examples and object schemas. They do not change `v1alpha1`.
+- Website header: links to the validator, the editor and the viewer next to GitHub; footer link to the viewer.
 - Links to the AWP editor and viewer ([online](https://editor.agenticworkflowprotocol.org), [Web Components](https://github.com/agenticworkflowprotocol/awp-editor)) in the README, the introduction, the Quickstart, the sidebar and the footer.
 - Links to the reference validator ([online](https://validator.agenticworkflowprotocol.org), [CLI and library](https://github.com/agenticworkflowprotocol/awp-validator)) in the README, the introduction, the Quickstart, "Build your own AWP runtime", the sidebar and the footer.
 - Website: concept page "Extending AWP" (extension fields, refinement with core fields, runtime-defined parts, the path into the core through AEPs, and what is rejected).

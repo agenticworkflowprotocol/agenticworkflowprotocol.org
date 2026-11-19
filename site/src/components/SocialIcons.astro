@@ -1,0 +1,32 @@
+---
+// Header links to the AWP tools, followed by Starlight's social icons (GitHub).
+// The same three destinations appear in the headers of the validator and the editor sites.
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+
+const tools = [
+  { label: 'Validator', href: 'https://validator.agenticworkflowprotocol.org/' },
+  { label: 'Editor', href: 'https://editor.agenticworkflowprotocol.org/' },
+  { label: 'Viewer', href: 'https://editor.agenticworkflowprotocol.org/viewer' },
+];
+---
+<nav class="awp-tools" aria-label="Tools">
+  {tools.map(({ label, href }) => <a href={href} rel="noopener">{label}</a>)}
+</nav>
+<Default />
+<style>
+  .awp-tools {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .awp-tools a {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .awp-tools a:hover {
+    color: var(--sl-color-white);
+  }
+</style>

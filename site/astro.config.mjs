@@ -39,7 +39,7 @@ export default defineConfig({
       locales: { root: { label: 'English', lang: 'en' } },
       social: [{ icon: 'github', label: 'GitHub', href: repo }],
       customCss: ['./src/styles/custom.css'],
-      components: { SiteTitle: './src/components/SiteTitle.astro', Footer: './src/components/Footer.astro', Sidebar: './src/components/Sidebar.astro' },
+      components: { SiteTitle: './src/components/SiteTitle.astro', Footer: './src/components/Footer.astro', Sidebar: './src/components/Sidebar.astro', SocialIcons: './src/components/SocialIcons.astro' },
       expressiveCode: { styleOverrides: { borderRadius: '0.75rem', codeFontSize: '0.875rem' } },
       pagination: true,
       tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 3 },
