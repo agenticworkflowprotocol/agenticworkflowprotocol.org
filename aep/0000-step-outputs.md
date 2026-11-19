@@ -146,6 +146,12 @@ concept used the same file convention and a completion tool with real models.
 2. Should the minimum sizes be larger? Kubernetes object size limits make 1 MiB per step a
    practical ceiling for runtimes that keep outputs in objects.
 3. Should `complete_step` be the only name (MUST) instead of a recommendation (SHOULD)?
+4. May a runtime accept non-string values in `complete_step` and store them as compact JSON text?
+   An agent that returns a list (for example extracted events that the next command step parses)
+   has to emit JSON inside a string parameter today: escaping errors are common and nothing is
+   validated. Typed outputs (AEP-0003) are the intended solution; until then, accepting arrays and
+   objects and serializing them as JSON would make such workflows reliable, but the value a
+   dependent step sees would depend on whether the runtime does it.
 
 ## Decision
 
