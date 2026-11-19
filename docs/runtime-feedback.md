@@ -25,7 +25,8 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 4. [Kubernetes and runtime binding](#4-kubernetes-and-runtime-binding)
 5. [Trust and data flow](#5-trust-and-data-flow)
 6. [Minor](#6-minor)
-7. [Questions for the project lead](#7-questions-for-the-project-lead)
+7. [From the operator](#7-from-the-operator)
+8. [Questions for the project lead](#8-questions-for-the-project-lead)
 
 ## 1. Status overview
 
@@ -33,7 +34,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | --- | --- |
 | AEP drafted and applied to the `v1alpha2` draft (Draft, not accepted) | G01, G07, G08; partly G14, G15 |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22 |
-| Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G26, K |
+| Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G38, K |
 
 ## 2. Step interface
 
@@ -76,6 +77,11 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | G26 | should | `metadata.namespace` and `secrets[].source: kubernetes` tie a manifest to one runtime. | Namespace is deployment data; `source` names an abstract store that the runtime resolves. | open |
 | K | should | No mapping of AWP concepts to Kubernetes primitives; every Kubernetes runtime invents its own. | A mapping table in spec 3.10, see below. | open |
 
+G09 is discussed further in the conversation with the project lead: instead of keeping unknown
+fields in every object, the CustomResourceDefinitions could prune them as Kubernetes does, express
+the conditional rules of the JSON Schema as CEL rules (`x-kubernetes-validations`), and keep
+unknown fields only in extension values. Not decided.
+
 **Proposed mapping (K).** Principle: AWP describes intent; Kubernetes is one way to enforce it.
 Manifests contain no Kubernetes objects (no `secretKeyRef`, resource requests, NetworkPolicy,
 node selectors); where AWP and Kubernetes share a concept, names and semantics are aligned (as
@@ -106,7 +112,29 @@ node selectors); where AWP and Kubernetes share a concept, names and semantics a
 - `maxCostUsd` is a floating-point number; runtimes store costs as decimal strings.
 - Durations with `d`, `w`, `y`: the runtime assumed 24 h, 7 d and 365 d; section 3.6 should say so.
 
-## 7. Questions for the project lead
+## 7. From the operator
+
+Reported later by the operator of the same runtime. Data point for G04 and G24: a run against six
+real venue sites found 358 events; the rating step rated 37 as relevant and cost 0.27 USD (about
+91,000 input tokens). Extracting about 250 events with a model hit the output token limit twice;
+the collector only works because a command step now parses structured sources deterministically.
+
+| ID | Sev. | Gap | Proposal from the runtime | Status |
+| --- | --- | --- | --- | --- |
+| G27 | should | `permissions.default` has no default; the runtime denies unlisted actions. | State the default (`deny`), or require `default` when tools or network are present. | open |
+| G28 | should | Input type `artifact` is undefined (reference, digest, where the step finds it); the runtime rejects it. | Artifact reference (URI and digest) and placement, together with G01 and G12. | open |
+| G29 | should | `execution.id` has no format or scope; the runtime used different values in expressions, `AWP_EXECUTION_ID` and audit events. | Opaque, globally unique, the same value everywhere. | open; spec 10.1 recommends `awp-exec-<ULID>`, the `WorkflowRun` draft adds `status.executionId` |
+| G30 | should | Retry semantics: what an attempt is, how timeouts apply, how `retries` relates to `maxRetries`. | Define attempts; `maxRetries` caps retries at each level. | open; outputs of failed attempts are covered by the step outputs AEP |
+| G31 | should | What `maxSteps` counts is unclear; the runtime counts model calls and command attempts. | Rename (`maxModelCalls`, `maxAttempts`) or define the unit. | open |
+| G32 | should | No defaults for step timeout (and runtimes differ on concurrency); the runtime uses 30 minutes. | Define defaults or require runtimes to state them. | open; `maxConcurrency` defaults to `1` in spec 5.6.3 |
+| G33 | minor | Manual start with only schedule or event triggers is not stated. | Say so in 5.2. | open; spec 5.2 covers absent `triggers`, and the `WorkflowRun` draft requires a manual start to be allowed |
+| G34 | should | No model request parameters; a real run hit the output token limit of 8192. Overlaps G24. | `agents[].model.parameters` with at least `maxOutputTokens`. | open |
+| G35 | should | Unknown prices and cached tokens in cost computation. | Fail closed for unknown prices when `maxCostUsd` applies; define whether cached tokens count. | open; AEP-0013 covers budget metering in part |
+| G36 | should | `permissions.secrets` semantics undefined; the runtime rejects it. | Allow list intersected over all permission objects, for every step type. | open |
+| G37 | minor | Whether command steps need `shell.execute` and whether that is checked statically. | Command steps require `shell.execute`, checked at validation. | open |
+| G38 | minor | `maxDuration` on an agent is ambiguous when the agent serves several steps; the runtime rejects it. | Only workflow and step level, or cumulative step time. | open |
+
+## 8. Questions for the project lead
 
 1. Do the three drafted AEPs (G01, G07, G08) join the `v1alpha2` scope table in the decision log,
    once they reach `Review`?
@@ -116,4 +144,7 @@ node selectors); where AWP and Kubernetes share a concept, names and semantics a
    well, so that a runtime can test them?
 4. K and G26: a normative Kubernetes mapping in spec 3.10, or an informative page on the website?
 5. G09: should this repository publish the validator as a container image for admission webhooks?
-6. G13 (`finally`), G23 (fan-out) and G24 (token and turn limits): `v1alpha2` or later?
+6. G13 (`finally`), G23 (fan-out) and G24 with G34 (token and turn limits, model parameters):
+   `v1alpha2` or later? The real run above makes G24/G34 the most pressing of them.
+7. G27 to G38 are mostly clarifications. Collect them in one AEP (like AEP-0013) or extend
+   AEP-0013?
