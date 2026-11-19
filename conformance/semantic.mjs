@@ -258,8 +258,8 @@ export function semanticCheck(doc, opts = {}) {
         needProfile('interaction', 'step with type: input', ptr('spec', 'workflow', i), '3.3');
         checkInputStep(s.input, ['spec', 'workflow', i, 'input'], err, ptr);
       }
-      // 5.6.4: the runtime owns AWP_* variables of command steps
-      for (const k of Object.keys(s.env ?? {})) {
+      // 5.6.4 (v1alpha2 only): the runtime owns AWP_* variables of command steps
+      for (const k of doc.apiVersion === V1ALPHA2 ? Object.keys(s.env ?? {}) : []) {
         if (k.startsWith('AWP_')) err('step.reserved-env', '5.6.4', ptr('spec', 'workflow', i, 'env', k), `environment variable "${k}" is reserved for the runtime (AWP_ prefix)`);
       }
       if (profiles.has('security') && s.type === 'command' && typeof s.image === 'string' && !/@(sha256:[0-9a-f]{64}|sha384:[0-9a-f]{96}|sha512:[0-9a-f]{128})$/.test(s.image)) {
