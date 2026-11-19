@@ -41,6 +41,7 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0018](../aep/0018-step-outputs.md) | Step output interface | Draft | proposed for `v1alpha2` |
 | [0019](../aep/0019-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions | Draft | proposed for `v1alpha2` |
 | [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha2` |
+| [0021](../aep/0021-extension-model.md) | Extension model aligned with the Kubernetes Gateway API (concept) | Draft | proposed for `v1alpha2` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

@@ -8,6 +8,10 @@ AWP is meant to be extended and refined. The core stays small and vendor-neutral
 
 There are four ways to extend AWP, from local to standard.
 
+:::note[Changes in the v1alpha2 draft]
+This page describes `v1alpha1`. In the `v1alpha2` draft, `x-` fields move into `extensions` objects so that manifests can be stored as Kubernetes resources ([AEP-0015](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0015-kubernetes-resource-model.md)). [AEP-0021](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0021-extension-model.md) proposes to replace them with typed references at defined extension points, domain-prefixed values and attached policies, as the Kubernetes Gateway API does. Both are drafts.
+:::
+
 ## 1. Extension fields (`x-`)
 
 Any object in a manifest may carry fields whose name starts with `x-` ([spec 3.3](/specification/v1alpha1/#33-unknown-fields-and-extensions)).

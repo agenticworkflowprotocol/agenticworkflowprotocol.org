@@ -34,7 +34,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | --- | --- |
 | AEP drafted and applied to the `v1alpha2` draft (Draft, not accepted) | G01, G07, G08; partly G14, G15 |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22 |
-| Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G38, K |
+| Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G39, K |
 
 ## 2. Step interface
 
@@ -80,7 +80,8 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 G09 is discussed further in the conversation with the project lead: instead of keeping unknown
 fields in every object, the CustomResourceDefinitions could prune them as Kubernetes does, express
 the conditional rules of the JSON Schema as CEL rules (`x-kubernetes-validations`), and keep
-unknown fields only in extension values. Not decided.
+unknown fields only in extension values. [AEP-0021](../aep/0021-extension-model.md) proposes this
+together with an extension model aligned with the Kubernetes Gateway API. Not decided.
 
 **Proposed mapping (K).** Principle: AWP describes intent; Kubernetes is one way to enforce it.
 Manifests contain no Kubernetes objects (no `secretKeyRef`, resource requests, NetworkPolicy,
@@ -133,6 +134,7 @@ the collector only works because a command step now parses structured sources de
 | G36 | should | `permissions.secrets` semantics undefined; the runtime rejects it. | Allow list intersected over all permission objects, for every step type. | open |
 | G37 | minor | Whether command steps need `shell.execute` and whether that is checked statically. | Command steps require `shell.execute`, checked at validation. | open |
 | G38 | minor | `maxDuration` on an agent is ambiguous when the agent serves several steps; the runtime rejects it. | Only workflow and step level, or cumulative step time. | open |
+| G39 | should | Runtime neutrality has only been tested on Kubernetes. The `WorkflowRun` draft defines conditions as `metav1.Condition` and names an admission webhook as the source of the actor. Related to G26. | Define conditions as plain JSON (`type`, `status`, `reason`, `message`, `lastTransitionTime`) with `metav1.Condition` as the Kubernetes mapping; keep "actor from an authenticated source" normative and the webhook as a non-normative example; mark Kubernetes-only text as informative. A run of the same workflow without a cluster is planned. | open |
 
 ## 8. Questions for the project lead
 
@@ -142,7 +144,7 @@ the collector only works because a command step now parses structured sources de
    next?
 3. G02, G04, G06, G22: apply AEP-0001, AEP-0003, AEP-0012 and AEP-0014 to the `v1alpha2` draft as
    well, so that a runtime can test them?
-4. K and G26: a normative Kubernetes mapping in spec 3.10, or an informative page on the website?
+4. K, G26 and G39: a normative Kubernetes mapping in spec 3.10, or an informative page on the website?
 5. G09: should this repository publish the validator as a container image for admission webhooks?
 6. G13 (`finally`), G23 (fan-out) and G24 with G34 (token and turn limits, model parameters):
    `v1alpha2` or later? The real run above makes G24/G34 the most pressing of them.
