@@ -1,6 +1,6 @@
-# Builds the website (site/), runs the checks and deploys it to GitHub Pages.
-# Uses GitHub-hosted runners only. The deploy job needs GitHub Pages to be enabled for this repository
-# (Settings > Pages > Source: GitHub Actions); do not enable it before the account restriction is lifted.
+# Builds the website (site/) and runs its checks. It does not deploy: Cloudflare Pages builds and
+# serves agenticworkflowprotocol.org from main itself, GitHub Pages is not used.
+# Uses GitHub-hosted runners only.
 name: pages
 
 on:
@@ -69,23 +69,3 @@ jobs:
         env:
           CHROME_PATH: /usr/bin/google-chrome
         run: npm run check:a11y
-
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        if: github.event_name != 'pull_request'
-        with:
-          path: site/dist
-
-  deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

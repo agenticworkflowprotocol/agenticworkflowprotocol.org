@@ -19,4 +19,5 @@ npm run dev          # local development server
 - **Node.** Astro 5.18.2 and Starlight 0.37.7 are pinned because Astro 6 and later require Node 22.
   The a11y check needs a system Chromium or Chrome (`CHROME_PATH`); no browser is downloaded.
 - **Languages.** English only. Add a `de` locale in `astro.config.mjs` and a `src/content/docs/de/` tree.
-- **Deploy.** `.github/workflows/pages.yml` (GitHub-hosted runners).
+- **Deploy.** Cloudflare Pages builds and serves the site from `main`. `.github/workflows/pages.yml`
+  only builds and checks it (GitHub-hosted runners) and does not deploy.
