@@ -1,4 +1,4 @@
-// Semantic rules for human input (v1alpha2 spec 5.8) that JSON Schema cannot express.
+// Semantic rules for human input (v1alpha3 spec 5.8) that JSON Schema cannot express.
 
 const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 

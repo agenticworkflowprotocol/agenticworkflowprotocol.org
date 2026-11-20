@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), security reviewer |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core`, `governance`, `security` |
 | **Created** | 2026-11-18 |
 | **Discussion** | issue to be opened |
@@ -25,7 +25,7 @@ of `v1alpha1` (`version`, `owner`, `classification`, `risk`, `integrity`, ...) m
 Extension fields move into `extensions` objects, two fields with a type union get one type, and
 `status` is reserved for runtimes. The JSON Schema becomes expressible as a Kubernetes structural
 schema, and the repository publishes CustomResourceDefinitions generated from it. The full text is
-applied in [spec/v1alpha2](../spec/v1alpha2/README.md).
+applied in [spec/v1alpha3](../spec/v1alpha3/README.md).
 
 ## Motivation
 
@@ -72,7 +72,7 @@ document shape, not a dependency.
 
 ## Specification
 
-Changes relative to `v1alpha1`, written out in [spec/v1alpha2](../spec/v1alpha2/README.md):
+Changes relative to `v1alpha1`, written out in [spec/v1alpha3](../spec/v1alpha3/README.md):
 
 1. **Top-level structure (3.2).** A manifest has `apiVersion`, `kind`, `metadata`, `spec` and,
    optionally, `status`, and nothing else. `status` is reserved: validators ignore it, it is not
@@ -109,7 +109,7 @@ Changes relative to `v1alpha1`, written out in [spec/v1alpha2](../spec/v1alpha2/
 ## Examples
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: Workflow
 metadata:
   name: example
@@ -138,7 +138,7 @@ and its digest is unchanged.
 
 ## Schema changes
 
-- New schema [`schema/awp.v1alpha2.json`](../schema/awp.v1alpha2.json), derived from
+- New schema [`schema/awp.v1alpha3.json`](../schema/awp.v1alpha3.json), derived from
   `awp.v1alpha1.json`: `Metadata` replaced by the `ObjectMeta` subset, new `ObjectName`, governance
   fields added to `WorkflowSpec`, `AgentSpec` and `PolicySpec`, `patternProperties: {"^x-": {}}`
   replaced by an `extensions` property on 74 objects (new `Extensions` definition), `Owner` and
@@ -154,7 +154,7 @@ and its digest is unchanged.
 
 - `core`: object names, metadata subset, common spec fields, extensions, reserved `status`, digest
   scope; the runtime requirements of 3.10.
-- New suite `conformance/v1alpha2/`: all 180 `v1alpha1` cases migrated (paths and codes adjusted
+- New suite `conformance/v1alpha3/`: all 180 `v1alpha1` cases migrated (paths and codes adjusted
   where the document model changes them), plus:
   - valid: `3.2-status-and-store-metadata`, `9.1-digest-ignores-deployment-fields`
     (`verifyDigest`), `4-labels-and-annotations` (replaces `4-owner-string-shorthand`);
@@ -171,7 +171,7 @@ strings, move `x-` fields into `extensions`, write policy condition values as `e
 need the author: names that are not DNS-1123 labels (for example uppercase or `_`) must be renamed,
 and digests must be recomputed because the digest input changes.
 
-Effect on other AEPs that target `v1alpha2` (to be adjusted in their own pull requests):
+Effect on other AEPs that target `v1alpha3` (to be adjusted in their own pull requests):
 
 - AEP-0010: the removed fields are `spec.integrity`, `spec.signature`, `spec.provenance`, and the
   digest input is the one of item 7; its test vectors must be recomputed.
@@ -220,10 +220,10 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-- The reference checker validates `v1alpha1` and `v1alpha2`, selected by `apiVersion`, and migrates
+- The reference checker validates `v1alpha1` and `v1alpha3`, selected by `apiVersion`, and migrates
   `v1alpha1` manifests. All conformance cases pass.
 - The generated CustomResourceDefinitions were applied to a Kubernetes 1.35 API server (k3s): they
-  are accepted as structural, every valid `v1alpha2` case and example is accepted by a server-side
+  are accepted as structural, every valid `v1alpha3` case and example is accepted by a server-side
   dry run with strict field validation, a governance field in `metadata` is rejected by strict
   field validation, an unknown field in `spec` is preserved when the client skips validation (and
   the reference checker then rejects the stored object), and a stored object read back with

@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes), runtime implementer (non-Kubernetes), author of command step images |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -24,12 +24,12 @@ output into the directory `$AWP_OUTPUTS`; agent steps end with a built-in tool `
 that carries the outputs. Runtimes accept outputs of at least 256 KiB each and 1 MiB per step,
 discard outputs of failed attempts, and reserve environment variables with the prefix `AWP_`.
 Output names are restricted so that they are valid file names. The text is applied in
-[spec/v1alpha2 section 5.6.4](../spec/v1alpha2/README.md#564-step-outputs).
+[spec/v1alpha3 section 5.6.4](../spec/v1alpha3/README.md#564-step-outputs).
 
 ## Motivation
 
 `outputs` declares names, and expressions read `steps.<id>.outputs.<name>`, but the specification
-never says how a value gets there. Runtimes that were built against `v1alpha1` and `v1alpha2`
+never says how a value gets there. Runtimes that were built against `v1alpha1` and `v1alpha3`
 had to invent conventions: files in a directory announced by an environment variable, a JSON
 document on standard output, a completion tool for agents. A command image written for one runtime
 does not produce outputs on another, and an agent prompt that says "call the tool X when done"
@@ -49,7 +49,7 @@ failed command are valid.
 
 ## Specification
 
-Applied in [spec/v1alpha2 section 5.6.4](../spec/v1alpha2/README.md#564-step-outputs), summarised:
+Applied in [spec/v1alpha3 section 5.6.4](../spec/v1alpha3/README.md#564-step-outputs), summarised:
 
 1. **Names.** `outputs[].name` matches `^[A-Za-z_][A-Za-z0-9_]{0,62}$`.
 2. **Command steps.** The runtime creates an empty directory per attempt and passes its path in
@@ -94,7 +94,7 @@ The agent of `rate` ends with `complete_step({"relevant": "[...]"})`.
 ## Conformance impact
 
 - `core`: the interface above.
-- New `v1alpha2` cases: `valid/5.6.4-command-step-outputs`, `invalid/5.6.1-output-name-with-dot`
+- New `v1alpha3` cases: `valid/5.6.4-command-step-outputs`, `invalid/5.6.1-output-name-with-dot`
   (`schema.pattern`), `invalid/5.6.4-reserved-env` (`step.reserved-env`).
 - Runtime tests, once a runtime suite exists: a command image writes outputs and a dependent step
   reads them; a trailing line feed is removed; a symbolic link is not followed; an oversized output

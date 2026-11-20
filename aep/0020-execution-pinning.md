@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator with GitOps), security reviewer |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core`, `audit` |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -24,7 +24,7 @@ Changes or deletions in the object store do not change a running execution; a ru
 it instead (`reason: manifestChanged`). Container images referenced by tag are resolved to digests
 at start and pinned the same way, so authors may use tags and every execution is still traceable. `workflow.started` must carry the workflow digest, and a
 `WorkflowRun` may assert the version or digest it expects. The text is applied in
-[spec/v1alpha2 section 10.1](../spec/v1alpha2/README.md#101-execution-identity).
+[spec/v1alpha3 section 10.1](../spec/v1alpha3/README.md#101-execution-identity).
 
 ## Motivation
 
@@ -45,7 +45,7 @@ concept took a snapshot at start; the specification should require it.
 
 ## Specification
 
-Applied in [spec/v1alpha2 section 10.1](../spec/v1alpha2/README.md#101-execution-identity),
+Applied in [spec/v1alpha3 section 10.1](../spec/v1alpha3/README.md#101-execution-identity),
 summarised:
 
 1. At start the runtime resolves and validates the workflow, referenced `Agent` manifests and
@@ -94,7 +94,7 @@ None for manifests. `WorkflowRun.spec.workflowRef.version` and `digest` and
 
 Runtimes that already snapshot at start comply. Runtimes that read manifests lazily have to
 resolve them at start. Audit events of `workflow.started` without a digest are no longer
-conformant in `v1alpha2`.
+conformant in `v1alpha3`.
 
 ## Security considerations
 

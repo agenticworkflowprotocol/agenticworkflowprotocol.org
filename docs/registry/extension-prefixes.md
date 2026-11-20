@@ -17,8 +17,8 @@ conformance or endorsement of an implementation, and an unlisted prefix is not i
 
 ## 1. Conventions
 
-In `v1alpha2` an extension field is a key of an `extensions` object on the object it modifies
-([spec v1alpha2 section 3.3](../../spec/v1alpha2/README.md#33-unknown-fields-and-extensions)); the
+In `v1alpha3` an extension field is a key of an `extensions` object on the object it modifies
+([spec v1alpha3 section 3.3](../../spec/v1alpha3/README.md#33-unknown-fields-and-extensions)); the
 key has the same `x-<prefix>-<name>` form as the field name in `v1alpha1`.
 
 1. An implementation uses one prefix of the form `x-<prefix>-`, where `<prefix>` is lowercase

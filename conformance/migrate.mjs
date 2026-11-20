@@ -1,8 +1,8 @@
-// Migration of AWP manifests from v1alpha1 to v1alpha2 (Kubernetes resource model alignment).
+// Migration of AWP manifests from v1alpha1 to v1alpha3 (Kubernetes resource model alignment).
 // Pure function on parsed documents; the CLI wrapper is `awp-check.mjs migrate`.
 
 const V1ALPHA1 = 'awp.agenticworkflowprotocol.org/v1alpha1';
-const V1ALPHA2 = 'awp.agenticworkflowprotocol.org/v1alpha2';
+const V1ALPHA3 = 'awp.agenticworkflowprotocol.org/v1alpha3';
 
 // Fields that leave metadata, in the order they are placed at the start of spec.
 const GOVERNANCE_FIELDS = ['version', 'description', 'owner', 'classification', 'purpose', 'risk', 'integrity', 'signature', 'provenance'];
@@ -44,7 +44,7 @@ function migrateRules(rules) {
  * Migrate one parsed v1alpha1 manifest. Returns { document, notes }; `notes` lists changes an
  * author should review (for example a name that is not a DNS-1123 label).
  */
-export function migrateToV1alpha2(doc) {
+export function migrateToV1alpha3(doc) {
   if (!isObj(doc) || doc.apiVersion !== V1ALPHA1) {
     throw new Error(`expected apiVersion ${V1ALPHA1}`);
   }
@@ -68,5 +68,5 @@ export function migrateToV1alpha2(doc) {
   if (Object.keys(extensions).length) spec.extensions = extensions;
   if (lifted.kind === 'Policy' && Array.isArray(spec.rules)) spec.rules = migrateRules(spec.rules);
 
-  return { document: { apiVersion: V1ALPHA2, kind: lifted.kind, metadata, spec }, notes };
+  return { document: { apiVersion: V1ALPHA3, kind: lifted.kind, metadata, spec }, notes };
 }

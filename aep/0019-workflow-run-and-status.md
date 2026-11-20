@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), security reviewer |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -25,11 +25,11 @@ in its `status` (phase, pinned workflow, per-step status, usage, conditions). De
 `status.conditions` as Kubernetes `metav1.Condition` and the standard conditions `Valid` and
 `Ready` for `Workflow`, `Agent` and `Policy`. The generated CustomResourceDefinitions type `status`
 and show the conditions in `kubectl get`. The text is applied in
-[spec/v1alpha2 sections 3.11 and 10.8](../spec/v1alpha2/README.md#108-kind-workflowrun).
+[spec/v1alpha3 sections 3.11 and 10.8](../spec/v1alpha3/README.md#108-kind-workflowrun).
 
 ## Motivation
 
-`v1alpha2` reserves `status` but does not describe it, and AWP has no object for an execution.
+`v1alpha3` reserves `status` but does not describe it, and AWP has no object for an execution.
 A Kubernetes runtime proof of concept had to define its own run kind and its own conditions, and
 because the printer columns of the CRDs come from this repository, `kubectl get workflows` could
 not show whether a manifest was valid. Every runtime would otherwise invent a different run object
@@ -46,8 +46,8 @@ could not work across runtimes. Runtimes without Kubernetes need the same shape 
 
 ## Specification
 
-Applied in [spec/v1alpha2 section 3.11](../spec/v1alpha2/README.md#311-status) and
-[section 10.8](../spec/v1alpha2/README.md#108-kind-workflowrun), summarised:
+Applied in [spec/v1alpha3 section 3.11](../spec/v1alpha3/README.md#311-status) and
+[section 10.8](../spec/v1alpha3/README.md#108-kind-workflowrun), summarised:
 
 1. **Conditions.** `status.conditions[]` with `type`, `status` (`True`, `False`, `Unknown`),
    `reason`, `message`, `lastTransitionTime`, `observedGeneration`, as `metav1.Condition`.
@@ -74,7 +74,7 @@ Applied in [spec/v1alpha2 section 3.11](../spec/v1alpha2/README.md#311-status) a
 ## Examples
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: WorkflowRun
 metadata:
   generateName: vulnerability-fixer-
@@ -97,7 +97,7 @@ NAME                        WORKFLOW              PHASE     STARTED   AGE
 vulnerability-fixer-7k2xq   vulnerability-fixer   running   5m        5m
 ```
 
-A complete run with status: [spec/v1alpha2/examples/vulnerability-fixer.run.yaml](../spec/v1alpha2/examples/vulnerability-fixer.run.yaml).
+A complete run with status: [spec/v1alpha3/examples/vulnerability-fixer.run.yaml](../spec/v1alpha3/examples/vulnerability-fixer.run.yaml).
 
 ## Schema changes
 
@@ -110,7 +110,7 @@ kinds stays an open object for validators. New CRD `schema/crd/workflowruns.yaml
 
 - `core`: section 10.8 for runtimes that expose executions as objects; the status shapes are
   SHOULD.
-- New `v1alpha2` cases: `valid/10.8-workflow-run`, `valid/10.8-workflow-run-with-status`,
+- New `v1alpha3` cases: `valid/10.8-workflow-run`, `valid/10.8-workflow-run-with-status`,
   `invalid/10.8-workflow-run-without-workflow-ref`, `invalid/10.8-workflow-run-without-name`,
   `invalid/10.8-workflow-run-governance-field`, `invalid/10.8-workflow-ref-version-not-semver`;
   example `vulnerability-fixer.run.yaml`.

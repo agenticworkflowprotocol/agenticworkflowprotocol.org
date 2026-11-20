@@ -1,11 +1,11 @@
-# Runtime feedback on `v1alpha2`
+# Runtime feedback on `v1alpha3`
 
 | | |
 | --- | --- |
 | **Status** | Working list for discussion. Nothing here is decided; an entry changes the specification only through an AEP ([decision D18](decisions.md#d18-implementation-experience-goes-into-aeps-and-implementer-guidance)). |
-| **Source** | A Kubernetes runtime proof of concept (operator, step runner, one real workflow) built against `v1alpha2` at commit `d1bc49b`. As decided in D17, the runtime is not named. |
+| **Source** | A Kubernetes runtime proof of concept (operator, step runner, one real workflow) built against `v1alpha3` at commit `d1bc49b`. As decided in D17, the runtime is not named. |
 | **Collected** | 2026-11-19 |
-| **Related** | [decision log](decisions.md), [AEP process](aep-process.md), [spec v1alpha2](../spec/v1alpha2/README.md) |
+| **Related** | [decision log](decisions.md), [AEP process](aep-process.md), [spec v1alpha3](../spec/v1alpha3/README.md) |
 
 The proof of concept ran a workflow that fetches event pages of venues, extracts events with a
 small model, compares them with stored state, rates new events with a larger model against a
@@ -32,7 +32,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | Status | Entries |
 | --- | --- |
-| AEP drafted and applied to the `v1alpha2` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
+| AEP drafted and applied to the `v1alpha3` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22 |
 | Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G39, K |
 
@@ -56,7 +56,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | ID | Sev. | Gap | Proposal from the runtime | Status |
 | --- | --- | --- | --- | --- |
-| G04 | must | No conditional steps: the expensive rating step runs daily even when nothing is new (about 1.50 USD a month for nothing). `v1alpha2` expressions have no operators. | AEP-0001 in `v1alpha2` with a minimal comparison. | [AEP-0001](../aep/0001-conditional-steps.md), not applied |
+| G04 | must | No conditional steps: the expensive rating step runs daily even when nothing is new (about 1.50 USD a month for nothing). `v1alpha3` expressions have no operators. | AEP-0001 in `v1alpha3` with a minimal comparison. | [AEP-0001](../aep/0001-conditional-steps.md), not applied |
 | G06 | must | Side effects of commands are invisible to governance: sending a message is only `shell.execute`, so rules on `external.communication` do not apply. | Tool steps. | [AEP-0012](../aep/0012-tool-steps.md), not applied |
 | G08 | must | No rule that an execution keeps the manifest version it started with; a GitOps sync can change a manifest mid-run. | MUST, with the digest in `workflow.started`. | AEP drafted: [execution pinning](../aep/0020-execution-pinning.md), spec 10.1 |
 | G13 | should | No step that runs after a failure ("notify me when the run fails"). | `finally` or `onFailure` steps. | open |
@@ -139,15 +139,15 @@ the collector only works because a command step now parses structured sources de
 
 ## 8. Questions for the project lead
 
-1. Do the three drafted AEPs (G01, G07, G08) join the `v1alpha2` scope table in the decision log,
+1. Do the three drafted AEPs (G01, G07, G08) join the `v1alpha3` scope table in the decision log,
    once they reach `Review`?
 2. G03 state and G05 secret scopes are the remaining **must** entries without an AEP. Draft them
    next?
-3. G02, G04, G06, G22: apply AEP-0001, AEP-0003, AEP-0012 and AEP-0014 to the `v1alpha2` draft as
+3. G02, G04, G06, G22: apply AEP-0001, AEP-0003, AEP-0012 and AEP-0014 to the `v1alpha3` draft as
    well, so that a runtime can test them?
 4. K, G26 and G39: a normative Kubernetes mapping in spec 3.10, or an informative page on the website?
 5. G09: should this repository publish the validator as a container image for admission webhooks?
 6. G13 (`finally`), G23 (fan-out) and G24 with G34 (token and turn limits, model parameters):
-   `v1alpha2` or later? The real run above makes G24/G34 the most pressing of them.
+   `v1alpha3` or later? The real run above makes G24/G34 the most pressing of them.
 7. G27 to G38 are mostly clarifications. Collect them in one AEP (like AEP-0013) or extend
    AEP-0013?

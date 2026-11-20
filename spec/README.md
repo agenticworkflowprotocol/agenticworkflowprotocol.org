@@ -5,11 +5,11 @@ This directory contains the normative text of the Agentic Workflow Protocol (AWP
 | API version | Status | Text |
 | ----------- | ------ | ---- |
 | `v1alpha1` | **Draft / alpha** - may change incompatibly | [v1alpha1/README.md](v1alpha1/README.md) |
-| `v1alpha2` | **Working draft / alpha** - starts from `v1alpha1` with the Kubernetes resource model alignment, schedule semantics and human input (Draft AEPs, not accepted); the other AEPs for `v1alpha2` are not applied yet | [v1alpha2/README.md](v1alpha2/README.md) |
+| `v1alpha3` | **Working draft / alpha** - starts from `v1alpha1` with the Kubernetes resource model alignment, schedule semantics and human input (Draft AEPs, not accepted); the other AEPs for `v1alpha3` are not applied yet | [v1alpha3/README.md](v1alpha3/README.md) |
 
-- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md), [v1alpha2/glossary.md](v1alpha2/glossary.md)
-- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/), [v1alpha2/examples/](v1alpha2/examples/)
-- Kubernetes CustomResourceDefinitions for `v1alpha2`, generated from the schema: [../schema/crd/](../schema/crd/)
+- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md), [v1alpha3/glossary.md](v1alpha3/glossary.md)
+- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/), [v1alpha3/examples/](v1alpha3/examples/)
+- Kubernetes CustomResourceDefinitions for `v1alpha3`, generated from the schema: [../schema/crd/](../schema/crd/)
 
 ## Roadmap: proposed changes
 
@@ -35,13 +35,13 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
 | [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
 | [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
-| [0015](../aep/0015-kubernetes-resource-model.md) | Kubernetes resource model alignment | Draft | proposed for `v1alpha2` |
-| [0016](../aep/0016-schedule-semantics.md) | Schedule semantics: overlap and missed ticks | Draft | proposed for `v1alpha2` |
-| [0017](../aep/0017-human-input.md) | Human input during an execution | Draft | proposed for `v1alpha2` |
-| [0018](../aep/0018-step-outputs.md) | Step output interface | Draft | proposed for `v1alpha2` |
-| [0019](../aep/0019-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions | Draft | proposed for `v1alpha2` |
-| [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha2` |
-| [0021](../aep/0021-extension-model.md) | Extension model aligned with the Kubernetes Gateway API (concept) | Draft | proposed for `v1alpha2` |
+| [0015](../aep/0015-kubernetes-resource-model.md) | Kubernetes resource model alignment | Draft | proposed for `v1alpha3` |
+| [0016](../aep/0016-schedule-semantics.md) | Schedule semantics: overlap and missed ticks | Draft | proposed for `v1alpha3` |
+| [0017](../aep/0017-human-input.md) | Human input during an execution | Draft | proposed for `v1alpha3` |
+| [0018](../aep/0018-step-outputs.md) | Step output interface | Draft | proposed for `v1alpha3` |
+| [0019](../aep/0019-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions | Draft | proposed for `v1alpha3` |
+| [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha3` |
+| [0021](../aep/0021-extension-model.md) | Extension model aligned with the Kubernetes Gateway API (concept) | Draft | proposed for `v1alpha3` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

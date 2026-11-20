@@ -1,5 +1,5 @@
-// Semantic validation rules of AWP v1alpha1 and v1alpha2 that JSON Schema cannot express.
-// v1alpha2 differs only in layout: governance fields live in spec instead of metadata,
+// Semantic validation rules of AWP v1alpha1 and v1alpha3 that JSON Schema cannot express.
+// v1alpha3 differs only in layout: governance fields live in spec instead of metadata,
 // extension fields in `extensions` objects instead of x- keys, and `status` is ignored.
 // Rule catalogue: schema/README.md. Every diagnostic has a stable `code`.
 // Runs on documents that already passed the structural schema.
@@ -16,12 +16,12 @@ const esc = s => String(s).replace(/~/g, '~0').replace(/\//g, '~1');
 const ptr = (...parts) => parts.map(p => '/' + esc(p)).join('');
 const isObj = v => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-const V1ALPHA2 = 'awp.agenticworkflowprotocol.org/v1alpha2';
+const V1ALPHA3 = 'awp.agenticworkflowprotocol.org/v1alpha3';
 const INTEGRITY_FIELDS = ['integrity', 'signature', 'provenance'];
 
 /** Where the governance fields (version, owner, classification, risk, integrity, ...) live. */
 function governanceOf(doc) {
-  return doc.apiVersion === V1ALPHA2
+  return doc.apiVersion === V1ALPHA3
     ? { fields: doc.spec ?? {}, base: 'spec' }
     : { fields: doc.metadata ?? {}, base: 'metadata' };
 }
@@ -36,12 +36,12 @@ export function jcs(value) {
 
 /** The value the digest is computed over (spec 9.1). */
 function digestInput(doc) {
-  if (doc.apiVersion !== V1ALPHA2) {
+  if (doc.apiVersion !== V1ALPHA3) {
     const copy = structuredClone(doc);
     if (copy.metadata) for (const f of INTEGRITY_FIELDS) delete copy.metadata[f];
     return copy;
   }
-  // v1alpha2: identity and spec only. Labels, annotations, namespace, store-populated metadata and
+  // v1alpha3: identity and spec only. Labels, annotations, namespace, store-populated metadata and
   // status are changed by deployment tools and object stores, so they are not covered.
   const spec = structuredClone(doc.spec ?? {});
   for (const f of INTEGRITY_FIELDS) delete spec[f];
@@ -67,7 +67,7 @@ function forEachNode(node, fn, path = []) {
   else if (isObj(node)) {
     for (const [k, v] of Object.entries(node)) {
       if (k.startsWith('x-') || (k === 'extensions' && isObj(v))) continue; // extension subtrees are opaque (spec 3.3)
-      if (path.length === 0 && k === 'status') continue; // runtime-owned (v1alpha2 spec 3.2)
+      if (path.length === 0 && k === 'status') continue; // runtime-owned (v1alpha3 spec 3.2)
       forEachNode(v, fn, [...path, k]);
     }
   }
@@ -258,8 +258,8 @@ export function semanticCheck(doc, opts = {}) {
         needProfile('interaction', 'step with type: input', ptr('spec', 'workflow', i), '3.3');
         checkInputStep(s.input, ['spec', 'workflow', i, 'input'], err, ptr);
       }
-      // 5.6.4 (v1alpha2 only): the runtime owns AWP_* variables of command steps
-      for (const k of doc.apiVersion === V1ALPHA2 ? Object.keys(s.env ?? {}) : []) {
+      // 5.6.4 (v1alpha3 only): the runtime owns AWP_* variables of command steps
+      for (const k of doc.apiVersion === V1ALPHA3 ? Object.keys(s.env ?? {}) : []) {
         if (k.startsWith('AWP_')) err('step.reserved-env', '5.6.4', ptr('spec', 'workflow', i, 'env', k), `environment variable "${k}" is reserved for the runtime (AWP_ prefix)`);
       }
       if (profiles.has('security') && s.type === 'command' && typeof s.image === 'string' && !/@(sha256:[0-9a-f]{64}|sha384:[0-9a-f]{96}|sha512:[0-9a-f]{128})$/.test(s.image)) {

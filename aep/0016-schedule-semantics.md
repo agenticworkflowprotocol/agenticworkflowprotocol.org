@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes) |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core`, `audit` |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -23,7 +23,7 @@ A `schedule` trigger has only `cron` and `timezone`. This AEP defines what happe
 arrives while the previous scheduled execution is still running (`concurrencyPolicy`: `forbid` by
 default, `allow`, `replace`), what happens to ticks missed while the runtime was down (skipped by
 default, optional `startingDeadline`), and a `trigger.skipped` event for every tick that does not
-start an execution. The text is applied in [spec/v1alpha2 section 5.2](../spec/v1alpha2/README.md#52-triggers).
+start an execution. The text is applied in [spec/v1alpha3 section 5.2](../spec/v1alpha3/README.md#52-triggers).
 
 ## Motivation
 
@@ -47,7 +47,7 @@ runtimes without Kubernetes need the same semantics to be portable.
 
 ## Specification
 
-Applied in [spec/v1alpha2 section 5.2](../spec/v1alpha2/README.md#52-triggers), summarised:
+Applied in [spec/v1alpha3 section 5.2](../spec/v1alpha3/README.md#52-triggers), summarised:
 
 1. New fields of `schedule` triggers: `concurrencyPolicy` (`forbid` default, `allow`, `replace`)
    and `startingDeadline` (duration). Both are invalid on other trigger types.
@@ -84,7 +84,7 @@ regenerated.
 
 - `core`: overlap and missed-tick behaviour for runtimes that support schedule triggers.
 - `audit`: `trigger.skipped`.
-- New `v1alpha2` cases: `valid/5.2-schedule-concurrency-and-deadline`,
+- New `v1alpha3` cases: `valid/5.2-schedule-concurrency-and-deadline`,
   `invalid/5.2-invalid-concurrency-policy` (`schema.enum`),
   `invalid/5.2-concurrency-policy-on-event-trigger` (`schema.not`),
   `invalid/5.2-starting-deadline-not-duration` (`schema.pattern`).
@@ -131,7 +131,7 @@ behaviour is implemented here.
 ## Open questions
 
 1. Should `concurrencyPolicy` also consider executions of the same workflow started manually?
-2. Should `replace` wait for `finally` steps once they exist (proposed elsewhere for `v1alpha2`)?
+2. Should `replace` wait for `finally` steps once they exist (proposed elsewhere for `v1alpha3`)?
 
 ## Decision
 

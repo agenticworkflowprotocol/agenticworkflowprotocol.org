@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer, security reviewer, someone familiar with MCP elicitation |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | new `interaction` profile; `audit`, `mcp` |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -24,7 +24,7 @@ Let an execution ask a person a question and wait for a free-text or structured 
 `humanInput` may ask questions of its own through a built-in tool. Answers follow a flat schema
 taken from MCP elicitation, come only from named human answerers, expire with `onTimeout`, are
 recorded as `input.*` audit events whose content follows the `payload` rules, and never count as
-approvals. The text is applied in [spec/v1alpha2 section 5.8](../spec/v1alpha2/README.md#58-human-input).
+approvals. The text is applied in [spec/v1alpha3 section 5.8](../spec/v1alpha3/README.md#58-human-input).
 
 ## Motivation
 
@@ -45,7 +45,7 @@ to decide what to do with such a request, and AWP gives it no rule.
 
 ## Specification
 
-Applied in [spec/v1alpha2 section 5.8](../spec/v1alpha2/README.md#58-human-input), summarised:
+Applied in [spec/v1alpha3 section 5.8](../spec/v1alpha3/README.md#58-human-input), summarised:
 
 1. **Input step** (`type: input`, field `input`): `message` (expression), `answerSchema`
    (optional; absent means free text), `answerers` (REQUIRED, `role` or `user` entries), `timeout`,
@@ -120,7 +120,7 @@ covers the `interaction` profile.
 ## Conformance impact
 
 - New profile `interaction` (spec 11.2) and its fields in the profile table (spec 3.3).
-- New `v1alpha2` cases: valid `5.8-input-step`, `5.8-input-step-free-text`,
+- New `v1alpha3` cases: valid `5.8-input-step`, `5.8-input-step-free-text`,
   `5.8-agent-human-input`, `5.8-agent-manifest-human-input`; invalid `5.8-input-step-without-input`,
   `5.8-input-step-with-agent`, `5.8-input-without-answerers`, `5.8-use-default-without-default`,
   `5.8-answer-field-nested-object`, `5.8-required-unknown-field`, `5.8-default-mismatch`,

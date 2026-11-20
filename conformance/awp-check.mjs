@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Reference checker for AWP manifests (v1alpha1, v1alpha2) and the conformance suites.
+// Reference checker for AWP manifests (v1alpha1, v1alpha3) and the conformance suites.
 //
 //   node conformance/awp-check.mjs check   [--profiles core,governance] [--verify-digest] [--json] <file...>
 //   node conformance/awp-check.mjs run     [--json]
-//   node conformance/awp-check.mjs migrate <file>   (v1alpha1 -> v1alpha2, YAML on stdout)
+//   node conformance/awp-check.mjs migrate <file>   (v1alpha1 -> v1alpha3, YAML on stdout)
 //
 // Layers: yaml (spec 3.1) -> schema (schema/awp.<version>.json, chosen by apiVersion)
 // -> semantic (conformance/semantic.mjs).
@@ -15,13 +15,13 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { parseAllDocuments, stringify, visit, isScalar, isCollection, LineCounter } from 'yaml';
 import { semanticCheck, KNOWN_PROFILES } from './semantic.mjs';
-import { migrateToV1alpha2 } from './migrate.mjs';
+import { migrateToV1alpha3 } from './migrate.mjs';
 import { checkCrds } from './crd.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 const API_GROUP = 'awp.agenticworkflowprotocol.org';
-const VERSIONS = ['v1alpha1', 'v1alpha2'];
+const VERSIONS = ['v1alpha1', 'v1alpha3'];
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false });
 const validators = new Map(VERSIONS.map(v => [
@@ -177,7 +177,7 @@ function runSuite({ json }) {
   const crdProblems = checkCrds();
   const results = [
     ...runs.flatMap(r => r.results),
-    { id: 'crd:v1alpha2', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
+    { id: 'crd:v1alpha3', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
   ];
   const failed = results.filter(r => !r.ok);
   if (json) {
@@ -190,7 +190,7 @@ function runSuite({ json }) {
   return failed.length === 0 ? 0 : 1;
 }
 
-/** Print the v1alpha2 form of every manifest in a v1alpha1 file; review notes go to stderr. */
+/** Print the v1alpha3 form of every manifest in a v1alpha1 file; review notes go to stderr. */
 function migrateFile(file) {
   const text = fs.readFileSync(file, 'utf8');
   const header = text.match(/^(#[^\n]*\n)*/)[0];
@@ -200,7 +200,7 @@ function migrateFile(file) {
     return 1;
   }
   const docs = loaded.map(({ value }) => {
-    const { document, notes } = migrateToV1alpha2(value);
+    const { document, notes } = migrateToV1alpha3(value);
     for (const n of notes) console.error(`${file}: ${n}`);
     if (document.spec.integrity) console.error(`${file}: spec.integrity.digest must be recomputed (spec 9.1)`);
     return stringify(document, { lineWidth: 0 });

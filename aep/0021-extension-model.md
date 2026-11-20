@@ -10,7 +10,7 @@
 | **Status** | Draft (concept for discussion) |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), someone familiar with the Gateway API, security reviewer |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` |
 | **Profiles affected** | all (section 3.3, 8, 11 of the specification) |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |
@@ -35,7 +35,7 @@ This document is a concept. Nothing is applied to the specification yet.
 
 ## Motivation
 
-`v1alpha2` lets every object in `spec` carry an `extensions` object with `x-` keys and arbitrary
+`v1alpha3` lets every object in `spec` carry an `extensions` object with `x-` keys and arbitrary
 values. This came from the `x-` convention of OpenAPI and CloudEvents and keeps the fail-closed
 rule for unknown fields. On Kubernetes it has three problems:
 
@@ -109,7 +109,7 @@ The building blocks are independent; each can be accepted or rejected on its own
 ### B2. `WorkflowClass` (Kubernetes binding, optional)
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: WorkflowClass
 metadata:
   name: standard
@@ -195,7 +195,7 @@ rejects the manifest.
 editing them:
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: Policy
 metadata:
   name: no-production-autonomy
@@ -348,7 +348,7 @@ generator with CEL output and pruning.
 
 ## Compatibility and migration
 
-Breaking for `v1alpha2` drafts that use `extensions`; no published runtime depends on them. A
+Breaking for `v1alpha3` drafts that use `extensions`; no published runtime depends on them. A
 `v1alpha1` manifest with `x-` fields needs a manual decision per field (see Examples).
 
 ## Security considerations

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Generates Kubernetes CustomResourceDefinitions from the AWP JSON Schema (v1alpha2 spec 3.10).
+// Generates Kubernetes CustomResourceDefinitions from the AWP JSON Schema (v1alpha3 spec 3.10).
 //
 //   node conformance/crd.mjs write    writes schema/crd/<plural>.yaml
 //   node conformance/crd.mjs check    fails if the files are missing or stale
@@ -17,7 +17,7 @@ import { stringify } from 'yaml';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-const VERSION = 'v1alpha2';
+const VERSION = 'v1alpha3';
 const GROUP = 'awp.agenticworkflowprotocol.org';
 const OUT_DIR = path.join(root, 'schema', 'crd');
 
