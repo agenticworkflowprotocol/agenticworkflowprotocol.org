@@ -21,6 +21,10 @@ const pages = [
     title: 'Specification v1alpha2', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha2 (draft): v1alpha1 plus step iteration.', banner: 'Draft - v1alpha2: v1alpha1 plus step iteration (forEach). Fields and semantics may change before v1beta1.' },
   { src: 'spec/v1alpha2/glossary.md', out: 'specification/v1alpha2/glossary.md', url: '/specification/v1alpha2/glossary/',
     title: 'Glossary (v1alpha2)', description: 'Terms used in the AWP v1alpha2 specification.', banner: 'Draft - v1alpha2. Fields and semantics may change before v1beta1.' },
+  { src: 'spec/v1alpha3/README.md', out: 'specification/v1alpha3/index.md', url: '/specification/v1alpha3/',
+    title: 'Specification v1alpha3 (proposed draft)', description: 'Working draft of AWP v1alpha3: v1alpha2 aligned with the Kubernetes resource model, built from Draft AEPs that are not accepted.', banner: 'Proposed draft - v1alpha3, built from Draft AEPs 0015 to 0021 (not accepted). The current draft is v1alpha2.' },
+  { src: 'spec/v1alpha3/glossary.md', out: 'specification/v1alpha3/glossary.md', url: '/specification/v1alpha3/glossary/',
+    title: 'Glossary (v1alpha3)', description: 'Terms used in the AWP v1alpha3 draft.', banner: 'Proposed draft - v1alpha3. Fields and semantics may change.' },
   { src: 'docs/cli.md', out: 'tooling/cli.md', url: '/tooling/cli/',
     title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha1).', banner: true },
   { src: 'CHANGELOG.md', out: 'specification/changelog.md', url: '/specification/changelog/',
@@ -82,6 +86,6 @@ for (const f of readdirSync(exDir).filter((f) => f.endsWith('.yaml'))) copyFileS
 
 // Machine-readable schema, served at its $id (https://agenticworkflowprotocol.org/schema/...).
 mkdirSync(join(siteRoot, 'public/schema'), { recursive: true });
-for (const v of ['v1alpha1', 'v1alpha2']) copyFileSync(join(repoRoot, `schema/awp.${v}.json`), join(siteRoot, `public/schema/awp.${v}.json`));
+for (const v of ['v1alpha1', 'v1alpha2', 'v1alpha3']) copyFileSync(join(repoRoot, `schema/awp.${v}.json`), join(siteRoot, `public/schema/awp.${v}.json`));
 if (!existsSync(join(repoRoot, 'CNAME'))) throw new Error('CNAME missing in repository root');
 console.log(`sync-content: ${pages.length} pages, ${readdirSync(genDir).length} example files`);

@@ -11,8 +11,9 @@
 
 > MCP connects agents to tools. A2A connects agents to agents. AWP defines how agents work.
 
-> **Status: draft / alpha.** The specification has two draft versions: `v1alpha1` and `v1alpha2`
-> (`v1alpha1` plus step iteration, `forEach`). Both are working drafts: fields, semantics and
+> **Status: draft / alpha.** The specification has three draft versions: `v1alpha1`, `v1alpha2`
+> (`v1alpha1` plus step iteration, `forEach`) and the proposed `v1alpha3` (`v1alpha2` aligned with
+> the Kubernetes resource model, built from Draft AEPs). All are working drafts: fields, semantics and
 > conformance profiles may change incompatibly before `v1`. Do not rely on them for production
 > interoperability yet.
 

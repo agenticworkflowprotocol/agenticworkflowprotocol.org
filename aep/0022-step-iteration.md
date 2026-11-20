@@ -1,16 +1,16 @@
-# AEP-0015: Step iteration (`forEach`)
+# AEP-0022: Step iteration (`forEach`)
 
 | | |
 | --- | --- |
-| **AEP** | 0015 |
+| **AEP** | 0022 |
 | **Title** | Step iteration (`forEach`): bounded fan-out over a list |
-| **Authors** | Project lead |
+| **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead |
 | **Type** | Specification |
 | **Status** | Accepted (lead decision [D19](../docs/decisions.md#d19-step-iteration-goes-into-v1alpha2-directly), without the external review of D16) |
 | **Reviewer roles needed** | Runtime implementer, language or schema reviewer (still welcome; see Decision) |
 | **Reviewers** | none yet |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha2` (section 5.6.4); carried into the `v1alpha3` draft as section 5.6.5 ([D20](../docs/decisions.md#d20-the-kubernetes-resource-model-draft-becomes-v1alpha3)) |
 | **Profiles affected** | `core`; `audit` (one field in events of item runs) |
 | **Created** | 2026-11-19 |
 | **Discussion** | to be opened as a GitHub issue |
@@ -201,6 +201,12 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 The reference checker, the schema and the conformance suite of this repository implement the
 proposal. Validator and editor support follow in their own repositories.
+
+In the `v1alpha3` draft ([D20](../docs/decisions.md#d20-the-kubernetes-resource-model-draft-becomes-v1alpha3))
+iteration is section 5.6.5 and works with the step output interface of
+[AEP-0018](0018-step-outputs.md): each item run has its own `$AWP_OUTPUTS` or `complete_step`,
+command steps get `AWP_FOREACH_INDEX`, an output referenced by `items` is parsed as a JSON array,
+and `forEach` is not allowed on input steps.
 
 ## Open questions
 

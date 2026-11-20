@@ -5,16 +5,18 @@ This directory contains the normative text of the Agentic Workflow Protocol (AWP
 | API version | Status | Text |
 | ----------- | ------ | ---- |
 | `v1alpha1` | **Draft / alpha** - may change incompatibly | [v1alpha1/README.md](v1alpha1/README.md) |
-| `v1alpha2` | **Draft / alpha** - `v1alpha1` plus step iteration ([AEP-0015](../aep/0015-step-iteration.md)); the AEPs below join it when accepted | [v1alpha2/README.md](v1alpha2/README.md) |
+| `v1alpha2` | **Draft / alpha** - `v1alpha1` plus step iteration ([AEP-0022](../aep/0022-step-iteration.md)); the AEPs below join it when accepted | [v1alpha2/README.md](v1alpha2/README.md) |
+| `v1alpha3` | **Proposed draft / alpha** - `v1alpha2` (so with step iteration) aligned with the Kubernetes resource model, with schedule semantics, human input, step outputs, `WorkflowRun` and execution pinning; built from Draft AEPs 0015 to 0021, which are not accepted ([D20](../docs/decisions.md#d20-the-kubernetes-resource-model-draft-becomes-v1alpha3)) | [v1alpha3/README.md](v1alpha3/README.md) |
 
-- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md), [v1alpha2/glossary.md](v1alpha2/glossary.md)
-- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/), [v1alpha2/examples/](v1alpha2/examples/)
+- Glossary: [v1alpha1](v1alpha1/glossary.md), [v1alpha2](v1alpha2/glossary.md), [v1alpha3](v1alpha3/glossary.md)
+- Examples (valid YAML, non-normative): [v1alpha1](v1alpha1/examples/), [v1alpha2](v1alpha2/examples/), [v1alpha3](v1alpha3/examples/)
+- Kubernetes CustomResourceDefinitions for `v1alpha3`, generated from the schema: [../schema/crd/](../schema/crd/)
 
 ## Roadmap: proposed changes
 
 The following AWP Enhancement Proposals are in the status `Draft` or `Review` under the AEP process
-([docs/aep-process.md](../docs/aep-process.md), adopted 2026-10-10). Except AEP-0015 (accepted by
-lead decision D19, in the `v1alpha2` draft), none is accepted and none changes `v1alpha1`. Target versions follow the owner's decisions of 2026-10-10
+([docs/aep-process.md](../docs/aep-process.md), adopted 2026-10-10). Except AEP-0022 (accepted by
+lead decision D19, in the `v1alpha2` and `v1alpha3` drafts), none is accepted and none changes `v1alpha1`. Target versions follow the owner's decisions of 2026-10-10
 ([decision log](../docs/decisions.md)); an AEP is accepted only after an external review
 and a Final Comment Period, and may still be moved to a later version or rejected.
 
@@ -34,7 +36,14 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
 | [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
 | [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
-| [0015](../aep/0015-step-iteration.md) | Step iteration (`forEach`) | Accepted (lead decision D19) | in the `v1alpha2` draft |
+| [0015](../aep/0015-kubernetes-resource-model.md) | Kubernetes resource model alignment | Draft | proposed for `v1alpha3` |
+| [0016](../aep/0016-schedule-semantics.md) | Schedule semantics: overlap and missed ticks | Draft | proposed for `v1alpha3` |
+| [0017](../aep/0017-human-input.md) | Human input during an execution | Draft | proposed for `v1alpha3` |
+| [0018](../aep/0018-step-outputs.md) | Step output interface | Draft | proposed for `v1alpha3` |
+| [0019](../aep/0019-workflow-run-and-status.md) | Kind `WorkflowRun` and status conditions | Draft | proposed for `v1alpha3` |
+| [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha3` |
+| [0021](../aep/0021-extension-model.md) | Extension model aligned with the Kubernetes Gateway API (concept) | Draft | proposed for `v1alpha3` |
+| [0022](../aep/0022-step-iteration.md) | Step iteration (`forEach`) | Accepted (lead decision D19) | in the `v1alpha2` draft |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

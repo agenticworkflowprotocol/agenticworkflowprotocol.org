@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0015 and starts the `v1alpha2` draft. |
-| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18) and 2026-11-19 (D19) by the project lead |
+| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, and D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema. |
+| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18) and 2026-11-19 (D19, D20) by the project lead |
 | **Related** | [AEP process](aep-process.md), [extension prefix list](registry/extension-prefixes.md), [GOVERNANCE.md](../GOVERNANCE.md) |
 
 > Context. AWP is alpha. The owner allows the schema to change where implementation practice shows
@@ -197,16 +197,40 @@ a single implementation and were removed from this log by D17.
 
 - **Question**: wait with step iteration until `v1alpha2` is cut with all AEPs of its scope, or
   start `v1alpha2` now with it?
-- **Decision**: the project lead accepts AEP-0015 (step iteration, `forEach`) and publishes
-  `v1alpha2` now as a **draft**: `v1alpha1` plus AEP-0015. This is an exception to D16 for this
+- **Decision**: the project lead accepts AEP-0022 (step iteration, `forEach`) and publishes
+  `v1alpha2` now as a **draft**: `v1alpha1` plus AEP-0022. This is an exception to D16 for this
   AEP only: it is accepted without the external review. Reviews are still invited; their findings
   are handled as errata of the draft.
 - **Consequence**: `spec/v1alpha2/`, `schema/awp.v1alpha2.json` and conformance cases for
   `forEach` exist; the reference checker selects the schema by `apiVersion`. `v1alpha1` is
   unchanged. The other AEPs of section 2 join the `v1alpha2` draft when they are accepted;
   `v1alpha2` stays a draft (aep-process 6.2) until then.
-- **Applied in**: `aep/0015-step-iteration.md`, `spec/v1alpha2/`, `schema/awp.v1alpha2.json`,
+- **Applied in**: `aep/0022-step-iteration.md`, `spec/v1alpha2/`, `schema/awp.v1alpha2.json`,
   `schema/README.md`, `conformance/`, `spec/README.md`, `docs/aep-process.md`, `site/`.
+
+### D20. The Kubernetes resource model draft becomes `v1alpha3`
+
+- **Question**: pull request #16 proposed a `v1alpha2` draft aligned with the Kubernetes resource
+  model (AEPs 0015 to 0021). At the same time `v1alpha2` already existed as the draft with step
+  iteration (D19). Which draft is `v1alpha2`, and is the 5-day discussion period of GOVERNANCE.md
+  waited for?
+- **Decision**: `v1alpha2` stays the draft of D19 (`v1alpha1` plus step iteration). The draft of
+  pull request #16 becomes `v1alpha3` and starts from `v1alpha2`, so it has step iteration too
+  (section 5.6.5, because 5.6.4 is step outputs there). The pull request is merged now: the owner
+  waives the 5-day discussion period for it (alpha waiver of GOVERNANCE.md). AEPs 0015 to 0021 keep
+  their numbers and stay `Draft`; the step iteration AEP moves from 0015 to 0022, because the
+  numbers of the pull request were public first. The `v1alpha1` approval step fix of the pull
+  request (approval steps accept no `requiredFor` and no `separationOfDuties`, spec 5.6.1) is an
+  erratum and also applies to `v1alpha2`.
+- **Consequence**: three API versions: `v1alpha1`, `v1alpha2` (draft) and `v1alpha3` (draft built
+  from Draft AEPs, nothing in it is accepted except step iteration). Each has its own conformance
+  suite (`conformance/`, `conformance/v1alpha2/`, `conformance/v1alpha3/`); `awp-check.mjs migrate`
+  converts `v1alpha1` and `v1alpha2` manifests to `v1alpha3`. The review of AEPs 0015 to 0021
+  (D16) and the questions of the review guide stay open; the discussion continues in issues. The
+  side-by-side page of the pull request still says `v1alpha2` for what is now `v1alpha3`.
+- **Applied in**: this log, `spec/v1alpha3/`, `schema/awp.v1alpha3.json`, `schema/crd/`,
+  `schema/awp.v1alpha2.json`, `spec/v1alpha2/` (5.2 note, example), `conformance/`,
+  `aep/0015` to `aep/0022`, `docs/v1alpha3-review-guide.md`, `spec/README.md`, `README.md`, `site/`.
 
 ## 2. Resulting scope of `v1alpha2`
 
@@ -226,7 +250,8 @@ a single implementation and were removed from this log by D17.
 | 0012 | Tool steps | proposed for `v1alpha2`, not yet in scope | D18 |
 | 0013 | Runtime clarifications | proposed for `v1alpha2`, not yet in scope | D18 |
 | 0014 | Input examples and object schemas | proposed for `v1alpha2`, not yet in scope | D18 |
-| 0015 | Step iteration (`forEach`) | `v1alpha2`, in the draft since 2026-11-19 | D19 |
+| 0022 | Step iteration (`forEach`) | `v1alpha2`, in the draft since 2026-11-19; also in the `v1alpha3` draft | D19, D20 |
+| 0015-0021 | Kubernetes resource model, schedule semantics, human input, step outputs, `WorkflowRun`, execution pinning, extension model | proposed for `v1alpha3`, in its draft but not accepted | D20 |
 
 Since D19 `v1alpha2` exists as a draft. It is completed (no longer a draft) when every AEP in its
 scope is `Accepted` and written into it, or explicitly moved to a later version by an amendment to

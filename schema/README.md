@@ -1,4 +1,4 @@
-# AWP JSON Schemas (v1alpha1, v1alpha2)
+# AWP JSON Schemas (v1alpha1, v1alpha2, v1alpha3)
 
 There is one JSON Schema (draft 2020-12) per API version. Each expresses the **structural** rules of
 its specification. Rules that JSON Schema cannot express are listed below as **semantic validation
@@ -10,6 +10,7 @@ document.
 | ------ | ----------- | ------------- |
 | [`awp.v1alpha1.json`](awp.v1alpha1.json) | `awp.agenticworkflowprotocol.org/v1alpha1` | [spec/v1alpha1](../spec/v1alpha1/README.md) |
 | [`awp.v1alpha2.json`](awp.v1alpha2.json) | `awp.agenticworkflowprotocol.org/v1alpha2` | [spec/v1alpha2](../spec/v1alpha2/README.md): v1alpha1 plus `forEach` (`$defs/ForEach`, new expression references `forEach.*`) |
+| [`awp.v1alpha3.json`](awp.v1alpha3.json) | `awp.agenticworkflowprotocol.org/v1alpha3` | [spec/v1alpha3](../spec/v1alpha3/README.md): v1alpha2 with the Kubernetes resource model alignment (working draft, see below) |
 
 **The schema is normative for document structure**: field names, types, required fields, closed
 objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/decisions.md#d2-json-schema-is-normative-for-structure)).
@@ -31,6 +32,9 @@ from the schema, not the other way round.
 
 A document whose `apiVersion` matches no schema is rejected at `/apiVersion` (spec 3.2); the
 reference checker reports it against the latest schema.
+| `schema/awp.v1alpha3.json` (and the same `$defs`) | Manifests of `awp.agenticworkflowprotocol.org/v1alpha3` ([specification](../spec/v1alpha3/README.md), working draft). |
+| `schema/awp.v1alpha3.json#/$defs/WorkflowRun` | An execution object of kind `WorkflowRun` (spec v1alpha3 section 10.8). `ManifestStatus` and `WorkflowRunStatus` describe the `status` a runtime writes; validators ignore `status`. |
+| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions for `v1alpha3` (`workflows`, `agents`, `policies`, `workflowruns`), generated from `awp.v1alpha3.json` (see below). |
 
 YAML manifests are parsed first (YAML 1.2 core schema; custom tags and non-string keys rejected,
 spec 3.1) and the resulting JSON value is validated. Every document of a multi-document file is
@@ -57,12 +61,12 @@ complete pipeline: YAML restrictions, then this schema, then the semantic rules.
   one of `inputs.<name>`, `steps.<id>.outputs.<name>`, `execution.id`, `execution.environment`
   (spec 3.9). Output names are otherwise unconstrained by the specification; inside expressions
   they must not contain whitespace, `.`, `{`, `}` or `$`. Fields that are not expression-enabled
-  (notably `command`) are not scanned. In `v1alpha2` the pattern also allows `forEach.item`,
+  (notably `command`) are not scanned. In `v1alpha2` and `v1alpha3` the pattern also allows `forEach.item`,
   `forEach.item.<key>` and `forEach.index`; where they may be used is the semantic rule
   `expr.iteration-outside-forEach`.
-- **Iteration** (`v1alpha2`, spec 5.6.4). `forEach.items` has its own pattern: exactly one
+- **Iteration** (`v1alpha2` spec 5.6.4, `v1alpha3` spec 5.6.5). `forEach.items` has its own pattern: exactly one
   `${{ inputs.<name> }}` or `${{ steps.<id>.outputs.<name> }}` and nothing else. `forEach` is not
-  allowed on approval steps (the `if`/`then` of step types). `maxItems` is required.
+  allowed on approval steps, in `v1alpha3` also not on input steps (the `if`/`then` of step types). `maxItems` is required.
 - **Digests** (spec 3.8): `sha256`, `sha384` and `sha512` have their fixed hex length; other
   algorithms are accepted syntactically (`<algorithm>:<lowercase hex>`) and reported as the warning
   `digest.algorithm-unknown`.
@@ -72,6 +76,31 @@ complete pipeline: YAML restrictions, then this schema, then the semantic rules.
   rule. No JSON Schema `format` keyword is used, so validators need no format plugins.
 - Event envelopes, reproducibility records and conformance statements (spec 10 and 11.3) are not
   manifests and are not covered by this schema.
+
+## v1alpha3 and Kubernetes
+
+`awp.v1alpha3.json` has the same rules as `awp.v1alpha1.json` except for the document model
+([spec v1alpha3 section 14.1](../spec/v1alpha3/README.md#141-changes-from-v1alpha1)): `metadata`
+holds only Kubernetes `ObjectMeta` fields, the common governance fields are in `spec`, extension
+fields are keys of `extensions` objects instead of `x-` properties, `owner` and policy conditions
+have a single type, and `status` is reserved. These changes make the schema expressible as a
+Kubernetes structural schema.
+
+`conformance/crd.mjs` generates the CustomResourceDefinitions in [`crd/`](crd/) from it:
+`$ref` is inlined, `const` becomes `enum`, `if`/`then`/`else`, combinators, `propertyNames` and
+patterns that Go's RE2 cannot evaluate (lookahead) are dropped, and every object keeps unknown
+fields (`x-kubernetes-preserve-unknown-fields`) instead of pruning them. The API server therefore
+checks types and the remaining constraints, and unknown or misplaced fields stay visible to the
+AWP validator in the runtime or an admission webhook (spec v1alpha3 section 3.10). `npm test`
+fails when the generated files are stale; regenerate them with `node conformance/crd.mjs write`.
+
+`status` is typed with `ManifestStatus` or `WorkflowRunStatus`, so that the API server checks what
+a runtime writes, and the columns of `kubectl get` show the conditions `Valid` and `Ready` (for
+runs: workflow and phase).
+
+The semantic rules below apply to every version. In `v1alpha3` their paths use `spec` where
+`v1alpha1` uses `metadata` (for example `/spec/risk/level`), and `extensions` objects are skipped
+where `v1alpha1` skips `x-` fields.
 
 ## Semantic validation rules
 
@@ -101,12 +130,16 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `input.pattern-invalid` | 5.3 | An input `pattern` is a valid ECMA-262 regular expression. |
 | `date.invalid` | 3.7 | Dates exist in the calendar. |
 | `digest.mismatch`, `digest.unsupported-algorithm` | 9.1 | With digest verification enabled, `metadata.integrity.digest` equals the digest over the RFC 8785 serialization of the manifest without `metadata.integrity`, `metadata.signature` and `metadata.provenance`. |
-| `profile.unsupported` | 3.3 | A field of a profile the validator does not support is rejected, naming field and profile (table in spec 3.3, plus `kind: Policy` for the governance profile). |
+| `profile.unsupported` | 3.3 | A field of a profile the validator does not support is rejected, naming field and profile (table in spec 3.3, plus `kind: Policy` for the governance profile). In `v1alpha3` this includes the `interaction` profile (input steps, `humanInput`). |
 | `governance.classification-required` | 7.1 | Under the governance profile `Workflow` and `Agent` have `metadata.classification` (`owner.team` is structurally required). |
+| `input.required-unknown-field` | 5.8 (v1alpha3) | `answerSchema.required` names fields of `answerSchema.properties`. |
+| `input.enum-not-string` | 5.8 (v1alpha3) | `enum` is only used on answer fields of type `string`. |
+| `input.default-mismatch` | 5.8 (v1alpha3) | The `default` of an input step is a valid answer: a string without `answerSchema`, otherwise an object that matches it. |
+| `step.reserved-env` | 5.6.4 (v1alpha3) | `env` of a step defines no variable with the prefix `AWP_`; the runtime sets `AWP_OUTPUTS`, `AWP_EXECUTION_ID`, `AWP_STEP_ID`, `AWP_ATTEMPT` and, in item runs, `AWP_FOREACH_INDEX`. |
 | `security.image-not-pinned` | 9.4 | Under the security profile `mcpServers[].image` and command step `image` are pinned by digest. |
-| `expr.iteration-outside-forEach` | 3.9 | `v1alpha2`: `forEach.*` references appear only in `task` and `env` values of a step that declares `forEach`. |
-| `forEach.input-not-array` | 5.6.4 | `v1alpha2`: an input referenced by `forEach.items` has `type: array`. |
-| `forEach.concurrency-exceeds-budget` | 5.6.4 | `v1alpha2`: `forEach.concurrency` does not exceed the effective `budget.resources.maxConcurrency` (minimum of workflow, agent and step; the workflow default is `1`). |
+| `expr.iteration-outside-forEach` | 3.9 | `v1alpha2`, `v1alpha3`: `forEach.*` references appear only in `task` and `env` values of a step that declares `forEach`. |
+| `forEach.input-not-array` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: an input referenced by `forEach.items` has `type: array`. |
+| `forEach.concurrency-exceeds-budget` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: `forEach.concurrency` does not exceed the effective `budget.resources.maxConcurrency` (minimum of workflow, agent and step; the workflow default is `1`). |
 
 ### Warnings
 
@@ -117,6 +150,7 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `permissions.secret-undeclared` | 7.5.1 | `permissions.secrets` names a secret that is not declared. |
 | `digest.algorithm-unknown` | 3.8 | A digest uses an algorithm other than sha256, sha384, sha512. |
 | `lint.command-expression` | 5.6.2 | `command` contains `${{ }}`; commands are not expression-enabled and the text is passed literally. |
+| `lint.schedule-required-input` | 5.2 | A `schedule` trigger is declared, but an input is `required`; schedule triggers supply no inputs, so scheduled executions would not start. |
 | `lint.environment-not-listed` | 7.10 | `spec.environment.name` is not a key of `spec.environments`. |
 | `lint.permissions-absent` | 7.5.3 | Security profile only: no `permissions` object, so every action of exposed tools is allowed by permissions. |
 

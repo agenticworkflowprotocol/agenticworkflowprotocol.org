@@ -1,36 +1,35 @@
 #!/usr/bin/env node
-// Reference checker for AWP manifests (v1alpha1, v1alpha2) and the conformance suite.
+// Reference checker for AWP manifests (v1alpha1, v1alpha2, v1alpha3) and the conformance suites.
 //
-//   node conformance/awp-check.mjs check [--profiles core,governance] [--verify-digest] [--json] <file...>
-//   node conformance/awp-check.mjs run   [--json]
+//   node conformance/awp-check.mjs check   [--profiles core,governance] [--verify-digest] [--json] <file...>
+//   node conformance/awp-check.mjs run     [--json]
+//   node conformance/awp-check.mjs migrate <file>   (v1alpha1 or v1alpha2 -> v1alpha3, YAML on stdout)
 //
-// Layers: yaml (spec 3.1) -> schema of the document's apiVersion (schema/awp.<version>.json)
-// -> semantic (conformance/semantic.mjs). A document with an unknown or missing apiVersion is
-// checked against the latest schema, which rejects it at /apiVersion (spec 3.2).
+// Layers: yaml (spec 3.1) -> schema (schema/awp.<version>.json, chosen by apiVersion)
+// -> semantic (conformance/semantic.mjs).
 // Dependencies: ajv and yaml, both pinned in package-lock.json (development use only).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
-import { parseAllDocuments, visit, isScalar, isCollection, LineCounter } from 'yaml';
+import { parseAllDocuments, stringify, visit, isScalar, isCollection, LineCounter } from 'yaml';
 import { semanticCheck, KNOWN_PROFILES } from './semantic.mjs';
+import { migrateToV1alpha3 } from './migrate.mjs';
+import { checkCrds } from './crd.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
-/** API versions of this repository, oldest first; the last one is the latest draft. */
-export const API_VERSIONS = ['v1alpha1', 'v1alpha2'];
 const API_GROUP = 'awp.agenticworkflowprotocol.org';
+const VERSIONS = ['v1alpha1', 'v1alpha2', 'v1alpha3'];
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false });
-const validators = new Map(API_VERSIONS.map(v => {
-  const schema = JSON.parse(fs.readFileSync(path.join(root, 'schema', `awp.${v}.json`), 'utf8'));
-  return [`${API_GROUP}/${v}`, ajv.compile(schema)];
-}));
-const latest = validators.get(`${API_GROUP}/${API_VERSIONS.at(-1)}`);
-
-/** Structural validator for a document: its own apiVersion, else the latest. */
-const schemaFor = value => validators.get(value?.apiVersion) ?? latest;
+const validators = new Map(VERSIONS.map(v => [
+  `${API_GROUP}/${v}`,
+  ajv.compile(JSON.parse(fs.readFileSync(path.join(root, 'schema', `awp.${v}.json`), 'utf8'))),
+]));
+// Unknown apiVersions are validated against the first version, which rejects them (spec 3.2).
+const validatorFor = doc => validators.get(doc?.apiVersion) ?? validators.get(`${API_GROUP}/${VERSIONS[0]}`);
 
 /** Parse a file into manifests, enforcing the YAML restrictions of spec 3.1. */
 export function loadManifests(text) {
@@ -79,7 +78,7 @@ export function validateText(text, file = '<input>', opts = {}) {
     };
     diags.forEach(push);
     if (value === undefined) return;
-    const validateSchema = schemaFor(value);
+    const validateSchema = validatorFor(value);
     if (!validateSchema(value)) {
       const seen = new Set();
       for (const e of validateSchema.errors) {
@@ -123,14 +122,19 @@ function parseArgs(argv) {
   return o;
 }
 
-function runSuite({ json }) {
-  const index = JSON.parse(fs.readFileSync(path.join(here, 'index.json'), 'utf8'));
+// v1alpha1 keeps its suite at the top of conformance/; later versions live in conformance/<version>/.
+const suiteDir = version => (version === VERSIONS[0] ? here : path.join(here, version));
+
+function runVersion(version) {
+  const dir = suiteDir(version);
+  const prefix = version === VERSIONS[0] ? '' : `${version}/`;
+  const index = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8'));
   const results = [];
   const listed = new Set();
 
   for (const t of index.tests) {
     listed.add(t.file);
-    const r = validateFile(path.join(here, t.file), { profiles: t.profiles, verifyDigest: t.verifyDigest });
+    const r = validateFile(path.join(dir, t.file), { profiles: t.profiles, verifyDigest: t.verifyDigest });
     const errs = errorsOf(r);
     let ok; let detail = '';
     if (t.expect === 'valid') {
@@ -142,39 +146,67 @@ function runSuite({ json }) {
       ok = hit.length > 0 && stray.length === 0;
       if (!ok) detail = errs.length ? `expected ${t.code} at ${t.path ?? '*'}, got: ${errs.map(e => `${e.code} ${e.path}`).join('; ')}` : `expected ${t.code} at ${t.path ?? '*'}, but the manifest was accepted`;
     }
-    results.push({ id: t.id, file: t.file, section: t.section, expect: t.expect, ok, detail });
+    results.push({ id: prefix + t.id, file: prefix + t.file, section: t.section, expect: t.expect, ok, detail });
   }
 
   // every file in valid/ and invalid/ must be indexed
-  for (const dir of ['valid', 'invalid']) {
-    for (const f of fs.readdirSync(path.join(here, dir))) {
-      const rel = `${dir}/${f}`;
-      if (!listed.has(rel)) results.push({ id: rel, file: rel, section: '', expect: dir, ok: false, detail: 'file is not listed in index.json' });
+  for (const sub of ['valid', 'invalid']) {
+    for (const f of fs.readdirSync(path.join(dir, sub))) {
+      const rel = `${sub}/${f}`;
+      if (!listed.has(rel)) results.push({ id: prefix + rel, file: prefix + rel, section: '', expect: sub, ok: false, detail: 'file is not listed in index.json' });
     }
   }
 
-  // the examples of every API version of the specification must validate
+  // the examples of the specification must validate
+  const exDir = path.join(root, 'spec', version, 'examples');
   const nonManifests = new Set(index.nonManifestExamples ?? []);
-  for (const version of API_VERSIONS) {
-    const exDir = path.join(root, 'spec', version, 'examples');
-    for (const f of fs.readdirSync(exDir).sort()) {
-      if (!/\.ya?ml$|\.json$/.test(f)) continue;
-      const id = `example:${version}/${f}`;
-      const file = `spec/${version}/examples/${f}`;
-      if (nonManifests.has(f)) { results.push({ id, file, section: 'examples', expect: 'skipped', ok: true, detail: 'not a manifest (event stream, record or statement)' }); continue; }
-      const errs = errorsOf(validateFile(path.join(exDir, f)));
-      results.push({ id, file, section: 'examples', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' });
-    }
+  for (const f of fs.readdirSync(exDir).sort()) {
+    if (!/\.ya?ml$|\.json$/.test(f)) continue;
+    const id = `example:${prefix}${f}`;
+    const file = `spec/${version}/examples/${f}`;
+    if (nonManifests.has(f)) { results.push({ id, file, section: 'examples', expect: 'skipped', ok: true, detail: 'not a manifest (event stream, record or statement)' }); continue; }
+    const errs = errorsOf(validateFile(path.join(exDir, f)));
+    results.push({ id, file, section: 'examples', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' });
   }
 
+  return { index, results };
+}
+
+function runSuite({ json }) {
+  const runs = VERSIONS.map(runVersion);
+  const crdProblems = checkCrds();
+  const results = [
+    ...runs.flatMap(r => r.results),
+    { id: 'crd:v1alpha3', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
+  ];
   const failed = results.filter(r => !r.ok);
   if (json) {
-    console.log(JSON.stringify({ awp: API_VERSIONS, suite: index.suite, version: index.version, total: results.length, passed: results.length - failed.length, failed: failed.length, results }, null, 2));
+    const { suite, version } = runs[0].index;
+    console.log(JSON.stringify({ awp: VERSIONS, suite, version, total: results.length, passed: results.length - failed.length, failed: failed.length, results }, null, 2));
   } else {
     for (const r of results) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.id}${r.detail && !r.ok ? `\n      ${r.detail}` : ''}`);
     console.log(`\n${results.length - failed.length}/${results.length} passed, ${failed.length} failed`);
   }
   return failed.length === 0 ? 0 : 1;
+}
+
+/** Print the v1alpha3 form of every manifest in a v1alpha1 or v1alpha2 file; review notes go to stderr. */
+function migrateFile(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  const header = text.match(/^(#[^\n]*\n)*/)[0];
+  const loaded = loadManifests(text);
+  if (loaded.some(l => l.value === undefined)) {
+    console.error(`${file}: not a valid YAML manifest file`);
+    return 1;
+  }
+  const docs = loaded.map(({ value }) => {
+    const { document, notes } = migrateToV1alpha3(value);
+    for (const n of notes) console.error(`${file}: ${n}`);
+    if (document.spec.integrity) console.error(`${file}: spec.integrity.digest must be recomputed (spec 9.1)`);
+    return stringify(document, { lineWidth: 0 });
+  });
+  process.stdout.write(header + docs.join('---\n'));
+  return 0;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -195,6 +227,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     }
     process.exit(bad ? 1 : 0);
   }
-  console.error('usage: awp-check.mjs check [--profiles a,b] [--verify-digest] [--json] <file...> | run [--json]');
+  if (cmd === 'migrate' && o._.length === 1) process.exit(migrateFile(o._[0]));
+  console.error('usage: awp-check.mjs check [--profiles a,b] [--verify-digest] [--json] <file...> | run [--json] | migrate <file>');
   process.exit(2);
 }

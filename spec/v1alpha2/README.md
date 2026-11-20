@@ -323,6 +323,9 @@ triggers:
 - The mapping of `source` and `eventType` to concrete event sources is implementation-defined.
   Implementations MUST verify the authenticity of event sources they support (for example
   webhook signatures) and MUST NOT start an execution for an event that fails verification.
+- A `schedule` trigger supplies no input values: an execution it starts uses the `default` of
+  each input ([section 5.3](#53-inputs)). A workflow with a required input therefore cannot be
+  started by its `schedule` triggers.
 - An execution started by `schedule` or `event` has the actor type `system`; an execution started
   by `manual` has the actor type `human` (see [section 10.3](#103-event-envelope)).
 
@@ -1589,7 +1592,7 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
 ### 14.1 Changes from v1alpha1
 
 `v1alpha2` is `v1alpha1` with the following changes
-([AEP-0015](../../aep/0015-step-iteration.md)):
+([AEP-0022](../../aep/0022-step-iteration.md)):
 
 | Section | Change |
 | ------- | ------ |

@@ -4,7 +4,7 @@
 | --- | --- |
 | **AEP** | 0009 |
 | **Title** | Audit payload levels and content retention |
-| **Authors** | AI agent on behalf of @weisser-dev |
+| **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha3`; not accepted) |

@@ -314,6 +314,9 @@ triggers:
 - The mapping of `source` and `eventType` to concrete event sources is implementation-defined.
   Implementations MUST verify the authenticity of event sources they support (for example
   webhook signatures) and MUST NOT start an execution for an event that fails verification.
+- A `schedule` trigger supplies no input values: an execution it starts uses the `default` of
+  each input ([section 5.3](#53-inputs)). A workflow with a required input therefore cannot be
+  started by its `schedule` triggers.
 - An execution started by `schedule` or `event` has the actor type `system`; an execution started
   by `manual` has the actor type `human` (see [section 10.3](#103-event-envelope)).
 

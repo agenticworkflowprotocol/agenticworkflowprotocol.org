@@ -4,7 +4,7 @@
 | --- | --- |
 | **AEP** | 0002 |
 | **Title** | Argument constraints and call limits in tool permissions; action groups instead of prefix wildcards |
-| **Authors** | AI agent on behalf of @weisser-dev |
+| **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
 | **Status** | Review (proposed for `v1alpha2`; not accepted) |
