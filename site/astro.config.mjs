@@ -74,8 +74,9 @@ export default defineConfig({
         ] },
         { label: 'Specification', items: [
           { label: 'Overview', slug: 'specification' },
+          { label: 'v1alpha2 (draft)', slug: 'specification/v1alpha2' },
           { label: 'v1alpha1 (draft)', slug: 'specification/v1alpha1' },
-          { label: 'Glossary', slug: 'specification/v1alpha1/glossary' },
+          { label: 'Glossary', slug: 'specification/v1alpha2/glossary' },
           { label: 'Versioning', slug: 'specification/versioning' },
           { label: 'CLI output formats', slug: 'tooling/cli' },
           { label: 'Changelog', slug: 'specification/changelog' },

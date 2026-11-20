@@ -22,6 +22,8 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- API version `v1alpha2` as a draft: `v1alpha1` plus step iteration (`forEach`, AEP-0015, accepted by lead decision D19 without external review). New `spec/v1alpha2/` (section 5.6.4, references `forEach.item`, `forEach.item.<key>` and `forEach.index`, changes listed in section 14.1), `schema/awp.v1alpha2.json` (`$defs/ForEach`), semantic rules `expr.iteration-outside-forEach`, `forEach.input-not-array` and `forEach.concurrency-exceeds-budget`, nine conformance cases (suite 0.2.0) and the example `image-review.workflow.yaml`. `v1alpha1` is unchanged.
+- Reference checker: picks the schema by `apiVersion` (unknown versions are checked against the latest schema) and validates the examples of every API version.
 - Proposed (Draft, not accepted) AEPs from implementation experience with `v1alpha1` (decision D18): `aep/0012` tool steps (a step that performs one declared action without a model), `aep/0013` runtime clarifications (metering of budgets known only after a call, rendering of non-string values in expressions, the outcome of a rejected action approval, the minimum events of `core`), `aep/0014` input examples and object schemas. They do not change `v1alpha1`.
 - AWP logo: brand assets in light and dark (`site/public/brand/`, served at `/brand/`), logo in the site header and the README, new favicons and social preview image.
 - Website header: links to the validator, the editor and the viewer next to GitHub; footer link to the viewer.

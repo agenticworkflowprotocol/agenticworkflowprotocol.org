@@ -1,7 +1,8 @@
-# AWP conformance material (v1alpha1)
+# AWP conformance material (v1alpha1, v1alpha2)
 
 This directory contains the first machine-readable conformance material for
-[AWP v1alpha1](../spec/v1alpha1/README.md): manifests that a validator must accept or reject, an
+[AWP v1alpha1](../spec/v1alpha1/README.md) and [v1alpha2](../spec/v1alpha2/README.md) (each manifest
+names its `apiVersion`; the checker picks the schema from it): manifests that a validator must accept or reject, an
 index describing the expected result, and a small reference checker. It tests **validators**
 (spec 11.1) and manifest rules. It is not a runtime test suite (spec 11.3 still describes
 conformance statements as self-declarations).
@@ -23,7 +24,7 @@ npm test          # node conformance/awp-check.mjs run
 
 `npm test` validates every case of `index.json`, checks that every file in `valid/` and `invalid/`
 is indexed, and validates the manifest examples of the specification
-(`spec/v1alpha1/examples/`). It prints `PASS`/`FAIL` per case and exits with `1` if anything fails.
+(`spec/<version>/examples/` of every API version). It prints `PASS`/`FAIL` per case and exits with `1` if anything fails.
 `node conformance/awp-check.mjs run --json` prints the same result as JSON.
 
 Check single files:

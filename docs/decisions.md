@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`. |
-| **Decided** | 2026-10-10 (D1-D12, D16) and 2026-11-18 (D17, D18) by the project lead |
+| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0015 and starts the `v1alpha2` draft. |
+| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18) and 2026-11-19 (D19) by the project lead |
 | **Related** | [AEP process](aep-process.md), [extension prefix list](registry/extension-prefixes.md), [GOVERNANCE.md](../GOVERNANCE.md) |
 
 > Context. AWP is alpha. The owner allows the schema to change where implementation practice shows
@@ -193,6 +193,21 @@ a single implementation and were removed from this log by D17.
   scope is decided by an amendment of section 2 once they reach `Review`.
 - **Applied in**: `aep/0012` to `aep/0014`, `site/src/content/docs/implementations/`.
 
+### D19. Step iteration goes into `v1alpha2` directly
+
+- **Question**: wait with step iteration until `v1alpha2` is cut with all AEPs of its scope, or
+  start `v1alpha2` now with it?
+- **Decision**: the project lead accepts AEP-0015 (step iteration, `forEach`) and publishes
+  `v1alpha2` now as a **draft**: `v1alpha1` plus AEP-0015. This is an exception to D16 for this
+  AEP only: it is accepted without the external review. Reviews are still invited; their findings
+  are handled as errata of the draft.
+- **Consequence**: `spec/v1alpha2/`, `schema/awp.v1alpha2.json` and conformance cases for
+  `forEach` exist; the reference checker selects the schema by `apiVersion`. `v1alpha1` is
+  unchanged. The other AEPs of section 2 join the `v1alpha2` draft when they are accepted;
+  `v1alpha2` stays a draft (aep-process 6.2) until then.
+- **Applied in**: `aep/0015-step-iteration.md`, `spec/v1alpha2/`, `schema/awp.v1alpha2.json`,
+  `schema/README.md`, `conformance/`, `spec/README.md`, `docs/aep-process.md`, `site/`.
+
 ## 2. Resulting scope of `v1alpha2`
 
 | AEP | Title | Target | Reason |
@@ -211,9 +226,11 @@ a single implementation and were removed from this log by D17.
 | 0012 | Tool steps | proposed for `v1alpha2`, not yet in scope | D18 |
 | 0013 | Runtime clarifications | proposed for `v1alpha2`, not yet in scope | D18 |
 | 0014 | Input examples and object schemas | proposed for `v1alpha2`, not yet in scope | D18 |
+| 0015 | Step iteration (`forEach`) | `v1alpha2`, in the draft since 2026-11-19 | D19 |
 
-`v1alpha2` is cut when every AEP in its scope is `Accepted` or explicitly moved to a later version
-by an amendment to this table (an AEP that does not find a reviewer must not block the others).
+Since D19 `v1alpha2` exists as a draft. It is completed (no longer a draft) when every AEP in its
+scope is `Accepted` and written into it, or explicitly moved to a later version by an amendment to
+this table (an AEP that does not find a reviewer must not block the others).
 
 ## 3. Conflicts and how they are resolved
 

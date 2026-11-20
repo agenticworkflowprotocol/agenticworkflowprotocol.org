@@ -5,15 +5,16 @@ This directory contains the normative text of the Agentic Workflow Protocol (AWP
 | API version | Status | Text |
 | ----------- | ------ | ---- |
 | `v1alpha1` | **Draft / alpha** - may change incompatibly | [v1alpha1/README.md](v1alpha1/README.md) |
+| `v1alpha2` | **Draft / alpha** - `v1alpha1` plus step iteration ([AEP-0015](../aep/0015-step-iteration.md)); the AEPs below join it when accepted | [v1alpha2/README.md](v1alpha2/README.md) |
 
-- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md)
-- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/)
+- Glossary: [v1alpha1/glossary.md](v1alpha1/glossary.md), [v1alpha2/glossary.md](v1alpha2/glossary.md)
+- Examples (valid YAML, non-normative): [v1alpha1/examples/](v1alpha1/examples/), [v1alpha2/examples/](v1alpha2/examples/)
 
 ## Roadmap: proposed changes
 
 The following AWP Enhancement Proposals are in the status `Draft` or `Review` under the AEP process
-([docs/aep-process.md](../docs/aep-process.md), adopted 2026-10-10). None is accepted and none
-changes `v1alpha1`. Target versions follow the owner's decisions of 2026-10-10
+([docs/aep-process.md](../docs/aep-process.md), adopted 2026-10-10). Except AEP-0015 (accepted by
+lead decision D19, in the `v1alpha2` draft), none is accepted and none changes `v1alpha1`. Target versions follow the owner's decisions of 2026-10-10
 ([decision log](../docs/decisions.md)); an AEP is accepted only after an external review
 and a Final Comment Period, and may still be moved to a later version or rejected.
 
@@ -33,6 +34,7 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0012](../aep/0012-tool-steps.md) | Tool steps (`type: tool`) | Draft | proposed for `v1alpha2` |
 | [0013](../aep/0013-runtime-clarifications.md) | Runtime clarifications (budgets, value rendering, rejected approvals, `core` events, deployment policy, server binding) | Draft | proposed for `v1alpha2` |
 | [0014](../aep/0014-input-examples-and-schemas.md) | Input examples and object schemas | Draft | proposed for `v1alpha2` |
+| [0015](../aep/0015-step-iteration.md) | Step iteration (`forEach`) | Accepted (lead decision D19) | in the `v1alpha2` draft |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).

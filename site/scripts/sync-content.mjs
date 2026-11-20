@@ -17,6 +17,10 @@ const pages = [
     title: 'Specification v1alpha1', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha1 (draft).', banner: true },
   { src: 'spec/v1alpha1/glossary.md', out: 'specification/v1alpha1/glossary.md', url: '/specification/v1alpha1/glossary/',
     title: 'Glossary (v1alpha1)', description: 'Terms used in the AWP v1alpha1 specification.', banner: true },
+  { src: 'spec/v1alpha2/README.md', out: 'specification/v1alpha2/index.md', url: '/specification/v1alpha2/',
+    title: 'Specification v1alpha2', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha2 (draft): v1alpha1 plus step iteration.', banner: 'Draft - v1alpha2: v1alpha1 plus step iteration (forEach). Fields and semantics may change before v1beta1.' },
+  { src: 'spec/v1alpha2/glossary.md', out: 'specification/v1alpha2/glossary.md', url: '/specification/v1alpha2/glossary/',
+    title: 'Glossary (v1alpha2)', description: 'Terms used in the AWP v1alpha2 specification.', banner: 'Draft - v1alpha2. Fields and semantics may change before v1beta1.' },
   { src: 'docs/cli.md', out: 'tooling/cli.md', url: '/tooling/cli/',
     title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha1).', banner: true },
   { src: 'CHANGELOG.md', out: 'specification/changelog.md', url: '/specification/changelog/',
@@ -64,7 +68,7 @@ for (const p of pages) {
   body = body.replace(/^# .*\n+/, ''); // the page title comes from the front matter
   body = rewrite(p.src, body);
   const fm = ['---', `title: ${q(p.title)}`, `description: ${q(p.description)}`, `editUrl: ${q(`${GH}/edit/main/${p.src}`)}`];
-  if (p.banner) fm.push('banner:', `  content: ${q(BANNER)}`);
+  if (p.banner) fm.push('banner:', `  content: ${q(typeof p.banner === 'string' ? p.banner : BANNER)}`);
   fm.push('---', '');
   writeFileSync(out, `${fm.join('\n')}\n${body}`);
 }
@@ -78,6 +82,6 @@ for (const f of readdirSync(exDir).filter((f) => f.endsWith('.yaml'))) copyFileS
 
 // Machine-readable schema, served at its $id (https://agenticworkflowprotocol.org/schema/...).
 mkdirSync(join(siteRoot, 'public/schema'), { recursive: true });
-copyFileSync(join(repoRoot, 'schema/awp.v1alpha1.json'), join(siteRoot, 'public/schema/awp.v1alpha1.json'));
+for (const v of ['v1alpha1', 'v1alpha2']) copyFileSync(join(repoRoot, `schema/awp.${v}.json`), join(siteRoot, `public/schema/awp.${v}.json`));
 if (!existsSync(join(repoRoot, 'CNAME'))) throw new Error('CNAME missing in repository root');
 console.log(`sync-content: ${pages.length} pages, ${readdirSync(genDir).length} example files`);

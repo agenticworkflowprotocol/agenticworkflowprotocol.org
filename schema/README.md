@@ -1,10 +1,15 @@
-# AWP JSON Schema (v1alpha1)
+# AWP JSON Schemas (v1alpha1, v1alpha2)
 
-[`awp.v1alpha1.json`](awp.v1alpha1.json) is a JSON Schema (draft 2020-12) for AWP manifests of the
-API version `awp.agenticworkflowprotocol.org/v1alpha1`. It expresses the **structural** rules of the
-[specification](../spec/v1alpha1/README.md). Rules that JSON Schema cannot express are listed below
-as **semantic validation rules**; a validator that claims to accept exactly the manifests the
-specification allows (spec section 11.1) must implement both layers.
+There is one JSON Schema (draft 2020-12) per API version. Each expresses the **structural** rules of
+its specification. Rules that JSON Schema cannot express are listed below as **semantic validation
+rules**; a validator that claims to accept exactly the manifests the specification allows (spec
+section 11.1) must implement both layers, and must pick the schema by the `apiVersion` of each
+document.
+
+| Schema | API version | Specification |
+| ------ | ----------- | ------------- |
+| [`awp.v1alpha1.json`](awp.v1alpha1.json) | `awp.agenticworkflowprotocol.org/v1alpha1` | [spec/v1alpha1](../spec/v1alpha1/README.md) |
+| [`awp.v1alpha2.json`](awp.v1alpha2.json) | `awp.agenticworkflowprotocol.org/v1alpha2` | [spec/v1alpha2](../spec/v1alpha2/README.md): v1alpha1 plus `forEach` (`$defs/ForEach`, new expression references `forEach.*`) |
 
 **The schema is normative for document structure**: field names, types, required fields, closed
 objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/decisions.md#d2-json-schema-is-normative-for-structure)).
@@ -19,10 +24,13 @@ from the schema, not the other way round.
 
 | Entry point | Validates |
 | ----------- | --------- |
-| `schema/awp.v1alpha1.json` | Any manifest; selects the kind-specific rules from `kind`. |
-| `schema/awp.v1alpha1.json#/$defs/Workflow` | A manifest of kind `Workflow`. |
-| `schema/awp.v1alpha1.json#/$defs/Agent` | A manifest of kind `Agent`. |
-| `schema/awp.v1alpha1.json#/$defs/Policy` | A manifest of kind `Policy`. |
+| `schema/awp.<version>.json` | Any manifest of that API version; selects the kind-specific rules from `kind`. |
+| `schema/awp.<version>.json#/$defs/Workflow` | A manifest of kind `Workflow`. |
+| `schema/awp.<version>.json#/$defs/Agent` | A manifest of kind `Agent`. |
+| `schema/awp.<version>.json#/$defs/Policy` | A manifest of kind `Policy`. |
+
+A document whose `apiVersion` matches no schema is rejected at `/apiVersion` (spec 3.2); the
+reference checker reports it against the latest schema.
 
 YAML manifests are parsed first (YAML 1.2 core schema; custom tags and non-string keys rejected,
 spec 3.1) and the resulting JSON value is validated. Every document of a multi-document file is
@@ -49,7 +57,12 @@ complete pipeline: YAML restrictions, then this schema, then the semantic rules.
   one of `inputs.<name>`, `steps.<id>.outputs.<name>`, `execution.id`, `execution.environment`
   (spec 3.9). Output names are otherwise unconstrained by the specification; inside expressions
   they must not contain whitespace, `.`, `{`, `}` or `$`. Fields that are not expression-enabled
-  (notably `command`) are not scanned.
+  (notably `command`) are not scanned. In `v1alpha2` the pattern also allows `forEach.item`,
+  `forEach.item.<key>` and `forEach.index`; where they may be used is the semantic rule
+  `expr.iteration-outside-forEach`.
+- **Iteration** (`v1alpha2`, spec 5.6.4). `forEach.items` has its own pattern: exactly one
+  `${{ inputs.<name> }}` or `${{ steps.<id>.outputs.<name> }}` and nothing else. `forEach` is not
+  allowed on approval steps (the `if`/`then` of step types). `maxItems` is required.
 - **Digests** (spec 3.8): `sha256`, `sha384` and `sha512` have their fixed hex length; other
   algorithms are accepted syntactically (`<algorithm>:<lowercase hex>`) and reported as the warning
   `digest.algorithm-unknown`.
@@ -91,6 +104,9 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `profile.unsupported` | 3.3 | A field of a profile the validator does not support is rejected, naming field and profile (table in spec 3.3, plus `kind: Policy` for the governance profile). |
 | `governance.classification-required` | 7.1 | Under the governance profile `Workflow` and `Agent` have `metadata.classification` (`owner.team` is structurally required). |
 | `security.image-not-pinned` | 9.4 | Under the security profile `mcpServers[].image` and command step `image` are pinned by digest. |
+| `expr.iteration-outside-forEach` | 3.9 | `v1alpha2`: `forEach.*` references appear only in `task` and `env` values of a step that declares `forEach`. |
+| `forEach.input-not-array` | 5.6.4 | `v1alpha2`: an input referenced by `forEach.items` has `type: array`. |
+| `forEach.concurrency-exceeds-budget` | 5.6.4 | `v1alpha2`: `forEach.concurrency` does not exceed the effective `budget.resources.maxConcurrency` (minimum of workflow, agent and step; the workflow default is `1`). |
 
 ### Warnings
 
