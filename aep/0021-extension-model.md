@@ -182,12 +182,16 @@ Implementation-specific:
 | --- | --- | --- |
 | `model.provider` | names listed by AWP | `models.example.com/gateway` |
 | `secrets[].source` | names listed by AWP (resolved by the runtime) | `secrets.example.com/vault-ha` |
-| `triggers[].source` (event) | names listed by AWP | `events.example.com/github` |
 | audit event types | `workflow.*`, `agent.*`, ... | `example.com/cache.hit` (today reverse-domain) |
 | condition types | `Valid`, `Ready`, `Accepted`, `Succeeded`, `ResolvedRefs`, `PoliciesAttached`, `Bound` | `runtime.example.com/Scheduled` (rule already in spec 3.11) |
 
 The same rule applies wherever AWP later opens a value space. A runtime that does not know a value
 rejects the manifest.
+
+`triggers[].source` of an event trigger is not such a value space: it is matched against the
+CloudEvents `source` attribute and names the event producer (spec 5.2, AEP-0004, AEP-0024). Which
+adapter or transport delivers the event is runtime configuration, for example in a trigger
+object (runtime feedback G52, G54).
 
 ### B5. Policy attachment
 

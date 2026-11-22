@@ -44,6 +44,9 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0020](../aep/0020-execution-pinning.md) | Pinning an execution to its manifests | Draft | proposed for `v1alpha3` |
 | [0021](../aep/0021-extension-model.md) | Extension model aligned with the Kubernetes Gateway API (concept) | Draft | proposed for `v1alpha3` |
 | [0022](../aep/0022-step-iteration.md) | Step iteration (`forEach`) | Accepted (lead decision D19) | in the `v1alpha2` draft |
+| [0023](../aep/0023-step-isolation.md) | Step isolation: network permissions, platform ceilings and model credentials | Draft | proposed for `v1alpha3` |
+| [0024](../aep/0024-event-triggers.md) | Event triggers with CloudEvents | Draft | proposed for `v1alpha3` |
+| [0025](../aep/0025-state.md) | State across executions | Draft | proposed for `v1alpha3` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).
