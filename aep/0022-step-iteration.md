@@ -40,7 +40,7 @@ to do this, all of them poor:
 
 Prior art: CI systems (job matrices), workflow engines (map states, dynamic task mapping) and at
 least one agent runtime built against `v1alpha1` (as an extension field). The `for` task of the
-[Open Workflow Specification](https://github.com/serverlessworkflow/specification) (`in`, `each`,
+[Open Workflow Specification](https://github.com/open-workflow-specification/specification) (`in`, `each`,
 `at`, `while`) is the closest specification counterpart (named under D21). All of them bound the
 fan-out and give each element its own retries; none of them lets a model decide how many
 iterations run.
