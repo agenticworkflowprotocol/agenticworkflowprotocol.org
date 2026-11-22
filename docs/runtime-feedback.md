@@ -34,10 +34,11 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 
 | Status | Entries |
 | --- | --- |
+| Accepted and applied to `v1alpha2` and `v1alpha3` | G23 ([AEP-0022](../aep/0022-step-iteration.md), decision D19) |
 | AEP drafted and applied to the `v1alpha3` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
 | AEP drafted, not applied | G10, G47, G49, G50, G51, G61 (AEP-0023); G42 to G46, G54, G56 (AEP-0024); G03, G53, G58 (AEP-0025) |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22; G41 (AEP-0004); G48, G57 (AEP-0019 open question 1); G52 (AEP-0021); G55 (AEP-0012); G59, G60 (AEP-0008) |
-| Open, needs a decision whether and how | G05, G09, G11, G12, G13, G16 to G21, G23 to G39, K |
+| Open, needs a decision whether and how | G05, G09, G11, G12, G13, G16 to G21, G24 to G39, K |
 
 ## 2. Step interface
 
@@ -66,7 +67,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | G20 | should | Expressions have no date or time; a step has to write the fetch date into an output. | `execution.startedAt` as a reference. | open |
 | G21 | should | Input values cannot be set per environment or deployment; scheduled executions use defaults. | Inputs per environment (7.10) or inputs supplied by the runtime binding for schedule triggers. | open |
 | G22 | should | Array inputs have no item schema. | `items` and `schema` for array and object inputs. | [AEP-0014](../aep/0014-input-examples-and-schemas.md), not applied |
-| G23 | should | No fan-out: an agent step cannot run once per source. | `matrix` or `forEach` over an array. | open |
+| G23 | should | No fan-out: an agent step cannot run once per source. | `matrix` or `forEach` over an array. | resolved: `forEach`, [AEP-0022](../aep/0022-step-iteration.md) (accepted, D19), spec `v1alpha3` 5.6.5 |
 | G24 | should | No limit on output tokens or turns per agent step; large extractions hit hard-coded limits. | `budget.resources.maxOutputTokens` and `maxTurns`. | open |
 | G25 | minor | The model cannot see which step it serves; a gateway can only guess. | The runtime passes the step id as request metadata (informative). | open |
 
@@ -196,7 +197,7 @@ the question only because runtime-created runs record the trigger in status.
    well, so that a runtime can test them?
 4. K, G26 and G39: a normative Kubernetes mapping in spec 3.10, or an informative page on the website?
 5. G09: should this repository publish the validator as a container image for admission webhooks?
-6. G13 (`finally`), G23 (fan-out) and G24 with G34 (token and turn limits, model parameters):
+6. G13 (`finally`) and G24 with G34 (token and turn limits, model parameters):
    `v1alpha3` or later? The real run above makes G24/G34 the most pressing of them.
 7. G27 to G38 are mostly clarifications. Collect them in one AEP (like AEP-0013) or extend
    AEP-0013?
