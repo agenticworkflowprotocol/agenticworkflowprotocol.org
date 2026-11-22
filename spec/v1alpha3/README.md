@@ -83,6 +83,20 @@ AWP does not replace MCP or A2A. A manifest references MCP servers as tool sourc
 ([section 5.5](#55-tools-and-action-identifiers)) and A2A endpoints as remote agents
 ([section 5.4.4](#544-remote-agents-a2a)). The wire protocols themselves are out of scope.
 
+Related work (informative). AWP takes ideas from, but does not depend on:
+
+- the [Open Workflow Specification](https://github.com/serverlessworkflow/specification) (CNCF,
+  formerly Serverless Workflow), a DSL for the control flow of workflows (`call`, `do`, `for`,
+  `fork`, `listen`, `emit`, `try`, `wait`) with CloudEvents for events. It describes what a
+  workflow does in which order; AWP describes what an agent in a workflow may do (models, tools,
+  permissions, network, secrets) and how that is governed and audited. Where both cover the same
+  ground, such as iteration ([section 5.6.5](#565-iteration)) and event triggers, AWP aligns its
+  wording where it can;
+- [agent-sandbox](https://agent-sandbox.sigs.k8s.io/) (Kubernetes SIG Apps), a Kubernetes API for
+  isolated, stateful execution environments for agents, with templates, warm pools and isolation
+  backends selected by runtime class. It is one way a platform can isolate steps; AWP states what
+  must be isolated, not how.
+
 ### 1.3 Non-goals
 
 AWP does not define:

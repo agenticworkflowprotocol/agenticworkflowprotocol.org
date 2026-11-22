@@ -36,6 +36,10 @@ AWP complements existing protocols instead of replacing them:
 | A2A      | Agent ↔ agent communication |
 | AWP      | Definition, governance, execution and audit of agentic workflows |
 
+AWP also takes ideas from the [Open Workflow Specification](https://github.com/serverlessworkflow/specification)
+(control flow of workflows) and [agent-sandbox](https://agent-sandbox.sigs.k8s.io/) (isolated
+execution of agent code on Kubernetes), without depending on them.
+
 A minimal manifest:
 
 ```yaml

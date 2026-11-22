@@ -30,6 +30,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- Decision D21 (refines D17): open specifications and vendor-neutral foundation projects may be named as prior art, not as dependencies. Spec `v1alpha3` section 1.2 and the README name the Open Workflow Specification and agent-sandbox as related work; AEP-0022 names the `for` task of the Open Workflow Specification as prior art.
 - Decision D20: the Kubernetes resource model draft of pull request #16 becomes `v1alpha3` and starts from `v1alpha2`; the 5-day discussion period is waived for it. `v1alpha3` has step iteration as section 5.6.5, combined with the step output interface: each item run produces its outputs through `$AWP_OUTPUTS` or `complete_step`, command steps get `AWP_FOREACH_INDEX`, an output referenced by `forEach.items` is parsed as a JSON array, and `forEach` is not allowed on input steps (section 14.2 lists the changes from `v1alpha2`).
 - Conformance suite for `v1alpha2` (`conformance/v1alpha2/`): the `v1alpha1` cases with apiVersion `v1alpha2` plus the step iteration cases; the `v1alpha3` suite has the step iteration cases too. `awp-check.mjs migrate` also converts `v1alpha2` manifests.
 - Website: `v1alpha3` as a proposed draft next to `v1alpha1` and `v1alpha2`.
