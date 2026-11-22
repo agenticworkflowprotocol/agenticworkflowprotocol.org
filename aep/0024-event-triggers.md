@@ -224,7 +224,7 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 - **Always trust a person named in the event.** Rejected: any publisher could name anyone.
 
 Prior art (named under decision D21): the `listen` task of the
-[Open Workflow Specification](https://github.com/serverlessworkflow/specification) consumes
+[Open Workflow Specification](https://github.com/open-workflow-specification/specification) consumes
 CloudEvents and filters them with `with` on attributes and `data`, where values may be regular
 expressions or runtime expressions, and correlates events with `correlate`. This AEP keeps the
 CloudEvents model and attribute names of that design, but restricts the manifest filter to
