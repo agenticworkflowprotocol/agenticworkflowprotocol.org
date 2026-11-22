@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, and D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema. |
-| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18) and 2026-11-19 (D19, D20) by the project lead |
+| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, and D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema. D21 refines D17. |
+| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18), 2026-11-19 (D19, D20) and 2026-11-22 (D21) by the project lead |
 | **Related** | [AEP process](aep-process.md), [extension prefix list](registry/extension-prefixes.md), [GOVERNANCE.md](../GOVERNANCE.md) |
 
 > Context. AWP is alpha. The owner allows the schema to change where implementation practice shows
@@ -180,6 +180,8 @@ a single implementation and were removed from this log by D17.
 - **Applied in**: this log, `README.md`, `GOVERNANCE.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`,
   `docs/aep-process.md`, `docs/site-plan.md`, `docs/registry/extension-prefixes.md`,
   `aep/0001` to `aep/0011`, `site/`.
+- **Refined by**: D21 (open specifications and vendor-neutral foundation projects may be named as
+  prior art).
 
 ### D18. Implementation experience goes into AEPs and implementer guidance
 
@@ -231,6 +233,24 @@ a single implementation and were removed from this log by D17.
 - **Applied in**: this log, `spec/v1alpha3/`, `schema/awp.v1alpha3.json`, `schema/crd/`,
   `schema/awp.v1alpha2.json`, `spec/v1alpha2/` (5.2 note, example), `conformance/`,
   `aep/0015` to `aep/0022`, `docs/v1alpha3-review-guide.md`, `spec/README.md`, `README.md`, `site/`.
+
+### D21. Open specifications and foundation projects may be named as prior art
+
+- **Question**: D17 says the AEPs describe prior art without naming products. May the
+  specification and the AEPs name related open specifications and open-source projects that AWP
+  takes ideas from, such as the Open Workflow Specification or a Kubernetes SIG project?
+- **Decision**: yes, as sources of ideas and inspiration, not as dependencies. The repository may
+  name open specifications and standards (as it already names MCP, A2A, CloudEvents and the
+  Gateway API) and vendor-neutral open-source projects hosted by a foundation or a Kubernetes SIG,
+  where AWP borrows a concept or wording. It still names no runtime, product or vendor offering
+  outside the implementations list (D17). A named project creates no normative reference: AWP
+  stays complete without it, and conformance never requires it.
+- **Consequence**: spec `v1alpha3` section 1.2 and the README get a related-work paragraph naming
+  the Open Workflow Specification (control flow of workflows) and agent-sandbox (isolated
+  execution of agent code on Kubernetes). AEPs name such projects in their prior-art text where
+  they borrow from them: AEP-0022 (iteration), and the drafts for event triggers and step
+  isolation.
+- **Applied in**: this log, `spec/v1alpha3/README.md`, `README.md`, `aep/0022-step-iteration.md`.
 
 ## 2. Resulting scope of `v1alpha2`
 
