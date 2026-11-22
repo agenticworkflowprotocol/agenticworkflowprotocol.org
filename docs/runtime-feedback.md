@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | **Status** | Working list for discussion. Nothing here is decided; an entry changes the specification only through an AEP ([decision D18](decisions.md#d18-implementation-experience-goes-into-aeps-and-implementer-guidance)). |
-| **Source** | A Kubernetes runtime proof of concept (operator, step runner, one real workflow) built against `v1alpha3` at commit `d1bc49b`. As decided in D17, the runtime is not named. |
+| **Source** | A Kubernetes runtime proof of concept (operator, step runner, one real workflow) built against the draft at commit `d1bc49b` (then named `v1alpha2`, now `v1alpha3`, decision D20). As decided in D17, the runtime is not named. |
 | **Collected** | 2026-11-19 |
 | **Related** | [decision log](decisions.md), [AEP process](aep-process.md), [spec v1alpha3](../spec/v1alpha3/README.md) |
 
@@ -26,15 +26,18 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 5. [Trust and data flow](#5-trust-and-data-flow)
 6. [Minor](#6-minor)
 7. [From the operator](#7-from-the-operator)
-8. [Questions for the project lead](#8-questions-for-the-project-lead)
+8. [Event triggers](#8-event-triggers)
+9. [From the concept review](#9-from-the-concept-review)
+10. [Questions for the project lead](#10-questions-for-the-project-lead)
 
 ## 1. Status overview
 
 | Status | Entries |
 | --- | --- |
 | AEP drafted and applied to the `v1alpha3` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
-| Covered by an existing AEP that is not applied yet | G02, G04, G06, G22 |
-| Open, needs a decision whether and how | G03, G05, G09, G10, G11, G12, G13, G16 to G21, G23 to G39, K |
+| AEP drafted, not applied | G10, G47, G49, G50, G51, G61 (AEP-0023); G42 to G46, G54, G56 (AEP-0024); G03, G53, G58 (AEP-0025) |
+| Covered by an existing AEP that is not applied yet | G02, G04, G06, G22; G41 (AEP-0004); G48, G57 (AEP-0019 open question 1); G52 (AEP-0021); G55 (AEP-0012); G59, G60 (AEP-0008) |
+| Open, needs a decision whether and how | G05, G09, G11, G12, G13, G16 to G21, G23 to G39, K |
 
 ## 2. Step interface
 
@@ -42,7 +45,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | --- | --- | --- | --- | --- |
 | G01 | must | How a step produces its declared outputs is undefined; command images and agent prompts only work on the runtime they were written for. | Command steps write files to `$AWP_OUTPUTS`; agent steps get a completion mechanism. | AEP drafted: [step outputs](../aep/0018-step-outputs.md), spec 5.6.4; open question 4 there: non-string values in `complete_step` as JSON until AEP-0003 |
 | G02 | must | Outputs are untyped: a runtime cannot ask the model for structured output or check it before the next step. | `outputs[].type` and `schema`. | [AEP-0003](../aep/0003-typed-handoffs.md) and [AEP-0014](../aep/0014-input-examples-and-schemas.md), not applied |
-| G03 | must | No state across executions ("already reported"). Solved with a volume from the runtime binding, invisible to AWP: no data class, no retention. | `spec.state` (name, classification, retention), provided as a directory or key-value store. | open |
+| G03 | must | No state across executions ("already reported"). Solved with a volume from the runtime binding, invisible to AWP: no data class, no retention. | `spec.state` (name, classification, retention), provided as a directory or key-value store. | AEP drafted: [AEP-0025](../aep/0025-state.md) |
 | G05 | must | Secrets of command steps are too coarse: `scope: [command]` gives a secret to every command step; the variable name is undefined. | Step ids as `scope` entries; a secret is exposed as an environment variable with its name. | open |
 | G12 | should | Where the code of a command step comes from is undefined (scripts in the image; an example runs `npm test` without a checkout). | `workspace` (for example a Git repository and revision) or explicitly implementation-defined. | open |
 | G14 | should | No size limit for outputs. | A minimum every runtime accepts and a rule for larger outputs. | in AEP-0018 (256 KiB per output, 1 MiB per step) |
@@ -73,7 +76,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | --- | --- | --- | --- | --- |
 | G07 | must | No execution object and no status shape; `kubectl get workflows` cannot show validity. | A run kind; standard conditions in `metav1.Condition` shape with printer columns. | AEP drafted: [WorkflowRun and status](../aep/0019-workflow-run-and-status.md), spec 3.11 and 10.8 |
 | G09 | should | Unknown `spec` fields pass `kubectl apply --validate=strict` (the CRDs keep unknown fields); only `status` shows the error, and GitOps tools report "synced". | Ship the validator as an admission webhook image or a ValidatingAdmissionPolicy for common rules. | open; the `Valid` condition of G07 makes the error visible in `kubectl get` |
-| G10 | should | Host-based network permissions cannot be enforced with NetworkPolicy. | Informative note: egress proxy or FQDN policies of the network plugin, otherwise a declared limitation. | open |
+| G10 | should | Host-based network permissions cannot be enforced with NetworkPolicy. | Informative note: egress proxy or FQDN policies of the network plugin, otherwise a declared limitation. | AEP drafted: [AEP-0023](../aep/0023-step-isolation.md) |
 | G26 | should | `metadata.namespace` and `secrets[].source: kubernetes` tie a manifest to one runtime. | Namespace is deployment data; `source` names an abstract store that the runtime resolves. | open |
 | K | should | No mapping of AWP concepts to Kubernetes primitives; every Kubernetes runtime invents its own. | A mapping table in spec 3.10, see below. | open |
 
@@ -136,8 +139,54 @@ the collector only works because a command step now parses structured sources de
 | G38 | minor | `maxDuration` on an agent is ambiguous when the agent serves several steps; the runtime rejects it. | Only workflow and step level, or cumulative step time. | open |
 | G39 | should | Runtime neutrality has only been tested on Kubernetes. The `WorkflowRun` draft defines conditions as `metav1.Condition` and names an admission webhook as the source of the actor. Related to G26. | Define conditions as plain JSON (`type`, `status`, `reason`, `message`, `lastTransitionTime`) with `metav1.Condition` as the Kubernetes mapping; keep "actor from an authenticated source" normative and the webhook as a non-normative example; mark Kubernetes-only text as informative. A run of the same workflow without a cluster is planned. | open |
 | G40 | should | Command step `image`: what a runtime without containers does with it (ignoring it runs the command in an unreviewed environment), and whether digests are needed. Digests made Helm charts hard to maintain, and digests of single platforms break multi-architecture use. | A runtime that cannot run the image rejects the workflow; tags are allowed outside the security profile and resolved to the image index digest at start, pinned for the execution and recorded. | applied in the AEP-0020 draft (spec 5.6.2, 9.4, 10.1, 10.7) |
+| G47 | should | `permissions.network` and deployment limits: a namespace network policy also restricts egress, and the spec says neither who enforces `allowHosts` nor what happens when the deployment allows less. The default `egress: allow` also conflicts with deny-by-default deployments. | The manifest states what the workflow needs, the deployment sets a ceiling, the intersection applies (like a pod security context under a cluster security policy). The runtime MUST enforce, MAY restrict further and MUST reject before execution if the ceiling is narrower or it cannot enforce for a step type. `egress: deny` as the default under the security profile. | AEP drafted: [AEP-0023](../aep/0023-step-isolation.md) |
 
-## 8. Questions for the project lead
+## 8. Event triggers
+
+Reported while the same runtime added event-driven workflows: a chat bridge publishes messages as
+CloudEvents to an MQTT broker, an existing event router (one listener per transport, one filter
+object per workflow) creates a run for every matching workflow, and a step answers in the
+originating thread. Routing involves no model, so a message cannot redirect it by prompt. Two
+findings from the router used: it subscribes to MQTT with QoS 0 and keeps event ids for
+deduplication only in memory for a few minutes, so the runtime must deduplicate itself.
+
+| ID | Sev. | Gap | Proposal from the runtime | Status |
+| --- | --- | --- | --- | --- |
+| G41 | must | An event trigger cannot pass event data to the execution; spec 5.2 has no event context, so the proof of concept maps event fields to inputs. | Apply AEP-0004 (`${{ event.* }}`, `dataSchema`, `classification`, event data as untrusted input) to `v1alpha3`, keeping D7. The run object carries the event as set by the router (G48); a test or replay run carries a supplied event (G57). | partly solved: D7 and AEP-0004 replace the input mapping; AEP-0004 not applied to the draft yet |
+| G42 | should | `filter` semantics are undefined: which fields it matches, whether by equality, how entries combine. | Keys are CloudEvents attribute names or `data.<path>`, values match by equality, all entries must match. Richer conditions (CEL, expression filters) live in an implementation-specific trigger object attached with `targetRefs` (AEP-0021 B6) and may only narrow the manifest filter. | AEP drafted: [AEP-0024](../aep/0024-event-triggers.md) |
+| G43 | should | No duplicate handling and no concurrency for event triggers; MQTT and webhook retries deliver events more than once. | Deduplicate by CloudEvents `source` and `id` within a window the runtime states; allow `concurrencyPolicy` and a rate limit on event triggers. | AEP drafted: [AEP-0024](../aep/0024-event-triggers.md); duplicates observed in the proof of concept (a run rejected as duplicate event), the runtime deduplicates by `source` and `id` |
+| G44 | must | The actor of an event-triggered execution is unclear: the authenticated party is the bridge, not the person who wrote the message. | Record both: the authenticated source and an optional actor attested by it; policies may require an attested actor and name the sources allowed to attest. Answers never count as approvals (AEP-0017). | AEP drafted: [AEP-0024](../aep/0024-event-triggers.md); severity raised: approval rules on the initiator (spec 7.6 `initiatorCannotApprove`, `actorCannotApproveOwnAction`) do not bind a person who starts a run by message while the actor is `system`. Evidence: the bridge attests the author only through transport authorisation (broker access control), not end to end |
+| G45 | minor | No reply path: an execution started by a message cannot refer to where the message came from. | Standardise correlation data in the event context (thread, reply target as a CloudEvents extension); delivery stays with steps. | AEP drafted: [AEP-0024](../aep/0024-event-triggers.md) |
+| G46 | should | Conversation context: a reply in a thread (chat, ticket, mail) only sees the triggering message. The proof of concept lets the source adapter attach earlier thread messages (author, bot flag, time, text; capped, with a truncation flag) and the participants to the event data. | A standard shape for thread context inside `event.data` (AEP-0004), untrusted and classified like the rest, so workflows stay independent of the source. Participants are personal data and fall under the data policy. | AEP drafted: [AEP-0024](../aep/0024-event-triggers.md); limits in the proof of concept are set, not measured |
+
+## 9. From the concept review
+
+Found while writing a reference concept for operating agents and in three reviews of it against
+the proof of concept and the draft at `b8a0ee8` (now `v1alpha3`, decision D20). The column "Home" names the AEP or entry where a
+change would fit.
+
+| ID | Sev. | Gap | Proposal from the runtime | Home | Status |
+| --- | --- | --- | --- | --- | --- |
+| G48 | must | Event runs created by an external router (an event router creating run objects) fit neither role of spec 10.8: client-created runs are manual, runtime-created runs record the trigger only in status, and the run spec has no trigger. | A trusted-ingress role: an authenticated identity the runtime accepts may create runs with trigger type `event` and an event payload; the runtime checks the trigger against the manifest, records the ingress identity and rejects event fields from other creators. | AEP-0019 open question 1 | open; the runtime now plans to create event runs itself from a generated trigger object, which needs no new role; the role stays relevant for external routers |
+| G49 | should | `permissions.network.allowHosts` has no syntax: subdomain wildcards, ports, IP literals and CIDRs are undefined. | Define host matching (exact, `*.domain`), optional ports, and whether addresses or CIDRs are allowed. | [AEP-0023](../aep/0023-step-isolation.md) | AEP drafted |
+| G50 | must | An allowed host can resolve to loopback, private, link-local (cloud metadata) or CGNAT addresses (SSRF, DNS rebinding); the proof of concept had this hole. | Under the security profile, deny such destinations after resolution unless listed explicitly as addresses. | [AEP-0023](../aep/0023-step-isolation.md) | AEP drafted; the proof of concept now checks the resolved address at connection time (covers rebinding and redirects by construction), without an explicit rebinding test |
+| G51 | should | No guidance on how `permissions.network` is enforced for command steps. | Informative: a per-workload egress proxy with an allowlist derived from `allowHosts`, plus a network policy that allows only that proxy, is conforming. A runtime that cannot enforce a network rule rejects the workflow. | [AEP-0023](../aep/0023-step-isolation.md), with G10 | AEP drafted |
+| G52 | should | AEP-0021 B6 covers bindings but not runtime trigger objects (routing, expression filters, rate limits). | Trigger objects attach with `targetRefs` and `sectionName` (trigger index), may only narrow the manifest trigger, are generated from or validated against `spec.triggers`, and report `Accepted`. | AEP-0021 (extend B6) | open |
+| G53 | should | Two workflows of one owner share state (a daily run writes, a chat run reads and writes). | State as a named resource referenced by several workflows with an access mode, rules for concurrent writers, and the strictest classification for every reader. | [AEP-0025](../aep/0025-state.md), with G03 | AEP drafted; scenario derived, no conflict observed |
+| G54 | minor | Meaning of `triggers[].source`: the CloudEvents producer (URI) or an adapter name (AEP-0021 B4). | State which one. | [AEP-0024](../aep/0024-event-triggers.md); AEP-0021 B4 corrected | AEP drafted |
+| G55 | should | A step that posts as its own bot account acts under an external identity; the manifest shows only a secret, and governance sees `shell.execute` (G06). | Declare the external identity a step acts as, so audit and policies can refer to it. | AEP-0012 (its open point on which identity calls a tool) | open |
+| G56 | minor | Event routers can silently weaken delivery guarantees (one subscribes to MQTT with QoS 0). | Runtimes state the delivery guarantee per event source in the conformance statement. | [AEP-0024](../aep/0024-event-triggers.md) (conformance statement) | AEP drafted |
+| G57 | should | Event-only workflows cannot be tested conformingly: AEP-0004 fails `event.*` outside event runs, and 10.8 makes client runs manual. | A client run with a supplied event, marked as test or replay (actor is the creator), validated against `dataSchema`. | AEP-0019 open question 1, AEP-0004 | open |
+| G58 | should | State written by one execution is read as data by the next, so a message or web page can become a persistent instruction (memory poisoning, seen in the chat workflow). | Origin marking (G11) also for state; state is untrusted input by default. | [AEP-0025](../aep/0025-state.md); spec 12 now lists state as untrusted input | AEP drafted |
+| G59 | should | AEP-0008 treats `contextTokens` and `maxOutputTokens` as informative; a model server rejected every request because the runtime asked for more output tokens than the model allows. | Catalog limits are binding: the runtime caps requested output tokens at `maxOutputTokens` and rejects a workflow whose settings cannot fit. A price of 0 (local models) counts as a known price (G35). | AEP-0008 (its target `v1alpha3` predates D20 and now means after the current draft), with G34 | open |
+| G60 | minor | Agent steps need a model that supports tool calls; a small local model called tools without arguments, and the failure showed only at run time. | Optional capability flags in the catalog model entry (`toolUse`, `structuredOutput`); a runtime rejects an agent with tools on a model without tool support. | AEP-0008 | open |
+| G61 | should | The spec does not say where model credentials live; a runtime may hand the provider key to the step, where any command or injected instruction can read it. | Under the security profile, model credentials MUST NOT be visible in the step environment; the runtime calls the provider itself or through a proxy that authenticates the step with a short-lived, execution-bound credential. | [AEP-0023](../aep/0023-step-isolation.md); not AEP-0008, whose non-goals exclude credentials | AEP drafted; feasibility shown (key only at the runtime, short-lived credential per attempt), latency and cost of the proxy not measured |
+
+**Conflict in the draft (G44).** Spec 5.2 gives every `event` start the actor type `system`,
+while G44 asks to record a person attested by the event source. Both cannot hold; 10.8 avoids
+the question only because runtime-created runs record the trigger in status.
+
+## 10. Questions for the project lead
 
 1. Do the three drafted AEPs (G01, G07, G08) join the `v1alpha3` scope table in the decision log,
    once they reach `Review`?
@@ -151,3 +200,10 @@ the collector only works because a command step now parses structured sources de
    `v1alpha3` or later? The real run above makes G24/G34 the most pressing of them.
 7. G27 to G38 are mostly clarifications. Collect them in one AEP (like AEP-0013) or extend
    AEP-0013?
+8. Decided 2026-11-22: event triggers get one AEP, [AEP-0024](../aep/0024-event-triggers.md)
+   (G42 to G46, G54, G56). G41 is AEP-0004, G48 and G57 go into AEP-0019 (open question 1), G52
+   into AEP-0021.
+9. Decided 2026-11-22: network permissions and credentials get one AEP,
+   [AEP-0023](../aep/0023-step-isolation.md) (G10, G47, G49 to G51, G61). Internal destinations
+   are denied by default under the security profile, not banned: the manifest and the platform
+   ceiling can allow them. State gets [AEP-0025](../aep/0025-state.md) (G03, G53, G58).
