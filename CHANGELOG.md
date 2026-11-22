@@ -17,6 +17,8 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Changed
 
+- AEP-0021 B4: `triggers[].source` is no domain-prefixed value space; it is the CloudEvents `source` of the event producer (runtime feedback G54).
+- Spec `v1alpha3` section 12: content kept between executions (state) is untrusted input like tool results (runtime feedback G58).
 - README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).
 - Conformance case `3.2-unsupported-api-version` uses `awp.agenticworkflowprotocol.org/v9`, because `v1alpha3` is now a supported version of the reference checker.
 - The repository is implementation-neutral (decision D17): implementation-specific alignment documents, mappings and the single implementation page were removed, the AEPs describe prior art without naming products, the extension prefix list starts empty, and the project contact is info@agenticworkflowprotocol.org. Repository links point to `agenticworkflowprotocol/agenticworkflowprotocol.org`.
@@ -30,6 +32,8 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- AEP-0023 (step isolation: network permissions, platform ceilings and model credentials), AEP-0024 (event triggers with CloudEvents) and AEP-0025 (state across executions) as Draft for `v1alpha3`, from runtime feedback G03, G10, G42 to G47, G49 to G51, G53, G54, G56, G58 and G61.
+- `docs/runtime-feedback.md`: gaps G41 to G61 (event triggers, the concept review, models), with the AEP each belongs to and the evidence from the runtime.
 - Decision D20: the Kubernetes resource model draft of pull request #16 becomes `v1alpha3` and starts from `v1alpha2`; the 5-day discussion period is waived for it. `v1alpha3` has step iteration as section 5.6.5, combined with the step output interface: each item run produces its outputs through `$AWP_OUTPUTS` or `complete_step`, command steps get `AWP_FOREACH_INDEX`, an output referenced by `forEach.items` is parsed as a JSON array, and `forEach` is not allowed on input steps (section 14.2 lists the changes from `v1alpha2`).
 - Conformance suite for `v1alpha2` (`conformance/v1alpha2/`): the `v1alpha1` cases with apiVersion `v1alpha2` plus the step iteration cases; the `v1alpha3` suite has the step iteration cases too. `awp-check.mjs migrate` also converts `v1alpha2` manifests.
 - Website: `v1alpha3` as a proposed draft next to `v1alpha1` and `v1alpha2`.

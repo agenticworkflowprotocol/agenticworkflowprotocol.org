@@ -2116,7 +2116,9 @@ AWP anticipates a common command-line vocabulary (`awp validate`, `awp lint`, `a
 
 - **Fail closed.** Unknown fields, unsupported profiles, undeterminable regions or resources and
   unverifiable digests lead to rejection or denial, never to silent acceptance.
-- **Prompt injection.** Tool results and remote agent messages are untrusted input. Governance in
+- **Prompt injection.** Tool results, remote agent messages and content that a runtime keeps
+  between executions and passes to a later model invocation (state) are untrusted input: a message
+  stored by one execution must not become an instruction for the next. Governance in
   AWP is enforced by the runtime **outside** the model: an agent cannot change permissions,
   policies, budgets or approvals by producing text. Runtimes MUST NOT allow model output to
   modify the effective manifest of a running execution.
