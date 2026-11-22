@@ -218,6 +218,13 @@ enforce their own compliance requirements. This proposal makes no compliance pro
   addresses exist for a workload.
 - **Name a mechanism (proxy, network policy).** Rejected: not portable; kept as informative text.
 
+Prior art (named under decision D21): [agent-sandbox](https://agent-sandbox.sigs.k8s.io/)
+(Kubernetes SIG Apps) provides isolated, stateful execution environments for agents on
+Kubernetes (`Sandbox`, with `SandboxTemplate`, `SandboxClaim` and `SandboxWarmPool`), with the
+isolation backend chosen by `RuntimeClass` (for example gVisor or Kata Containers). It is one
+platform-side way to run steps in a sandbox and keep warm pools; this AEP does not require it and
+states only what the effective network and credential isolation must be.
+
 ## Implementation status
 
 A proof-of-concept Kubernetes runtime checks the resolved address at connection time in its tool
@@ -240,3 +247,4 @@ Not decided. Number and scope assigned by the maintainer on 2026-11-22.
 - Runtime feedback G10, G47, G49, G50, G51, G61 ([runtime-feedback.md](../docs/runtime-feedback.md)).
 - Spec `v1alpha3` sections 7.5, 7.9, 11.
 - Kubernetes `NetworkPolicy`; RFC 1918, RFC 6598 (CGNAT), RFC 4193 (unique local IPv6).
+- agent-sandbox, Kubernetes SIG Apps.
