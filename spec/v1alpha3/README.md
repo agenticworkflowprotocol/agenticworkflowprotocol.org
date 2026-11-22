@@ -85,7 +85,7 @@ AWP does not replace MCP or A2A. A manifest references MCP servers as tool sourc
 
 Related work (informative). AWP takes ideas from, but does not depend on:
 
-- the [Open Workflow Specification](https://github.com/serverlessworkflow/specification) (CNCF,
+- the [Open Workflow Specification](https://github.com/open-workflow-specification/specification) (CNCF,
   formerly Serverless Workflow), a DSL for the control flow of workflows (`call`, `do`, `for`,
   `fork`, `listen`, `emit`, `try`, `wait`) with CloudEvents for events. It describes what a
   workflow does in which order; AWP describes what an agent in a workflow may do (models, tools,
