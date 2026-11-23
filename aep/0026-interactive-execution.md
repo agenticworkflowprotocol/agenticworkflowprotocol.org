@@ -201,6 +201,8 @@ real models. Not built: `maxAutonomy` in the manifest.
 7. **Naming:** `autonomy` is already used by `environments` with other values; rename the session
    field (for example `mode`)? `AgentSession` or `Session`?
 8. **Events:** which lifecycle and confirmation events, with which required data?
+9. **Time limits:** `sessions.idleTimeout` (pause after inactivity) and `sessions.maxDuration` (end
+   after active time) in the manifest, or runtime configuration?
 
 ## Decision
 

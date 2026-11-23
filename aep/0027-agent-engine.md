@@ -158,6 +158,8 @@ only `summary` and `diff` as outputs.
    permissions only?
 6. **Failure:** does a refused tool call fail the step, or is it a tool error the agent can recover
    from?
+7. **Runtime profile:** should the manifest name a runtime-defined profile for image and resources
+   (`engine.runtimeProfile`), or is that binding data only?
 
 ## Decision
 
