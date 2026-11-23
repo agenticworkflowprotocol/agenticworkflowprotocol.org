@@ -75,6 +75,27 @@ Rendering rules:
 supplies the variables. `promptRef.version` stays an exact version; `digest` is verified like
 `ref.digest` (spec 5.4.2, 9.1).
 
+### Prompts as tasks of interactive executions (runtime feedback G75)
+
+A `Prompt` with `role: user` MAY also serve as a reusable task of an interactive execution
+(AEP-0026), for example a security review or a test-writing request that people start from a
+library instead of typing it. Additional optional `spec` fields:
+
+| `spec` field | Type | Req. | Description |
+| ------------ | ---- | ---- | ----------- |
+| `title` | string | no | Short name shown to people. |
+| `agents` | list | no | Names of `Agent` manifests the prompt fits. Absent: any agent. |
+| `suggestedAutonomy` | string | no | `readOnly`, `ask` or `auto` (AEP-0026), shown as a suggestion. |
+
+Rules:
+
+- Such a prompt is plain user input: it runs with the permissions, budget and autonomy level of the
+  execution, can never extend them, and a suggested level is capped like any level the person
+  selects.
+- Variables are filled by the person; for a free-text argument a prompt declares one `string`
+  variable (runtimes MAY map it to the argument convention of their engine).
+- A server prompt of an MCP server (AEP-0007 rule 9) is not a `Prompt` manifest.
+
 ### Reproducibility record (section 10.7)
 
 `agents[].prompt`: `name`, `version`, `digest` of the resolved `Prompt` manifest.
@@ -166,6 +187,11 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 ## Implementation status
 
 No implementation of this AEP exists.
+
+A proof-of-concept Kubernetes runtime has a namespaced prompt library object with title, prompt
+text with one argument placeholder, the session templates it fits and a suggested mode; tenant
+entries override platform entries of the same name, and sessions get them as commands of the
+coding agent. It has no versions, digests or typed variables yet.
 
 ## Open questions
 

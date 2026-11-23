@@ -82,6 +82,29 @@ Rules:
 4. Runtimes MAY enforce a lower maximum `contentRetention` or level by configuration and MUST then
    reject manifests that request more.
 
+### Origin of events (runtime feedback G76)
+
+An agent's actions can be recorded in the execution environment (an engine or step runner, which
+the agent can influence), in a user interface (which sees only what the engine reports) or in a
+component outside the execution environment that holds the credentials (a model or tool gateway).
+
+5. Every event carries `origin`: `runtime` (produced outside the execution environment) or
+   `executionEnvironment` (produced inside it, for example by an engine). Under the `security`
+   profile, events about model calls, tool calls and approvals or confirmations MUST have origin
+   `runtime`. Events from inside MAY be recorded in addition and joined by identifiers (tool call
+   id); a runtime SHOULD flag disagreements between both.
+6. A tool result reaches a gateway only as the agent reports it when the tool runs inside the
+   execution environment (a shell command). A runtime MUST document which events it cannot verify.
+
+### Content sent to tool sources and session history (runtime feedback G77, G85)
+
+7. Tool arguments can carry large amounts of workflow data (a scanner receives source code). At
+   `content`, they are content under rule 1 with `contentRetention`; at `metadata`, the event
+   records size and digest of the arguments, so that it stays verifiable what was sent where.
+8. The history of an interactive execution (AEP-0026: prompts, answers, confirmations, model
+   output) is content. It follows `contentRetention` of the agent; read access to it is limited to
+   identities that could control the session and to auditors the runtime documents.
+
 ## Examples
 
 ```yaml
@@ -142,6 +165,13 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 ## Implementation status
 
 No implementation of this AEP exists.
+
+A proof-of-concept Kubernetes runtime records conversations at its model gateway, append-only with
+a hash chain per conversation, tool calls at its MCP gateway with arguments and result, and the
+egress of the tenant proxy; events of the coding agent inside the sandbox are joined by tool call
+id. Secret values are replaced by placeholders before the model and the audit log (the `redacted`
+idea, shown on a test installation). It has no separate content storage, no salted digests and no
+`contentRetention` yet.
 
 ## Open questions
 

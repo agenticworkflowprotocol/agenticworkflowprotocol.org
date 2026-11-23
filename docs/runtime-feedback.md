@@ -39,7 +39,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | AEP drafted and applied to the `v1alpha3` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
 | AEP drafted, not applied | G10, G47, G49, G50, G51, G61, G64, G67 to G69 (AEP-0023); G42 to G46, G54, G56, G86 (AEP-0024); G03, G53, G58, G87 (AEP-0025) |
 | New AEP proposed (number to be confirmed) | G62, G63, G73, G82, G85 (AEP-0026, interactive execution); G65, G66, G81, G83 (AEP-0027, agent engine) |
-| Fits an existing AEP that is not applied yet (from section 10) | G70 to G72 (AEP-0007); G74 (AEP-0002); G75 (AEP-0005); G76 (AEP-0009); G78 (AEP-0013); G84 (AEP-0017) |
+| Amendment drafted in an existing AEP that is not applied yet (from section 10) | G70 to G72 (AEP-0007); G74 (AEP-0002); G75 (AEP-0005); G76, G85 in part, G77 in part (AEP-0009); G78 (AEP-0013); G84 (AEP-0017) |
 | Covered by an existing AEP that is not applied yet | G02, G04, G06, G22; G41 (AEP-0004); G48, G57 (AEP-0019 open question 1); G52 (AEP-0021); G55 (AEP-0012); G59, G60 (AEP-0008) |
 | Open, needs a decision whether and how | G05, G09, G11, G12, G13, G16 to G21, G24 to G39, G77, G79, G80, K |
 

@@ -68,6 +68,13 @@ Applied in [spec/v1alpha3 section 5.8](../spec/v1alpha3/README.md#58-human-input
    messages and answers per `payload` (digest under `payload: metadata`).
 8. **Profile**: new `interaction` profile, depending on `core`. Waiting counts against step
    `timeout` and `maxDuration`.
+9. **Interactive executions (runtime feedback G84).** In an `AgentSession` (AEP-0026) agent
+   requests go to the identities that may control the session; `answerers` is not needed. The
+   request is answered in the session's user interface, audited with the same events, and the
+   session shows `waiting` while it is open. An answer stays information and is never a
+   confirmation of an action (AEP-0026) or an approval. Without a person (a paused session, an
+   unattended engine step) requests are declined. An engine's own question tool maps to agent
+   requests; questions it would ask outside this mechanism are declined.
 
 ## Examples
 
@@ -168,6 +175,11 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 Schema, CustomResourceDefinitions, semantic rules and conformance cases are in this repository. No
 runtime behaviour is implemented here.
+
+A proof-of-concept Kubernetes runtime shows questions of a coding agent in interactive sessions as
+cards with choices and free text and audits each answer; it rejects `humanInput` on session agents
+because the session already has a person, and its MCP gateway declines elicitation requests of
+servers.
 
 ## Open questions
 

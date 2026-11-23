@@ -271,7 +271,11 @@ spec:
 ```
 
 - **Implementation-specific.** Binding kinds belong to the runtime (vendor group, own CRD). AWP
-  defines only `targetRefs`, the status and the rules below. Bindings carry the discovery label
+  defines only `targetRefs`, the status and the rules below.
+- **Targets.** A binding targets a `Workflow` or an `Agent`. An `Agent` binding configures how the
+  runtime runs that agent on its own, for example as an interactive session (AEP-0026): image or
+  runtime profile, model alternatives, secret mapping. For an agent used inside a workflow, the
+  workflow's binding applies. Bindings carry the discovery label
   `awp.agenticworkflowprotocol.org/binding: "true"`; the target gets a condition `Bound`.
 - **One accepted binding per workflow and runtime.** Several bindings of one runtime on the same
   workflow would start it twice. The runtime accepts the oldest binding (creation time, then name)
@@ -393,6 +397,10 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 Concept only. A Kubernetes runtime proof of concept already uses a binding object that points at
 the workflow (B6) and no extension fields; its review of this draft is reflected in B6 and B9.
+Its platform extension adds an agent binding for interactive sessions and keeps tenants and
+sandbox profiles as implementation-specific objects; its one extension field (the engine of an
+agent) is the kind of field that B3 turns into an `extensionRef` until AEP-0027 is applied. Which
+of its objects should become AWP kinds is discussed in runtime feedback section 10.
 
 ## Open questions
 

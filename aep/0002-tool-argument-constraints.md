@@ -96,6 +96,26 @@ denied actions do not count. When the limit is reached, further matching actions
 with `reason: budget`. `maxCalls` is
 independent of `budget.resources.maxToolCalls`; both apply.
 
+### New section 7.5.7: Resource scope of `shell.execute` (runtime feedback G74)
+
+A command line is not one target: it can chain commands (`;`, `&&`, `||`, `|`), substitute
+commands (`$(...)`, backquotes), nest them in subshells or compound commands, and set variables
+before a command. For `shell.execute` the resource of a call is defined as follows:
+
+1. The resources of a command line are its **simple commands**: the words of each command, without
+   quotes, joined by one space, with redirections removed.
+2. `resources` entries are glob patterns: `*` matches any sequence, `?` one character, and a
+   trailing ` *` also matches the command without arguments.
+3. The call is allowed only if **every** simple command of the line matches an entry.
+4. A runtime MUST deny a line it cannot split into simple commands: command or process
+   substitution, subshells, compound commands (`if`, `for`, functions), leading variable
+   assignments, and expansions in the command name.
+5. `resources` on a group or wildcard key applies to every action the key matches. A runtime that
+   cannot apply it to an action of the group MUST deny that action.
+6. Informative: an allow list restricts which programs start, not what an allowed program does
+   (`make`, `npm test`, a test runner execute code from the repository). The isolation class and
+   the network rules of AEP-0023 are the boundary for that.
+
 ### Changes to section 5.5.3 (wildcards): decision (confirmed by owner decision D4)
 
 The existing rule stays: a wildcard is only a final segment `*` (`github.*`). **Prefix wildcards
@@ -197,6 +217,12 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 At least one runtime in progress enforces argument constraints, an `allowAdditionalArgs` flag and
 per-tool call limits in its own format. No implementation of this AEP exists.
+
+A proof-of-concept Kubernetes runtime implements section 7.5.7 for interactive sessions, decided by
+a component outside the sandbox. Shown on a test installation with `resources: ["git *", "ls *",
+"echo *"]`: `echo` and `git --version` ran; `curl ...`, `echo a; id` and `echo $(id)` were refused
+with a reason the model sees. It accepts `resources` only on the exact key `shell.execute` and
+rejects expressions in them.
 
 ## Open questions
 
