@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | **AEP** | 0026 |
-| **Title** | Interactive execution: the `AgentSession` kind, autonomy levels and per-call confirmation |
+| **Title** | Interactive execution: the `AgentSession` kind, autonomy levels, per-call confirmation and agent governance |
 | **Authors** | @agenticworkflowprotocol |
 | **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
@@ -26,8 +26,8 @@ runtime can run this today only by pretending a session is a workflow with one s
 AEP adds an execution form for that: the kind `AgentSession`, a sibling of `WorkflowRun`. It also
 adds autonomy levels with a ceiling that the agent's author sets, a per-action `confirm` setting,
 the lifecycle, budget scope and audit events of a session, and the narrowing of tool sources and
-the choice of a model for one session. It answers runtime feedback G62, G63, G73, G82 and part of
-G85.
+the choice of a model for one session, and governance fields on `Agent` for executions without a
+workflow. It answers runtime feedback G62, G63, G73, G82 and part of G85.
 
 ## Motivation
 
@@ -82,6 +82,29 @@ New `spec` field of `Agent`:
 A session is not possible without the explicit opt-in of the author, because interactive use
 changes what the agent does more than any input value.
 
+**Governance of an agent that runs on its own.** Inside a workflow, `dataPolicy`, `modelPolicy`,
+`environments`, `policies` and `audit` of the workflow apply to the agent (spec 6). A session has
+no workflow. New optional `spec` fields of `Agent`, with the same shape as on `Workflow`:
+
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `dataPolicy` | object | no | Spec 7.2, 7.3. |
+| `modelPolicy` | object | no | Spec 7.4; also applies to `sessions.models`. |
+| `environments` | map | no | Spec 7.10. |
+| `policies` | object | no | Spec 8.1: policies the agent includes. |
+| `audit` | object | no | Spec 10.2 with the payload levels of AEP-0009. |
+
+- They apply whenever the agent runs on its own (an `AgentSession`, or a single agent run as a
+  workflow with one step).
+- When a workflow references the agent, the workflow's fields apply as today, and the agent's
+  fields apply as well: both must allow an operation (the stricter one wins), as for
+  `permissions` (spec 7.5.4).
+- Platforms MAY attach `Policy` objects to an `Agent` with `targetRefs` (AEP-0021 B5); they apply
+  in addition.
+- Under the `security` profile, an agent with `sessions` MUST declare `audit` with a payload level
+  and, unless the level is `metadata`, `contentRetention` (AEP-0009); otherwise it is invalid. A
+  session produces prompts and answers, which must have a reviewed retention.
+
 ### New section 7.5.8 (autonomy and confirmation)
 
 **Autonomy level.** Each prompt of a session runs at one level:
@@ -101,20 +124,23 @@ level, and no level allows an action that permissions deny.
 | Value | Meaning |
 | ----- | ------- |
 | absent | Follows the autonomy level. |
-| `always` | Requires a confirmation at every level. In executions without a person (workflow runs) the action is denied. |
+| `always` | Requires a confirmation at every level, for every single call: only `allowOnce` or `refuse` (see Confirmation). In executions without a person (workflow runs) the action is denied. |
 | `never` | Runs without confirmation at `ask` and `auto`; still denied at `readOnly` if it changes state. |
 
 When several permission objects apply, the strictest `confirm` wins (`always` over absent over
 `never`).
 
-**Effective level.** The level that applies to a prompt is the lowest of: the level that the person
-selected, `sessions.maxAutonomy`, and the platform ceiling (AEP-0023 section 7.5.7). Only an
-identity that may control the session (section 10.9) may change the level. Every change is an
-audit event.
+**Selecting a level.** A level above `sessions.maxAutonomy` or above the platform ceiling is
+rejected, both when the session is created and when a controlling identity changes the level
+later (AEP-0023 section 7.5.7: ceilings reject, never adjust). A rejected change leaves the
+current level in place and is audited with reason `ceilingExceeded`. Only an identity that may
+control the session (section 10.9) may change the level. Every change is an audit event.
 
 **Confirmation.** A confirmation names the action, its arguments as the runtime shows them, and
 the outcome: `allowOnce`, `allowForSession` (the same action and resource for the rest of the
-session, never beyond it) or `refuse`. A confirmation is a decision under AEP-0023 section 7.6.1:
+session, never beyond it) or `refuse`. For an action with `confirm: always` the runtime MUST
+offer only `allowOnce` and `refuse`; it MUST NOT reuse an earlier grant for it, and an
+`allowForSession` received for such an action is recorded and applied as `allowOnce`. A confirmation is a decision under AEP-0023 section 7.6.1:
 it MUST come from an authenticated identity that may control the session, and MUST be decided
 outside the execution environment. A confirmation is not an approval in the sense of spec 7.6:
 rules that require an approval (`requireApproval`, approval steps) still require one.
@@ -146,7 +172,7 @@ spec:
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
 | `spec.agentRef` | object | yes | `name` of an `Agent` in the same namespace; `version` and `digest` are assertions as in `WorkflowRun`. |
-| `spec.autonomy` | string | no | Level the person selected: `readOnly`, `ask` (default) or `auto`. Capped as in 7.5.8. May change while the session runs. |
+| `spec.autonomy` | string | no | Level the person selected: `readOnly`, `ask` (default) or `auto`. A level above `maxAutonomy` or the ceiling is rejected (7.5.8). May change while the session runs. |
 | `spec.model` | object | no | `model` or one of `sessions.models` of the agent. Anything else is rejected. May change between prompts. |
 | `spec.toolSources` | list | no | Names of the agent's tool sources to enable. Absent: all. Empty list: none. A name that is not a tool source of the agent is reported in status and ignored. |
 | `spec.initialPrompt` | string | no | First prompt, sent when the session is ready. |
@@ -160,8 +186,8 @@ Rules:
 
 - **Starting.** The creator of the object is the actor. It is taken from an authenticated source,
   as for `WorkflowRun`. The runtime validates the agent (including `sessions`), the model, the
-  tool sources, the autonomy level and every policy before it starts anything. Otherwise it sets
-  `phase: rejected`.
+  tool sources, the autonomy level, the agent's governance fields, every policy and every platform
+  ceiling before it starts anything. Otherwise it sets `phase: rejected`.
 - **Control.** The creator may send prompts, confirm actions, change level and model, pause, resume
   and stop. A runtime MAY let further identities control a session (for example a team
   maintainer), and MUST document who. Every action of a controlling identity is an audit event with
@@ -237,6 +263,13 @@ spec:
     - type: mcp
       server: code-scanner
       tools: [scan]
+  modelPolicy:
+    allowedProviders: [example-provider]
+  environments:
+    development: {}
+  audit:
+    payload: redacted
+    contentRetention: 30d
   permissions:
     default: deny
     tools:
@@ -253,22 +286,26 @@ spec:
     maxCostUsd: 5
 ```
 
-A person who selects `auto` gets `ask` (the ceiling). Scans run without asking. A `git push` asks
-every time. `curl` is denied.
+Selecting `auto` is rejected (above `maxAutonomy`); the session keeps `ask`. Scans run without
+asking. A `git push` asks every time and can only be allowed once. `curl` is denied. Prompts and
+answers are kept 30 days.
 
 ## Schema changes
 
 - New root kind `AgentSession` with `$defs/AgentSessionSpec`, `$defs/AgentSessionStatus`.
-- `$defs/AgentSpec.sessions`; `confirm` enum in `$defs/PermissionToolEntry`.
+- `$defs/AgentSpec.sessions`; `dataPolicy`, `modelPolicy`, `environments`, `policies` and
+  `audit` on `$defs/AgentSpec`; `confirm` enum in `$defs/PermissionToolEntry`.
 - Semantic rules: `session.agent-not-interactive` (no `sessions`), `session.model-not-allowed`,
-  `session.autonomy-invalid`, `permissions.confirm-invalid`.
+  `session.autonomy-invalid`, `session.audit-missing` (security profile),
+  `permissions.confirm-invalid`.
 - Kubernetes binding (spec 3.10): plural `agentsessions`, namespaced, `status` subresource.
 
 ## Conformance impact
 
 - New profile `session`. Valid: `10.9-agent-session.yaml`, `6-agent-sessions.yaml`. Invalid:
   `10.9-agent-session-model-not-allowed.yaml`, `7.5.8-confirm-unknown.yaml`.
-- Runtime tests: a level above `maxAutonomy` is capped; `confirm: always` asks at `auto`; a
+- Runtime tests: a level above `maxAutonomy` is rejected and the level stays; `confirm: always`
+  asks at `auto` and accepts no session-wide grant; a
   disabled tool source is refused; a confirmation sent from inside the execution environment is
   not accepted; the budget is summed across a pause.
 
@@ -284,7 +321,7 @@ keep doing so. A runtime that offered interactive use without this AEP needs the
   agent's own permission system ask the person, inside the sandbox, offers no protection against a
   command that answers for the person.
 - `allowForSession` can turn into a broad grant. It is limited to the same action and resource,
-  and it ends with the session.
+  it ends with the session, and it never applies to actions with `confirm: always`.
 - A command allow list (AEP-0002) and confirmations do not restrict what an allowed program runs.
   The isolation class (AEP-0023) is the boundary for that.
 - Prompts and repository content are untrusted input (spec 12, runtime feedback G81). A prompt
@@ -335,6 +372,9 @@ sessions started by events.
 4. Should a session be startable by an event (runtime feedback G86), and is the attested actor of
    AEP-0024 then its creator?
 5. Name: `AgentSession` or `Session`?
+6. Is the agent the right place for session governance, or should a platform-level object (a
+   session class) hold `audit` and `dataPolicy` for all sessions of a namespace? This draft puts
+   them on the agent so that the reviewed manifest shows them.
 
 ## Decision
 
