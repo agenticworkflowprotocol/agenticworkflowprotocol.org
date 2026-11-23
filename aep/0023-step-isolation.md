@@ -22,13 +22,13 @@
 `permissions.network` says what a workflow or agent needs, but not how host names are written,
 how the rule relates to limits that the platform sets (network policies, egress proxies,
 firewalls), what happens when a runtime cannot enforce it, or which addresses an allowed host may
-resolve to. Model credentials are not covered at all. This AEP defines the host syntax, makes the
+resolve to. Model credentials are not covered at all. This AEP replaces `allowHosts` with structured destinations (`allowTo`: `host` or `cidr`, `except`, `ports`, aligned with network policies), makes the
 effective network the intersection of the manifest and a platform ceiling, requires a runtime to
-enforce or reject, denies private and internal destinations after resolution by default under the
+enforce or reject, denies private and internal destinations after resolution and normalisation by default under the
 `security` profile unless both the manifest and the ceiling allow them, defaults `egress` to `deny`
 under that profile, and keeps model credentials out of steps. It extends the same rule to the
 credentials of tool servers and to the authority that approves actions, lets a manifest require a
-minimum isolation class, and states which ceilings reject and which cap. It answers runtime
+minimum isolation class, and states that ceilings reject and never adjust a manifest. It answers runtime
 feedback G10, G47, G49, G50, G51, G61, G64, G67, G68 and G69.
 
 All additions follow one principle: **what decides about a step, or what a step must not be able
@@ -75,16 +75,19 @@ credentials and approvals are the three cases a proof of concept met in practice
 - **Isolation is invisible.** A step that runs commands on an untrusted repository needs more than
   a container (a user-space kernel or a virtual machine). The manifest cannot require it; the
   choice sits in a runtime binding that reviewers do not see (G67).
-- **Reject or cap.** The proof of concept has ceilings per tenant for models, hosts, tool servers,
-  autonomy and cost. A model outside the ceiling makes the agent invalid, while a cost limit above
-  the ceiling is lowered to it. The specification says neither (G68).
+- **Reject or adjust.** The proof of concept has ceilings per tenant for models, hosts, tool
+  servers, autonomy and cost. A model outside the ceiling makes the agent invalid, while a cost
+  limit above the ceiling is lowered to it, so the run differs from the reviewed manifest. The
+  specification says neither (G68).
+- **Ports and IPv6.** A port appended to an address string is ambiguous for IPv6
+  (`2001:db8::1:443`), and the egress rules of network policies keep addresses and ports apart.
 
 ## Goals and non-goals
 
-- Goals: one host syntax; a defined relation between manifest and platform ceiling; enforce or
+- Goals: one structured destination format; a defined relation between manifest and platform ceiling; enforce or
   reject; safe defaults under `security`; internal destinations possible when explicitly
   allowed; model and tool server credentials outside steps; approvals decided outside steps; a
-  minimum isolation class that reviewers can see; one rule for ceilings.
+  minimum isolation class that reviewers can see; one rule for ceilings (reject).
 - Non-goals: a mechanism (proxy, mesh, policy engine, sandbox technology); per-port or
   per-protocol firewall rules; inbound traffic; secret stores (spec 7.9 stays as it is); the
   interactive execution form itself (AEP-0026); what data a step may send to a tool server
@@ -97,24 +100,34 @@ credentials and approvals are the three cases a proof of concept met in practice
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `network.egress` | string | `allow` or `deny`: outbound network access of command steps and built-in tools. Default `allow`; under the `security` profile the default is `deny`. |
-| `network.allowHosts` | list | Destinations reachable when `egress` is `deny`, in the syntax of section 7.5.5. |
+| `network.allowTo` | list | Destinations reachable when `egress` is `deny`, as objects of section 7.5.5. Replaces `allowHosts`. |
 
 ### New section 7.5.5 (network destinations)
 
-An entry of `allowHosts` is one of:
+An entry of `allowTo` is an object. Its fields follow the egress rules of a Kubernetes
+`NetworkPolicy` (`ipBlock.cidr`, `ipBlock.except`, `ports`), without the nesting, so that a rule
+can be translated field by field:
 
-| Form | Example | Matches |
-| ---- | ------- | ------- |
-| Host name | `api.example.com` | exactly this name (case-insensitive, without trailing dot) |
-| Subdomain wildcard | `*.example.com` | any name with at least one label before `example.com`, not `example.com` itself |
-| Address | `10.20.0.15`, `2001:db8::1` | exactly this address |
-| CIDR | `10.20.0.0/16` | any address in the range |
+| Field | Type | Req. | Description |
+| ----- | ---- | ---- | ----------- |
+| `host` | string | cond. | A host name (`api.example.com`, matched case-insensitive, without trailing dot) or a subdomain wildcard (`*.example.com`: any name with at least one label before `example.com`, not `example.com` itself). Exactly one of `host` and `cidr`. |
+| `cidr` | string | cond. | An IPv4 or IPv6 range in CIDR notation (`10.20.0.0/16`, `2001:db8::/32`). A single address is written with a full prefix (`10.20.0.15/32`, `2001:db8::1/128`). Exactly one of `host` and `cidr`. |
+| `except` | list | no | CIDR ranges inside `cidr` that are excluded. Only with `cidr`. |
+| `ports` | list | no | Allowed ports. Absent: every port. Each entry has `port` (integer 1 to 65535, REQUIRED), `endPort` (integer, optional, at least `port`: a range) and `protocol` (`TCP` (default) or `UDP`). |
 
-Each form MAY end with `:<port>`; without a port, every port matches. A `*` anywhere other than as
-the first label is invalid, and so is a bare `*`. Validators MUST reject invalid entries.
+Rules:
 
-Host name entries are matched against the name the step requested, before resolution. Address and
-CIDR entries are matched against the resolved address.
+- Entries are objects only; a string entry is invalid. A `*` anywhere other than as the whole
+  first label of `host` is invalid, and so is a bare `*`. `host` MUST NOT contain a port, an
+  address or a CIDR. Validators MUST reject invalid entries.
+- `host` entries are matched against the name the step requested, before resolution. `cidr`
+  entries are matched against the resolved address, after normalisation (7.5.6).
+- A connection is allowed if one entry matches its destination and, when the entry has `ports`,
+  its port and protocol.
+
+Informative mapping: a `cidr` entry becomes an `ipBlock` with `except` and `ports` in a
+`NetworkPolicy`; a `host` entry needs a mechanism that matches names, for example the FQDN rules
+of a network plugin (`toFQDNs` with `toPorts`) or the allow list of an egress proxy.
 
 ### New section 7.5.6 (enforcement and platform ceilings)
 
@@ -128,20 +141,27 @@ CIDR entries are matched against the resolved address.
   requires, the runtime MUST reject the manifest or the execution before any step runs, with a
   reason that names the rule and the step type. It MUST NOT run the step with weaker
   restrictions.
-- **Internal destinations (security profile).** After resolution, the runtime MUST deny
-  connections to loopback (`127.0.0.0/8`, `::1`), private (`10.0.0.0/8`, `172.16.0.0/12`,
-  `192.168.0.0/16`, `fc00::/7`), link-local (`169.254.0.0/16`, `fe80::/10`), CGNAT
-  (`100.64.0.0/10`) and unspecified addresses by default. Such a destination is allowed only if
-  **both** hold: the manifest allows it explicitly (an address or CIDR entry that contains the
-  resolved address, or a host name entry for the name that resolved to it), and the platform
-  ceiling allows the resolved address. This is no blanket ban: agents may use internal services
+- **Normalisation.** Before any check against `cidr` entries, the internal ranges below or the
+  ceiling, the runtime MUST normalise an IPv6 address that embeds an IPv4 address in a fixed way
+  to that IPv4 address: IPv4-mapped (`::ffff:0:0/96`) and IPv4-compatible (`::/96`, except `::`
+  and `::1`). Otherwise `::ffff:169.254.169.254` would reach the metadata address while passing a
+  check against `169.254.0.0/16`.
+- **Internal destinations (security profile).** After resolution and normalisation, the runtime
+  MUST deny connections to loopback (`127.0.0.0/8`, `::1`), private (`10.0.0.0/8`,
+  `172.16.0.0/12`, `192.168.0.0/16`, `fc00::/7`), link-local (`169.254.0.0/16`, `fe80::/10`),
+  CGNAT (`100.64.0.0/10`), unspecified addresses, and the IPv6 translation ranges NAT64
+  (`64:ff9b::/96`, `64:ff9b:1::/48`) and 6to4 (`2002::/16`) by default. Translation ranges are
+  denied rather than normalised because whether a translator sits behind them depends on the
+  network. Such a destination is allowed only if **both** hold: the manifest allows it
+  explicitly (a `cidr` entry that contains the normalised address, or a `host` entry for the name
+  that resolved to it), and the platform ceiling allows the normalised address. This is no blanket ban: agents may use internal services
   when author and operator both say so. The check MUST apply to the address actually connected
   to, including after redirects, so that a DNS change between check and connection cannot reach
   an address that the ceiling does not allow.
 - **Conformance statement.** A runtime MUST state per step type how it enforces network access and
   which ceiling sources it reads (spec 11).
 
-Informative: a per-workload egress proxy with an allowlist derived from `allowHosts`, plus a
+Informative: a per-workload egress proxy with an allowlist derived from `allowTo`, plus a
 network policy that lets the workload reach only that proxy, is one conforming enforcement for
 command steps. A built-in tool can enforce in-process with a connection-time address check.
 
@@ -168,7 +188,7 @@ command steps. A built-in tool can enforce in-process with a connection-time add
   (which tools are listed and which calls are allowed), because a step that talks to the server
   directly is not bound by anything else.
 - Traffic from the step to such a component is runtime-internal and does not need an
-  `allowHosts` entry. The tool server's own outbound traffic is not part of the step's
+  `allowTo` entry. The tool server's own outbound traffic is not part of the step's
   `permissions.network`; a runtime SHOULD restrict it as well and say how in its conformance
   statement.
 
@@ -204,25 +224,33 @@ under the same user ID as the step's commands is not.
 
 - The values are ordered (`process` < `container` < `sandbox` < `vm`). A runtime MUST run the step
   with at least the required class or reject the manifest or execution before any step runs.
+- `isolation` is a minimum: a step that runs with a stronger class meets it. A platform MAY require
+  a minimum class for every workload (for example `sandbox` per tenant); running an agent that
+  requires `container` in a sandbox is no conflict.
 - Which mechanism provides a class (for example gVisor for `sandbox`, Kata Containers or
-  Firecracker for `vm`) is platform configuration. A platform MAY also require a minimum class
-  through its ceiling; the stricter one applies.
+  Firecracker for `vm`) is platform configuration.
 - The conformance statement lists which classes the runtime provides and by which mechanism.
 
 ### New section 7.5.7 (platform ceilings in general)
 
-7.5.6 defines the network ceiling. The same rules apply to every ceiling that a platform sets:
+7.5.6 defines the network ceiling. The same rule applies to every ceiling that a platform sets
+(permissions, models, tool servers, network, autonomy, isolation, budgets): **a ceiling never
+changes a manifest silently, it rejects.**
 
-- **Permissions, models, tool servers, autonomy and isolation**: the effective value is the
-  intersection of the manifest and the ceiling. If the manifest requires something that the
-  ceiling does not allow (a model, a host, a tool server, an autonomy level, an isolation class
-  below the platform minimum), the runtime MUST reject the manifest or execution before any step
-  runs, with a reason that names the rule.
-- **Budgets**: a ceiling caps the manifest's limits. The effective limit is the lower one, and a
-  manifest without a limit gets the ceiling. A runtime MUST NOT reject a manifest only because its
-  budget is higher than the ceiling.
-- A runtime SHOULD report the effect of a ceiling where the author can see it (status condition,
-  validation result).
+- If the manifest or a request asks for more than the ceiling allows, the runtime MUST reject the
+  manifest, the execution or the request before anything runs, with a reason that names the rule
+  (`ceilingExceeded`, with the field). Examples: a model or tool server outside the ceiling; a
+  destination the ceiling does not allow; an isolation class the platform cannot provide; an
+  autonomy level above the ceiling (AEP-0026); a `maxCostUsd` or token limit above the ceiling.
+- If the ceiling sets a budget limit, the manifest MUST declare that limit (at a value up to the
+  ceiling); a manifest without it is rejected. A runtime MUST NOT fill in or lower a limit on its
+  own.
+- A stronger isolation class than required is no deviation (5.4).
+- A runtime SHOULD make ceilings visible to authors before they apply a manifest (for example in
+  the status of a binding or a validation command).
+
+Rejecting instead of adjusting keeps the reviewed manifest the truth: an execution never runs with
+a budget, a model or an autonomy level that differs from what the reviewer saw.
 
 ### Change to the profile table (spec 11)
 
@@ -245,10 +273,20 @@ spec:
   permissions:
     network:
       egress: deny
-      allowHosts:
-        - api.example.com
-        - "*.cdn.example.com:443"
-        - 10.20.0.0/16        # internal ticket system, explicitly allowed
+      allowTo:
+        - host: api.example.com
+          ports:
+            - port: 443
+        - host: "*.cdn.example.com"
+        - cidr: 10.20.0.0/16        # internal ticket system, explicitly allowed
+          except:
+            - 10.20.99.0/24
+          ports:
+            - port: 8000
+              endPort: 8080
+        - cidr: 2001:db8::1/128
+          ports:
+            - port: 443
   agents:
     - id: triage
       model:
@@ -276,9 +314,11 @@ runtime holds:
           tools: [scan]
       permissions:
         default: deny
-        allow:
-          code-scanner.scan: true
-          shell.execute: true
+        tools:
+          code-scanner.scan:
+            allow: true
+          shell.execute:
+            allow: true
 ```
 
 A runtime that offers only containers rejects this agent. The step reaches `code-scanner` through
@@ -292,21 +332,28 @@ is denied.
 
 ## Schema changes
 
-- `allowHosts` items: a pattern for the four forms with optional port.
-- Semantic rule `permissions.network.host-invalid` for wildcards outside the first label, bare
-  `*` and invalid CIDRs.
+- `permissions.network.allowTo`: list of objects with `host` or `cidr` (`oneOf`), `except`
+  (only with `cidr`), `ports` (`port`, `endPort`, `protocol`). `allowHosts` is removed;
+  `awp-check.mjs migrate` converts `name` to `{host: name}`, an address to `{cidr: address/32}` or
+  `/128`, and a CIDR to `{cidr: ...}`.
+- Semantic rules: `permissions.network.host-invalid` (wildcards outside the first label, bare `*`,
+  a port or address in `host`), `permissions.network.cidr-invalid`, `except-outside-cidr`,
+  `port-range-invalid` (`endPort` below `port`).
 - `agents[].isolation`: enum `process`, `container`, `sandbox`, `vm`.
 
 ## Conformance impact
 
-- `core`: host syntax, enforce-or-reject, conformance statement.
+- `core`: `allowTo`, enforce-or-reject, conformance statement.
 - `security`: default `egress: deny`, internal destinations, model and tool server credentials,
   approval authority, isolation class.
 - Valid: `5.4-agent-isolation.yaml`. Invalid: `5.4-agent-isolation-unknown.yaml`.
-- Valid: `7.5.5-allow-hosts-forms.yaml`. Invalid: `7.5.5-allow-hosts-bare-wildcard.yaml`,
-  `7.5.5-allow-hosts-inner-wildcard.yaml`, `7.5.5-allow-hosts-invalid-cidr.yaml`.
+- Valid: `7.5.5-allow-to-forms.yaml`. Invalid: `7.5.5-allow-to-string-entry.yaml`,
+  `7.5.5-allow-to-bare-wildcard.yaml`, `7.5.5-allow-to-host-with-port.yaml`,
+  `7.5.5-allow-to-host-and-cidr.yaml`, `7.5.5-allow-to-except-outside.yaml`,
+  `7.5.5-allow-to-port-range.yaml`.
 - Runtime tests (once a runtime suite exists): a host that resolves to a private address; a
-  redirect to `169.254.169.254`; a DNS answer that changes between two lookups; a ceiling that
+  redirect to `169.254.169.254`; a AAAA record `::ffff:169.254.169.254`; an address in
+  `64:ff9b::/96`; a DNS answer that changes between two lookups; a ceiling that
   forbids a required host (rejected before start); a process in the step that tries to read a
   tool server credential; a process in the step that answers its own confirmation request; an
   agent that requires `vm` on a runtime with containers only (rejected before start).
@@ -316,8 +363,13 @@ is denied.
 - Manifests with host names only stay valid. Entries that were tolerated before and are invalid
   now (bare `*`) become invalid.
 - Under `security`, manifests without `network` change from "egress allowed" to "egress denied";
-  authors add `egress: allow` or `allowHosts`.
-- Runtimes that ignored `allowHosts` for command steps must enforce or reject.
+  authors add `egress: allow` or `allowTo`.
+- `allowHosts` becomes `allowTo` with objects (incompatible, allowed in an alpha version);
+  `awp-check.mjs migrate` converts it. Entries with a port in the string have no automatic
+  conversion for IPv6 and are reported.
+- Under a budget ceiling, manifests without that budget limit and manifests with a higher limit
+  become invalid for that platform.
+- Runtimes that ignored network rules for command steps must enforce or reject.
 - Under `security`, runtimes that pass `auth` of MCP servers into steps must move it to a gateway
   or the runtime. Manifests stay valid; `auth.secretRef` becomes optional where the runtime
   provides the credential.
@@ -379,10 +431,12 @@ and no measurement of proxy latency or cost.
 The same runtime, extended to interactive sessions with a coding agent, shows the additions:
 
 - **Ceilings and egress.** An egress proxy per tenant with an allow list derived from the tenant
-  ceiling and the agent's `allowHosts`. It denies private, loopback, link-local and CGNAT
+  ceiling and the agent's host list. It denies private, loopback, link-local and CGNAT
   destinations after resolution, and a network policy lets the sandbox reach only that proxy and
-  the gateways. Models, hosts and tool servers outside the tenant ceiling reject the agent; cost
-  limits are capped.
+  the gateways. Models, hosts and tool servers outside the tenant ceiling reject the agent. It
+  differs from this AEP in two points: cost limits above the tenant ceiling are capped instead of
+  rejected, and its allow list has host names without ports. Normalisation of IPv4-mapped
+  addresses and the translation ranges are not tested.
 - **Tool server credentials.** A static analysis server over MCP is reachable only through the
   runtime's MCP gateway (network policy). The gateway accepts a session ticket or a step ticket,
   hides tools that are not in the catalog, refuses calls to them, counts calls against the budget
@@ -397,9 +451,9 @@ The same runtime, extended to interactive sessions with a coding agent, shows th
 
 ## Open questions
 
-1. Should the ceiling be visible to authors, for example in the status of a binding or workflow
-   (`Accepted` with reason `NetworkCeiling`)? The proof of concept reports it in the status of the
-   binding.
+1. How are ceilings made visible to authors before they apply a manifest, given that they reject
+   (status of a binding, a validation command, a published ceiling object)? The proof of concept
+   reports them in the status of its binding.
 2. Do MCP servers over `streamable-http` fall under the same rules as built-in tools? Proposed
    answer from the proof of concept: the step's connection to the server goes through a component
    outside the step (5.5.1) and is runtime-internal; the server's own egress is restricted by the
