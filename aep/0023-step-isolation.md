@@ -100,9 +100,9 @@ credentials and approvals are the three cases a proof of concept met in practice
 | Field | Type | Description |
 | ----- | ---- | ----------- |
 | `network.egress` | string | `allow` or `deny`: outbound network access of command steps and built-in tools. Default `allow`; under the `security` profile the default is `deny`. |
-| `network.allowTo` | list | Destinations reachable when `egress` is `deny`, as objects of section 7.5.5. Replaces `allowHosts`. |
+| `network.allowTo` | list | Destinations reachable when `egress` is `deny`, as objects of section 7.5.8. Replaces `allowHosts`. |
 
-### New section 7.5.5 (network destinations)
+### New section 7.5.8 (network destinations)
 
 An entry of `allowTo` is an object. Its fields follow the egress rules of a Kubernetes
 `NetworkPolicy` (`ipBlock.cidr`, `ipBlock.except`, `ports`), without the nesting, so that a rule
@@ -121,7 +121,7 @@ Rules:
   first label of `host` is invalid, and so is a bare `*`. `host` MUST NOT contain a port, an
   address or a CIDR. Validators MUST reject invalid entries.
 - `host` entries are matched against the name the step requested, before resolution. `cidr`
-  entries are matched against the resolved address, after normalisation (7.5.6).
+  entries are matched against the resolved address, after normalisation (7.5.9).
 - A connection is allowed if one entry matches its destination and, when the entry has `ports`,
   its port and protocol.
 
@@ -129,7 +129,7 @@ Informative mapping: a `cidr` entry becomes an `ipBlock` with `except` and `port
 `NetworkPolicy`; a `host` entry needs a mechanism that matches names, for example the FQDN rules
 of a network plugin (`toFQDNs` with `toPorts`) or the allow list of an egress proxy.
 
-### New section 7.5.6 (enforcement and platform ceilings)
+### New section 7.5.9 (enforcement and platform ceilings)
 
 - **Effective network.** A platform MAY set a ceiling on the network access of executions
   (for example per namespace, tenant or runtime installation). The effective network access of a
@@ -231,9 +231,9 @@ under the same user ID as the step's commands is not.
   Firecracker for `vm`) is platform configuration.
 - The conformance statement lists which classes the runtime provides and by which mechanism.
 
-### New section 7.5.7 (platform ceilings in general)
+### New section 7.5.10 (platform ceilings in general)
 
-7.5.6 defines the network ceiling. The same rule applies to every ceiling that a platform sets
+7.5.9 defines the network ceiling. The same rule applies to every ceiling that a platform sets
 (permissions, models, tool servers, network, autonomy, isolation, budgets): **a ceiling never
 changes a manifest silently, it rejects.**
 
@@ -249,12 +249,17 @@ changes a manifest silently, it rejects.**
 - A runtime SHOULD make ceilings visible to authors before they apply a manifest (for example in
   the status of a binding or a validation command).
 
+Change to spec 5.7: replace "Runtimes MAY enforce stricter limits than the manifest declares (for
+example tenant quotas)" with "A runtime that enforces a stricter limit than the manifest declares
+(for example a tenant quota) MUST reject the manifest or execution as in section 7.5.10; it MUST
+NOT lower a limit silently."
+
 Rejecting instead of adjusting keeps the reviewed manifest the truth: an execution never runs with
 a budget, a model or an autonomy level that differs from what the reviewer saw.
 
 ### Change to the profile table (spec 11)
 
-`security`: add "network enforcement or rejection (7.5.6), internal destinations (7.5.6), model
+`security`: add "network enforcement or rejection (7.5.9), internal destinations (7.5.9), model
 credentials outside steps (7.9), tool server credentials outside steps (5.5.1), approval
 authority outside steps (7.6.1), isolation class enforced or rejected (5.4)".
 
@@ -338,7 +343,8 @@ is denied.
   `/128`, and a CIDR to `{cidr: ...}`.
 - Semantic rules: `permissions.network.host-invalid` (wildcards outside the first label, bare `*`,
   a port or address in `host`), `permissions.network.cidr-invalid`, `except-outside-cidr`,
-  `port-range-invalid` (`endPort` below `port`).
+  `port-range-invalid` (`endPort` below `port`), `cidr-embedded-ipv4` (a `cidr` inside
+  `::ffff:0:0/96` or `::/96`, which never matches a normalised address: write the IPv4 range).
 - `agents[].isolation`: enum `process`, `container`, `sandbox`, `vm`.
 
 ## Conformance impact
@@ -347,10 +353,10 @@ is denied.
 - `security`: default `egress: deny`, internal destinations, model and tool server credentials,
   approval authority, isolation class.
 - Valid: `5.4-agent-isolation.yaml`. Invalid: `5.4-agent-isolation-unknown.yaml`.
-- Valid: `7.5.5-allow-to-forms.yaml`. Invalid: `7.5.5-allow-to-string-entry.yaml`,
-  `7.5.5-allow-to-bare-wildcard.yaml`, `7.5.5-allow-to-host-with-port.yaml`,
-  `7.5.5-allow-to-host-and-cidr.yaml`, `7.5.5-allow-to-except-outside.yaml`,
-  `7.5.5-allow-to-port-range.yaml`.
+- Valid: `7.5.8-allow-to-forms.yaml`. Invalid: `7.5.8-allow-to-string-entry.yaml`,
+  `7.5.8-allow-to-bare-wildcard.yaml`, `7.5.8-allow-to-host-with-port.yaml`,
+  `7.5.8-allow-to-host-and-cidr.yaml`, `7.5.8-allow-to-except-outside.yaml`,
+  `7.5.8-allow-to-port-range.yaml`.
 - Runtime tests (once a runtime suite exists): a host that resolves to a private address; a
   redirect to `169.254.169.254`; a AAAA record `::ffff:169.254.169.254`; an address in
   `64:ff9b::/96`; a DNS answer that changes between two lookups; a ceiling that

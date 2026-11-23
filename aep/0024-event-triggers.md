@@ -155,7 +155,7 @@ spec:
       source: chat.example.com
       eventType: com.example.chat.message.posted
       filter:
-        data.mentions: assistant
+        data.mentioned: "true"        # a scalar; equality on lists is undefined
       concurrencyPolicy: allow
       rateLimit:
         maxExecutions: 20

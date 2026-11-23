@@ -197,7 +197,7 @@ Rules:
    the order is: the manifest's declaration, then the runtime binding, then the runtime's catalog.
    A declaration and the resolved server MUST NOT contradict each other (transport, URL, catalog
    digest); a runtime MUST reject the manifest instead of substituting a different server. A
-   platform ceiling (AEP-0023 section 7.5.7) MAY restrict which servers are usable.
+   platform ceiling (AEP-0023 section 7.5.10) MAY restrict which servers are usable.
 12. **Unattended executions.** For executions without a person, a tool source SHOULD list its tools
    explicitly; under `security`, `<server>.*` grants only tools that are catalogued, so a tool the
    server adds later is not exposed (rule 3).

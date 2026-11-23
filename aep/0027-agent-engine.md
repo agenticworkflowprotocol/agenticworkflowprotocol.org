@@ -62,7 +62,7 @@ New field `engine` on inline agents and in `Agent` manifests:
 
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
-| `engine.type` | string | yes | The engine, a domain-prefixed value or a name from a registry this repository keeps (for example `opencode`). A runtime that does not support the type MUST reject the manifest. |
+| `engine.type` | string | yes | The engine, a domain-prefixed value or a name from a registry this repository keeps (for example `example.com/coding-agent`). A runtime that does not support the type MUST reject the manifest. |
 | `engine.runtimeProfile` | string | no | A runtime-defined profile for image and resources. It MUST NOT weaken `isolation` (AEP-0023). |
 | `engine.workspace.repositories` | list | no | `url` (https, expression-enabled), `ref` (branch, tag or commit, expression-enabled), `path`. Cloned before the engine starts; the commit each one starts from is recorded as its base. |
 | `engine.workspace.trustRepositoryConfig` | list | no | Kinds of workspace configuration the engine may load: `instructions` (agent instruction files), `skills`, `commands`, `toolchain` (tool manager configuration). Default: none. |
@@ -72,7 +72,7 @@ New field `engine` on inline agents and in `Agent` manifests:
 `inputs.*`, `event.*` (AEP-0004) and `execution.*`. A resolved `url` is subject to the effective
 network (AEP-0023) like any other destination.
 
-### New section 5.4.6 (engine semantics)
+### New section 5.4.5 (engine semantics)
 
 - **Permissions.** The runtime maps the effective permissions (spec 7.5.4) to the engine. In
   unattended executions an action is allowed or denied. There is nobody to ask, so `confirm:
@@ -91,8 +91,10 @@ network (AEP-0023) like any other destination.
 - **Outputs.** The engine produces the declared outputs of the step through the completion
   mechanism of AEP-0018, with types and schemas from AEP-0003 where present. A runtime also
   provides `summary` (the engine's final answer) and `diff` (changes against the base) if the step
-  declares them. A step that pushes MUST declare `branch` and `commit`, so that the execution
-  records what left the workspace.
+  declares them. Every workflow step that uses an agent with `engine.push` MUST declare the
+  outputs `branch` and `commit`, so that the execution records what left the workspace. In an
+  `AgentSession` (AEP-0026) there are no outputs; a push is an action under `git.push` and its
+  confirmation, and the audit event records branch and commit.
 - **Push.** `push` requires the action `git.push`, and pushes only to `branch` of `repository`.
 - **Credentials.** Clone and push credentials are workflow secrets (spec 7.9). Under `security` they
   MUST NOT be visible to the engine. The runtime clones and pushes outside the engine, or removes
@@ -105,7 +107,7 @@ network (AEP-0023) like any other destination.
 
 ### Profile `engine` (spec 11)
 
-New profile with `engine` and section 5.4.6. The conformance statement lists the supported engine
+New profile with `engine` and section 5.4.5. The conformance statement lists the supported engine
 types, the action mapping of their built-in tools, and which workspace configuration kinds they
 can disable.
 
@@ -130,7 +132,7 @@ spec:
     - id: scanner
       isolation: sandbox
       engine:
-        type: opencode
+        type: example.com/coding-agent
         workspace:
           repositories:
             - url: ${{ event.data.repository }}
@@ -148,6 +150,10 @@ spec:
         tools:
           code-scanner.scan: {allow: true}
           file.read: {allow: true}
+    - id: notifier
+      model:
+        provider: example-provider
+        name: example-model
   workflow:
     - id: scan
       agent: scanner
@@ -220,7 +226,7 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 ## Implementation status
 
-A proof-of-concept Kubernetes runtime runs agent steps with OpenCode through an extension field of
+A proof-of-concept Kubernetes runtime runs agent steps with an open-source coding agent through an extension field of
 this shape (with the repositories fixed and the outputs limited to `summary` and `diff`). The
 runtime disables project configuration and external skills of the engine. A security scan
 workflow ran with it on a test installation, started by hand and by a CloudEvent: the engine

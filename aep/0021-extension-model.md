@@ -274,7 +274,7 @@ spec:
   defines only `targetRefs`, the status and the rules below.
 - **Targets.** A binding targets a `Workflow` or an `Agent`. An `Agent` binding configures how the
   runtime runs that agent on its own, for example as an interactive session (AEP-0026): image or
-  runtime profile, model alternatives, secret mapping. For an agent used inside a workflow, the
+  runtime profile, a mapping or narrowing of the agent's model alternatives (never new ones), secret mapping. For an agent used inside a workflow, the
   workflow's binding applies. Bindings carry the discovery label
   `awp.agenticworkflowprotocol.org/binding: "true"`; the target gets a condition `Bound`.
 - **One accepted binding per workflow and runtime.** Several bindings of one runtime on the same

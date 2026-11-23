@@ -90,8 +90,8 @@ library instead of typing it. Additional optional `spec` fields:
 Rules:
 
 - Such a prompt is plain user input: it runs with the permissions, budget and autonomy level of the
-  execution, can never extend them, and a suggested level is capped like any level the person
-  selects.
+  execution, can never extend them, and a suggested level above the agent's `maxAutonomy` or the
+  ceiling is rejected like any level the person selects (AEP-0026); the session keeps its level.
 - Variables are filled by the person; for a free-text argument a prompt declares one `string`
   variable (runtimes MAY map it to the argument convention of their engine).
 - A server prompt of an MCP server (AEP-0007 rule 9) is not a `Prompt` manifest.

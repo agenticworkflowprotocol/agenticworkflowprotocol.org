@@ -74,7 +74,7 @@ New `spec` field of `Agent`:
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
 | `sessions` | object | no | Whether and how the agent may run interactively. Absent: the agent MUST NOT run as an `AgentSession`. |
-| `sessions.maxAutonomy` | string | no | Highest autonomy level (section 7.5.8): `readOnly`, `ask` (default) or `auto`. |
+| `sessions.maxAutonomy` | string | no | Highest autonomy level (section 7.5.11): `readOnly`, `ask` (default) or `auto`. |
 | `sessions.models` | list | no | Alternatives to `model` that a session may choose, model objects as in [section 5.4.3](../spec/v1alpha3/README.md#543-model-object). `model` stays the default. |
 | `sessions.idleTimeout` | duration | no | Time without a prompt after which the runtime pauses the session. Default: implementation-defined, stated in the conformance statement. |
 | `sessions.maxDuration` | duration | no | Time after which the runtime ends the session, paused time not counted. |
@@ -105,7 +105,7 @@ no workflow. New optional `spec` fields of `Agent`, with the same shape as on `W
   and, unless the level is `metadata`, `contentRetention` (AEP-0009); otherwise it is invalid. A
   session produces prompts and answers, which must have a reviewed retention.
 
-### New section 7.5.8 (autonomy and confirmation)
+### New section 7.5.11 (autonomy and confirmation)
 
 **Autonomy level.** Each prompt of a session runs at one level:
 
@@ -132,7 +132,7 @@ When several permission objects apply, the strictest `confirm` wins (`always` ov
 
 **Selecting a level.** A level above `sessions.maxAutonomy` or above the platform ceiling is
 rejected, both when the session is created and when a controlling identity changes the level
-later (AEP-0023 section 7.5.7: ceilings reject, never adjust). A rejected change leaves the
+later (AEP-0023 section 7.5.10: ceilings reject, never adjust). A rejected change leaves the
 current level in place and is audited with reason `ceilingExceeded`. Only an identity that may
 control the session (section 10.9) may change the level. Every change is an audit event.
 
@@ -172,9 +172,9 @@ spec:
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
 | `spec.agentRef` | object | yes | `name` of an `Agent` in the same namespace; `version` and `digest` are assertions as in `WorkflowRun`. |
-| `spec.autonomy` | string | no | Level the person selected: `readOnly`, `ask` (default) or `auto`. A level above `maxAutonomy` or the ceiling is rejected (7.5.8). May change while the session runs. |
+| `spec.autonomy` | string | no | Level the person selected: `readOnly`, `ask` (default) or `auto`. A level above `maxAutonomy` or the ceiling is rejected (7.5.11). May change while the session runs. |
 | `spec.model` | object | no | `model` or one of `sessions.models` of the agent. Anything else is rejected. May change between prompts. |
-| `spec.toolSources` | list | no | Names of the agent's tool sources to enable. Absent: all. Empty list: none. A name that is not a tool source of the agent is reported in status and ignored. |
+| `spec.toolSources` | list | no | Tool sources of the agent to enable, identified by `server` for `mcp` sources and `name` for `builtin` sources (spec 5.5.2); an agent whose tool sources are not unique by this identifier cannot run as a session. Absent: all. Empty list: none. An identifier that is not a tool source of the agent is rejected. |
 | `spec.initialPrompt` | string | no | First prompt, sent when the session is ready. |
 | `spec.promptRef` | object | no | A `Prompt` (AEP-0005) used as the first prompt instead of `initialPrompt`. |
 | `spec.environment` | string | no | Target environment (spec 7.10). |
@@ -192,8 +192,9 @@ Rules:
   and stop. A runtime MAY let further identities control a session (for example a team
   maintainer), and MUST document who. Every action of a controlling identity is an audit event with
   that identity. A prompt is user input: it cannot change permissions, policies or budgets.
-- **Narrowing only.** `toolSources` and `model` can only select from what the agent declares,
-  intersected with the platform ceiling. A runtime MUST NOT offer a tool source that is not
+- **Narrowing only.** `toolSources` and `model` can only select from what the agent declares. A
+  model or tool source that the platform ceiling does not allow has already rejected the agent
+  (AEP-0023 section 7.5.10); selecting one in a session is rejected the same way. A runtime MUST NOT offer a tool source that is not
   enabled. Calls to such a source are refused, and its permissions are irrelevant for this
   session. If a change cannot take effect while the session runs, the runtime reports this in
   status and applies the change on the next resume.
@@ -222,11 +223,15 @@ a person is pending.
 
 | Event | When |
 | ----- | ---- |
-| `session.started`, `session.ready`, `session.paused`, `session.resumed`, `session.finished`, `session.failed` | Lifecycle. |
+| `session.started` | The session was admitted. Required `data`: `agent` (`name`, `version`, `digest` of the pinned manifest, as `workflow` in `workflow.started`), `autonomy`, `model`, `toolSources`. |
+| `session.ready`, `session.paused`, `session.resumed`, `session.finished`, `session.failed` | Lifecycle. |
 | `session.prompt` | A prompt was sent (actor, length; content only at the payload level of AEP-0009). |
 | `session.autonomy.changed`, `session.model.changed`, `session.toolSources.changed` | A controlling identity changed the session (actor, from, to). |
 | `action.confirmationRequested` | The runtime asks a person to confirm an action. |
 | `action.confirmed`, `action.refused` | The outcome, with the identity that decided and the scope (`once`, `session`). |
+
+In a session, events of spec 10.4 that carry `stepId` (for example `tool.*`) have no `stepId`;
+`executionId` identifies the session.
 
 These events SHOULD come from the component outside the execution environment that decides
 (AEP-0023 section 7.6.1, runtime feedback G76).
@@ -265,8 +270,6 @@ spec:
       tools: [scan]
   modelPolicy:
     allowedProviders: [example-provider]
-  environments:
-    development: {}
   audit:
     payload: redacted
     contentRetention: 30d
@@ -303,7 +306,7 @@ answers are kept 30 days.
 ## Conformance impact
 
 - New profile `session`. Valid: `10.9-agent-session.yaml`, `6-agent-sessions.yaml`. Invalid:
-  `10.9-agent-session-model-not-allowed.yaml`, `7.5.8-confirm-unknown.yaml`.
+  `10.9-agent-session-model-not-allowed.yaml`, `7.5.11-confirm-unknown.yaml`.
 - Runtime tests: a level above `maxAutonomy` is rejected and the level stays; `confirm: always`
   asks at `auto` and accepts no session-wide grant; a
   disabled tool source is refused; a confirmation sent from inside the execution environment is
