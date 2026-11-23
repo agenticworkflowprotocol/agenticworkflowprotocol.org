@@ -86,8 +86,11 @@ redirect it by prompt. It found:
 
 ### Duplicates, concurrency and rate
 
-- The runtime MUST NOT start a second execution for an event with the same `source` and `id`
-  within a deduplication window. It MUST state the window in its conformance statement; the
+- Deduplication is per workflow: the runtime MUST NOT start a second execution **of the same
+  workflow** for an event with the same `source` and `id` within a deduplication window. An event
+  that matches several workflows starts each of them once. If several trigger entries of one
+  workflow match the same event, the workflow starts once, with the first matching entry recorded
+  in `status.trigger.index`. It MUST state the window in its conformance statement; the
   window MUST be at least 24 hours. A rejected duplicate MUST be recorded as `trigger.skipped` with
   reason `duplicate`.
 - An `event` trigger MAY have `concurrencyPolicy` with the values and semantics of a `schedule`

@@ -72,9 +72,11 @@ Applied in [spec/v1alpha3 section 5.8](../spec/v1alpha3/README.md#58-human-input
    requests go to the identities that may control the session; `answerers` is not needed. The
    request is answered in the session's user interface, audited with the same events, and the
    session shows `waiting` while it is open. An answer stays information and is never a
-   confirmation of an action (AEP-0026) or an approval. Without a person (a paused session, an
-   unattended engine step) requests are declined. An engine's own question tool maps to agent
-   requests; questions it would ask outside this mechanism are declined.
+   confirmation of an action (AEP-0026) or an approval. In a paused session an open request
+   waits until the session resumes (timeouts still apply). An unattended engine step (AEP-0027)
+   is an agent step like any other: with `humanInput`, its requests go to the `answerers` as in
+   item 2; without it, they are declined. An engine's own question tool maps to agent requests;
+   questions it would ask outside this mechanism are declined.
 
 ## Examples
 

@@ -176,7 +176,11 @@ Rules:
    entry of `resources` MUST be denied; without `resources`, every read is denied. The runtime
    MUST filter `resources/list` and `resources/templates/list` to catalogued entries and MUST deny
    `resources/subscribe` and completions for anything else. A catalog tool named `resources.read`
-   is rejected (`catalog.reserved-name`).
+   or `prompts.get` is rejected (`catalog.reserved-name`): both are action identifiers of
+   protocol operations (rules 7 and 9), and a tool with the same name would share their grants.
+8. A catalog is identified by its digest (AEP-0010 over the inline catalog object or the
+   `McpCatalog` manifest). The reproducibility record (spec 10.7) lists, per MCP server, the catalog
+   digest and the digests of the tool definitions that were exposed.
 9. **Prompts.** Getting a server prompt (`prompts/get`) is the action `<server>.prompts.get` with
    the prompt name as its resource scope. The runtime MUST filter `prompts/list` to catalogued
    prompts and deny `prompts/get` for anything else. The content of a prompt is untrusted input
@@ -184,12 +188,11 @@ Rules:
    more authority, and grants nothing. A server prompt and a `Prompt` manifest (AEP-0005) are
    different things: the manifest is reviewed content of the workflow's owner, a server prompt is
    content of the server's operator.
-10. **Requests of the server.** The runtime MUST NOT relay sampling requests of a server to a model
-   unless the manifest allows it explicitly; an allowed sampling request is a model call under the
-   model policy (spec 7.4) and the budget. It MUST NOT answer roots requests with paths of the
-   execution environment unless allowed. Elicitation follows spec 5.8.2 (declined without
-   `humanInput`). A runtime SHOULD answer these requests itself rather than pass them to an engine
-   inside the execution environment.
+10. **Requests of the server.** The runtime MUST decline every sampling request (the server asks
+   the client to call a model) and every roots request (the server asks for paths of the client)
+   of a server; this version defines no way to allow them (open question 5). Elicitation follows
+   spec 5.8.2 (declined without `humanInput`). A runtime SHOULD answer these requests itself
+   rather than pass them to an engine inside the execution environment, which might answer them.
 11. **Resolution.** When the runtime resolves a server from its own configuration (spec 5.5.1),
    the order is: the manifest's declaration, then the runtime binding, then the runtime's catalog.
    A declaration and the resolved server MUST NOT contradict each other (transport, URL, catalog
@@ -198,9 +201,6 @@ Rules:
 12. **Unattended executions.** For executions without a person, a tool source SHOULD list its tools
    explicitly; under `security`, `<server>.*` grants only tools that are catalogued, so a tool the
    server adds later is not exposed (rule 3).
-8. A catalog is identified by its digest (AEP-0010 over the inline catalog object or the
-   `McpCatalog` manifest). The reproducibility record (spec 10.7) lists, per MCP server, the catalog
-   digest and the digests of the tool definitions that were exposed.
 
 ### Changes to section 5.6.1
 
@@ -369,6 +369,9 @@ resources are allowed (runtime feedback G69 to G72). No definition digests yet.
    manifest.
 4. Should the definition digest include `icons` (display only) or members added by later MCP
    revisions?
+5. Sampling and roots: is there a use case that needs them? If so, an opt-in per server (for
+   example `sampling` with a model and a budget, counted as a model call under the model policy,
+   and `roots` with workspace paths). Until then, rule 10 declines both.
 
 ## Decision
 

@@ -67,8 +67,10 @@ feedback G03, G53 and G58.
   declared.
 - **Sharing.** Workflows with the same `spec.owner` in the same namespace that declare a store of
   the same `name` share it. If their `classification` values differ, the strictest applies to
-  every reader. A runtime MUST reject a declaration that would give a workflow of another owner
-  access.
+  every reader. `retention` and `maxSize` MUST be equal in every declaration of a shared store
+  (or absent in all of them); a runtime MUST reject a workflow whose declaration differs from the
+  store's existing declarations, with reason `stateConflict`, instead of choosing one value. A
+  runtime MUST reject a declaration that would give a workflow of another owner access.
 - **Concurrent writers.** The runtime MUST make each write of a file or key atomic. It MUST state
   in its conformance statement whether concurrent executions writing the same store are
   serialised or last-writer-wins. With `readWrite`, a step MUST NOT see a partially written value.
