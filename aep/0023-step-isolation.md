@@ -263,6 +263,8 @@ ports, and no isolation class above `container` is deployed.
 3. Are four isolation classes the right granularity, and should `sandbox` be defined by a property?
 4. Should approval authority be its own AEP, since it also applies to approval steps without any
    sandbox?
+5. Should separation of duties (spec 7.8) state explicitly that it is checked against the
+   authenticated identity of a decision, never against an identity the step asserts?
 
 ## Decision
 
