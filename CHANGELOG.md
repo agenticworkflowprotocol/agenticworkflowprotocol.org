@@ -17,6 +17,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Changed
 
+- Amendments from interactive sessions: AEP-0007 server prompts and resources as allow lists with default none (answers its open question 3), `prompts.get` reserved, sampling and roots declined; AEP-0002 resource scope of `shell.execute` and mapping of commands to well-known actions through `actionGroups`; AEP-0005 prompts as session tasks; AEP-0009 `origin` of audit events; AEP-0013 budgets during streaming (runtime feedback G71, G72, G74 to G76, G78).
 - AEP-0021 B4: `triggers[].source` is no domain-prefixed value space; it is the CloudEvents `source` of the event producer (runtime feedback G54). B6: bindings may also target an `Agent`.
 - Spec `v1alpha3` section 12: content kept between executions (state) is untrusted input like tool results (runtime feedback G58).
 - README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).
@@ -32,6 +33,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- AEP-0026 (interactive execution: kind `AgentSession`, `sessions` opt-in with `maxAutonomy`, three autonomy levels) and AEP-0027 (agent engine: `agents[].engine`, repository configuration off by default) as Draft concepts with open questions; numbers to be confirmed. From runtime feedback G62, G63, G65, G73, G81, G82.
 - AEP-0023 (step isolation) as Draft for `v1alpha3`: structured network destinations (`allowTo` with `host` or `cidr` and `ports`, replacing `allowHosts`), enforce or reject, internal destinations only through a `cidr` entry under `security`, platform ceilings that reject and never adjust (with a change to spec 5.7), credentials and approvals outside the execution environment, a minimum isolation class; hardening as informative implementer guidance. From runtime feedback G10, G47, G49 to G51, G61, G64, G67 to G69.
 - `docs/runtime-feedback.md`: gaps G41 to G87 (event triggers, the concept review, models, interactive sessions and a coding agent engine), with the AEP each belongs to, the evidence from the runtime, and a rule for what goes into AWP (section 10).
 - AEP-0024 (event triggers with CloudEvents) and AEP-0025 (state across executions) as Draft for `v1alpha3`, from runtime feedback G03, G42 to G46, G53, G54, G56 and G58.

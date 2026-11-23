@@ -47,6 +47,8 @@ and a Final Comment Period, and may still be moved to a later version or rejecte
 | [0023](../aep/0023-step-isolation.md) | Step isolation: network permissions, platform ceilings, credentials and approvals outside the execution environment | Draft | proposed for `v1alpha3` |
 | [0024](../aep/0024-event-triggers.md) | Event triggers with CloudEvents | Draft | proposed for `v1alpha3` |
 | [0025](../aep/0025-state.md) | State across executions | Draft | proposed for `v1alpha3` |
+| [0026](../aep/0026-interactive-execution.md) | Interactive execution: `AgentSession` and autonomy levels | Draft | proposed for `v1alpha3` |
+| [0027](../aep/0027-agent-engine.md) | Agent engine: running an agent with an existing coding agent | Draft | proposed for `v1alpha3` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).
