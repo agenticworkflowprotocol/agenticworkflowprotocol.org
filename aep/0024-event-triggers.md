@@ -239,6 +239,18 @@ to create event runs itself from a trigger object generated from `spec.triggers`
 uses subscribes to MQTT with QoS 0. The thread limits of its bridge (30 entries, 12,000
 characters) are set, not measured.
 
+The same runtime, extended to a platform with interactive sessions, adds three data points:
+
+- **Deduplication confirmed.** A security scan workflow started by a CloudEvent over MQTT ran once;
+  a repeated delivery was rejected as a duplicate by `source` and `id`.
+- **Events emitted by the runtime.** The runtime publishes CloudEvents about sessions (created,
+  ready, idle, resumed, finished, failed) and "waiting for a person" when a confirmation is
+  pending, so that chat bridges can notify people. AWP has no vocabulary for events that a runtime
+  emits about executions, only for events that start them (runtime feedback G62).
+- **Event-started sessions (concept, not built).** An event could also start an interactive
+  session with an initial prompt. The actor question of G44 then decides who created the session
+  and who may control it: the attested person, not the bridge (runtime feedback G86).
+
 ## Open questions
 
 1. Is 24 hours the right minimum deduplication window?

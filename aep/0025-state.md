@@ -164,6 +164,18 @@ A proof-of-concept Kubernetes runtime provides one volume per workflow through i
 mounts it at `/awp/state`. Sharing between workflows and the conflict scenario are derived, not
 implemented.
 
+Interactive sessions of the same runtime raise two more kinds of state:
+
+- **Workspace across pause and resume.** When a session pauses, the engine process ends; the
+  repositories, the engine's history and configuration stay on a volume and are used again on
+  resume. A running turn is cancelled. This is state of one execution rather than across
+  executions, but it has the same questions: classification (it contains the repository and every
+  prompt), retention after the session ends, and who may read it (runtime feedback G62, G85).
+- **Shared workspace of several steps (concept).** Steps that plan, implement and review the same
+  change need one workspace, as Tekton workspaces provide. Today each engine step gets its own
+  empty directory. A declared store with an access mode per step would cover it, with the trust
+  boundary that a later step reads what an earlier agent wrote (runtime feedback G87, with G58).
+
 ## Open questions
 
 1. Should stores be their own kind (`State`) instead of a manifest field, so that ownership and

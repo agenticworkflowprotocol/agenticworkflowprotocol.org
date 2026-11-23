@@ -17,6 +17,10 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Changed
 
+- Runtime feedback: section 10 with G62 to G87 from interactive sessions and a coding agent engine, a proposal which platform objects become AWP kinds (extends K), and evidence for G50 and G60.
+- AEP-0023 (Draft): credentials of tool servers outside steps (G69), approval authority outside the execution environment (G64), a minimum isolation class on agents (G67), and one rule for platform ceilings: permissions, models, tool servers, autonomy and isolation reject, budgets cap (G68). Answers its open question 2.
+- New AEP drafts: AEP-0026 interactive execution (kind `AgentSession`, autonomy levels with an author ceiling, `confirm` per action, G62, G63, G73, G82) and AEP-0027 agent engine (`agents[].engine`, workspace configuration off by default, G65, G66, G81, G83). Numbers to be confirmed.
+- AEP-0024 and AEP-0025 (Draft): evidence from interactive sessions (runtime events, event-started sessions, workspaces across pause and resume, shared workspaces).
 - AEP-0021 B4: `triggers[].source` is no domain-prefixed value space; it is the CloudEvents `source` of the event producer (runtime feedback G54).
 - Spec `v1alpha3` section 12: content kept between executions (state) is untrusted input like tool results (runtime feedback G58).
 - README: the minimal manifest is now valid under all profiles (classification, declared MCP server, explicit tools and permissions).
