@@ -32,6 +32,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- AEP-0023 (step isolation) as Draft for `v1alpha3`: structured network destinations (`allowTo` with `host` or `cidr` and `ports`, replacing `allowHosts`), enforce or reject, internal destinations only through a `cidr` entry under `security`, platform ceilings that reject and never adjust (with a change to spec 5.7), credentials and approvals outside the execution environment, a minimum isolation class; hardening as informative implementer guidance. From runtime feedback G10, G47, G49 to G51, G61, G64, G67 to G69.
 - `docs/runtime-feedback.md`: gaps G41 to G87 (event triggers, the concept review, models, interactive sessions and a coding agent engine), with the AEP each belongs to, the evidence from the runtime, and a rule for what goes into AWP (section 10).
 - AEP-0024 (event triggers with CloudEvents) and AEP-0025 (state across executions) as Draft for `v1alpha3`, from runtime feedback G03, G42 to G46, G53, G54, G56 and G58.
 - Decision D21 (refines D17): open specifications and vendor-neutral foundation projects may be named as prior art, not as dependencies. Spec `v1alpha3` section 1.2 and the README name the Open Workflow Specification and agent-sandbox as related work; AEP-0022 names the `for` task of the Open Workflow Specification as prior art.
