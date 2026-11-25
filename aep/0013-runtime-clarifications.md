@@ -62,6 +62,12 @@ Add after "The runtime MUST check limits before each model invocation and each a
   provider nor from a configured price, the runtime MUST NOT start the invocation (fail closed)
   and MUST fail the execution with `reason: budgetExceeded`, `limit: maxCostUsd` and
   `costKnown: false`. Counting unknown cost as zero is not allowed.
+- **Streaming (runtime feedback G78).** When a provider reports usage only at the end of a
+  streamed invocation, the runtime MAY estimate usage while the stream runs and MAY end the stream
+  when the estimate reaches the remaining budget. It MUST then charge the best known usage (the
+  provider's figures if they arrive, otherwise the estimate) and MUST report that the figure is an
+  estimate. Budgets are hard limits that the last allowed invocation may exceed by what it consumed
+  before the runtime could stop it; the conformance statement says how usage is estimated.
 
 ### 2. Value rendering (section 3.9)
 
@@ -215,6 +221,11 @@ approvals for write tools come from its tool catalog), 5 (explicit tool lists re
 must equal the bound connection). It differs in item 2 (missing values render as empty text) and
 item 4 (own event format, no `workflow.*` events), and counts unknown cost as zero. No
 implementation of this AEP exists.
+
+For streamed invocations, a proof-of-concept runtime estimates output tokens from the streamed text
+(about four bytes per token) at its model gateway, ends the stream with an error event when the
+estimate reaches the budget, and charges what it knows; a session can end slightly above
+`maxCostUsd`. The overshoot is not measured.
 
 ## Open questions
 

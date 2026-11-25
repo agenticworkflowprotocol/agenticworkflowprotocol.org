@@ -122,7 +122,8 @@ A catalog has these fields:
 | `matchServerInfo` | boolean | no | When `true`, a server whose `serverInfo` differs MUST NOT be used. Default `false`. |
 | `protocolVersion` | string | no | MCP protocol revision the catalog was reviewed against (for example `2026-07-28`). |
 | `tools` | map | yes | MCP tool `name` -> tool entry (below). |
-| `resources` | list | no | Resource entries (below). |
+| `resources` | list | no | Resource entries (below). Absent: no resource of the server is readable. |
+| `prompts` | map | no | MCP prompt `name` -> prompt entry (below). Absent: no prompt of the server is offered. |
 | `profiles` | map | no | Profile name (`^[a-z][a-z0-9-]{0,62}$`) -> list of tool names of this catalog. |
 
 Tool entry:
@@ -139,6 +140,10 @@ Tool entry:
 Resource entry: exactly one of `uri` or `uriTemplate` (RFC 6570, as in MCP resource templates),
 plus `classification` (highest data class the content may have; the operation's data class is
 raised to it when the resource is read) and an optional `name`.
+
+Prompt entry: `definitionDigest` (as for tools, over `name`, `title`, `description` and
+`arguments` of the `prompts/list` entry; REQUIRED under `security`) and an optional
+`classification` (highest data class of the arguments).
 
 Rules:
 
@@ -167,12 +172,30 @@ Rules:
    `reason: dataPolicy`) when the data classification of the operation ranks higher than the tool's
    `classification`.
 7. Reading a resource (`resources/read`) is the action `<server>.resources.read` with the resource
-   URI as its resource scope (spec 7.5.2); its access class is always `read`. When a catalog lists
-   `resources`, a URI that matches no entry MUST be denied. A catalog tool named `resources.read`
-   is rejected (`catalog.reserved-name`).
+   URI as its resource scope (spec 7.5.2); its access class is always `read`. A URI that matches no
+   entry of `resources` MUST be denied; without `resources`, every read is denied. The runtime
+   MUST filter `resources/list` and `resources/templates/list` to catalogued entries and MUST deny
+   `resources/subscribe` and completions for anything else. A catalog tool named `resources.read`
+   or `prompts.get` is rejected (`catalog.reserved-name`): both are action identifiers of
+   protocol operations (rules 7 and 9), and a tool with the same name would share their grants.
 8. A catalog is identified by its digest (AEP-0010 over the inline catalog object or the
    `McpCatalog` manifest). The reproducibility record (spec 10.7) lists, per MCP server, the catalog
    digest and the digests of the tool definitions that were exposed.
+9. **Prompts.** Getting a server prompt (`prompts/get`) is the action `<server>.prompts.get` with
+   the prompt name as its resource scope. The runtime MUST filter `prompts/list` to catalogued
+   prompts and deny `prompts/get` for anything else. The content of a prompt is untrusted input
+   (spec 12): it is shown to the model or the person as user input, never as instructions with
+   more authority, and grants nothing. A server prompt and a `Prompt` manifest (AEP-0005) are
+   different things: the manifest is reviewed content of the workflow's owner, a server prompt is
+   content of the server's operator.
+10. **Requests of the server.** The runtime MUST decline every sampling request (the server asks
+   the client to call a model) and every roots request (the server asks for paths of the client)
+   of a server; this version defines no way to allow them (open question 5). Elicitation follows
+   spec 5.8.2 (declined without `humanInput`). A runtime SHOULD answer these requests itself
+   rather than pass them to an engine inside the execution environment, which might answer them.
+11. **Unattended executions.** For executions without a person, a tool source SHOULD list its tools
+   explicitly; `<server>.*` grants only catalogued tools, so a tool the server adds later is not
+   exposed (rule 3).
 
 ### Changes to section 5.6.1
 
@@ -321,15 +344,31 @@ Runtimes in progress keep connection-level tool access classes (read or write) i
 catalog and derive per-call approval and network placement from them; a manifest that is moved to
 another runtime loses this information. No implementation of this AEP exists.
 
+A proof-of-concept Kubernetes runtime has a cluster-wide catalog object per MCP server with allow
+lists for tools, prompts and resource URIs (prompts and resources default to none), resolved by
+name in the order declaration, binding, catalog, and limited by a tenant ceiling. An MCP gateway
+outside the execution environment filters the list operations, refuses everything else, answers
+sampling, roots and elicitation requests itself, adds the server's credential and audits every
+call with arguments and result. Shown on a test installation with a static analysis server: two
+of its tools are not in the catalog and are neither listed nor callable; one prompt and the rule
+resources are allowed (runtime feedback G69 to G72). No definition digests yet.
+
 ## Open questions
 
 1. Should built-in tools (`shell`) get catalog entries too?
 2. Should `profiles` be renamed (for example `toolSets`) to avoid confusion with conformance
    profiles? MCP has no term for tool sets.
 3. MCP prompts: should a catalog list server prompts, and how do they relate to the `Prompt` kind
-   (AEP-0005)?
+   (AEP-0005)? Proposed answer (runtime feedback G72): yes, as allow list with default none (rule
+   9); a server prompt is untrusted content of the server's operator and is not a `Prompt`
+   manifest.
 4. Should the definition digest include `icons` (display only) or members added by later MCP
    revisions?
+5. Sampling and roots: is there a use case that needs them? If so, an opt-in per server (for
+   example `sampling` with a model and a budget, counted as a model call under the model policy,
+   and `roots` with workspace paths). Until then, rule 10 declines both.
+6. Resolution of servers from runtime configuration (G70): order declaration, binding, catalog, and
+   no substitution of a server that contradicts the declaration?
 
 ## Decision
 
