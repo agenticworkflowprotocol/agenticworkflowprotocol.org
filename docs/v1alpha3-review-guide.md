@@ -28,7 +28,7 @@ cannot be stored as one: the API server drops unknown `metadata` fields (`versio
 Kubernetes implementation would have to wrap the AWP document in its own resource.
 
 A Kubernetes runtime proof of concept then built an operator, a step runner and one real workflow
-against the draft. Its findings (G01 to G39 in [runtime-feedback.md](runtime-feedback.md)) went
+against the draft. Its findings (G01 to G61 in [runtime-feedback.md](runtime-feedback.md)) went
 into AEPs, as decision D18 asks. The runtime is not named (D17).
 
 ## 2. What to read and what to skip
@@ -143,7 +143,7 @@ it. It is a concept: nothing in the schema changes until the project lead decide
 2. **Extension model.** Follow AEP-0021 (reverses D3 and D12) or keep `extensions` objects?
 3. **Kubernetes text.** Normative Kubernetes mapping in spec 3.10, or Kubernetes-only text marked
    informative (K, G26, G39)?
-4. The remaining questions in [runtime-feedback.md section 8](runtime-feedback.md#8-questions-for-the-project-lead)
+4. The remaining questions in [runtime-feedback.md section 10](runtime-feedback.md#10-questions-for-the-project-lead)
    (next AEPs for state and secret scopes, model parameters, collecting clarifications).
 
 ## 6. How it was tested
