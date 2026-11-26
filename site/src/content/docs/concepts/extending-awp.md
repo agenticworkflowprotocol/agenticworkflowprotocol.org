@@ -2,58 +2,74 @@
 title: "Extending AWP"
 description: "How implementations and organisations extend and refine AWP: extension fields, stricter rules, runtime-defined parts and the path into the core."
 banner:
-  content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
 ---
 AWP is meant to be extended and refined. The core stays small and vendor-neutral; implementations and organisations add what they need on top. One rule limits every extension: **it may add or restrict, never weaken.** A manifest that passed review must not do more on another runtime than its authors expected.
 
 There are four ways to extend AWP, from local to standard.
 
-:::note[Changes in the v1alpha3 draft]
-This page describes `v1alpha1`. In the `v1alpha3` draft, `x-` fields move into `extensions` objects so that manifests can be stored as Kubernetes resources ([AEP-0015](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0015-kubernetes-resource-model.md)). [AEP-0021](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0021-extension-model.md) proposes to replace them with typed references at defined extension points, domain-prefixed values and attached policies, as the Kubernetes Gateway API does. Both are drafts.
+:::note[Proposed: AEP-0021]
+[AEP-0021](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0021-extension-model.md) proposes to replace `extensions` objects with typed references at defined extension points, domain-prefixed values and attached policies, as the Kubernetes Gateway API does. It is a Draft and not part of `v1alpha3`.
 :::
 
-## 1. Extension fields (`x-`)
+## 1. Extension fields (`extensions`)
 
-Any object in a manifest may carry fields whose name starts with `x-` ([spec 3.3](/specification/v1alpha1/#33-unknown-fields-and-extensions)).
+Any object in `spec` that has defined fields may carry an `extensions` object; its keys start with `x-` ([spec 3.3](/specification/v1alpha3/#33-unknown-fields-and-extensions)). `metadata` has none: non-identifying data belongs in annotations.
 
+<!-- awp-check profiles=core -->
 ```yaml
-workflow:
-  - id: review
-    agent: reviewer
-    x-example-reviewChecklist: security-v2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+kind: Workflow
+metadata:
+  name: review
+spec:
+  version: 0.1.0
+  owner:
+    team: example-team
+  agents:
+    - id: reviewer
+      model:
+        provider: example-provider
+        name: example-model
+  workflow:
+    - id: review
+      agent: reviewer
+      extensions:
+        x-example-reviewChecklist: security-v2
 ```
 
 - A runtime that understands the field interprets it; every other runtime ignores it.
 - An extension MUST NOT weaken a requirement of the specification.
-- Extension values are part of the manifest digest, so changing one needs a new `metadata.version`.
-- Use one prefix per implementation (`x-<prefix>-<name>`, lowerCamelCase), put the field on the object it modifies, and record the prefix in the [extension prefix list](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/docs/registry/extension-prefixes.md) so that names do not collide.
+- Extension values in `spec` are part of the manifest digest, so changing one needs a new `spec.version`.
+- Use one prefix per implementation (`x-<prefix>-<name>`, lowerCamelCase), put the field into the `extensions` object of the object it modifies, and record the prefix in the [extension prefix list](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/docs/registry/extension-prefixes.md) so that names do not collide.
+- A field starting with `x-` outside an `extensions` object is an unknown field. In `v1alpha1` and `v1alpha2` extension fields sat directly on the object; `awp-check.mjs migrate` moves them.
 
-**Safe to ignore or critical.** A field that only adds information (a description, a UI hint, an example value) is safe for other runtimes to ignore. A field that restricts behaviour (an argument constraint, an output schema, a placement requirement) is critical: a runtime that ignores it runs the manifest with fewer restrictions. Until [AEP-0011](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0011-required-extensions.md) adds `metadata.requiredExtensions`, a manifest with critical extensions is not portable, and its authors should say so.
+**Safe to ignore or critical.** A field that only adds information (a description, a UI hint, an example value) is safe for other runtimes to ignore. A field that restricts behaviour (an argument constraint, an output schema, a placement requirement) is critical: a runtime that ignores it runs the manifest with fewer restrictions. Until [AEP-0011](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0011-required-extensions.md) adds required extensions, a manifest with critical extensions is not portable, and its authors should say so.
 
 ## 2. Refinement with core fields
 
 Many refinements need no extension, because AWP lets every level only narrow what the level above allows:
 
-- **Budgets** on workflow, agent and step: the effective limit is the minimum ([spec 5.7](/specification/v1alpha1/#57-budgets-and-resources)).
-- **Permissions** on workflow and agent: an action needs both; `allow: false` wins ([spec 7.5](/specification/v1alpha1/#75-tool-governance-permissions)).
-- **Action groups** map concrete tools to well-known actions, so rules can be written once for `git.merge` or `production.deploy` ([spec 5.5.4](/specification/v1alpha1/#554-action-groups)).
-- **`Policy` manifests** hold an organisation's own rules (deny, require approval, data and model conditions) and are included by workflows ([spec 8](/specification/v1alpha1/#8-kind-policy-and-policy-evaluation), `governance` profile).
+- **Budgets** on workflow, agent and step: the effective limit is the minimum ([spec 5.7](/specification/v1alpha3/#57-budgets-and-resources)).
+- **Permissions** on workflow and agent: an action needs both; `allow: false` wins ([spec 7.5](/specification/v1alpha3/#75-tool-governance-permissions)).
+- **Action groups** map concrete tools to well-known actions, so rules can be written once for `git.merge` or `production.deploy` ([spec 5.5.4](/specification/v1alpha3/#554-action-groups)).
+- **`Policy` manifests** hold an organisation's own rules (deny, require approval, data and model conditions) and are included by workflows ([spec 8](/specification/v1alpha3/#8-kind-policy-and-policy-evaluation), `governance` profile).
 
 ## 3. Runtime-defined parts
 
 Some things are deliberately left to the runtime, so that the manifest stays portable:
 
-- binding MCP servers that a manifest does not declare ([spec 5.5.1](/specification/v1alpha1/#551-mcp-servers));
-- built-in tools and their action identifiers ([spec 5.5.2](/specification/v1alpha1/#552-tool-sources));
+- binding MCP servers that a manifest does not declare ([spec 5.5.1](/specification/v1alpha3/#551-mcp-servers));
+- built-in tools and their action identifiers ([spec 5.5.2](/specification/v1alpha3/#552-tool-sources));
 - where steps run ([execution placement](/implementations/execution-placement/));
-- additional audit event types with a reverse-domain prefix, for example `com.example.cache.hit` ([spec 10.4](/specification/v1alpha1/#104-event-types));
+- additional audit event types with a reverse-domain prefix, for example `com.example.cache.hit` ([spec 10.4](/specification/v1alpha3/#104-event-types));
 - rules of a deployment that are stricter than the specification, for example "every MCP tool source lists its tools". A runtime may reject a valid manifest for such a rule if the diagnostic names it; it may never execute a manifest with fewer restrictions.
 
 ## 4. Into the core: AEPs
 
 When an extension proves useful beyond one runtime, it becomes a proposal ([AEP process](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/docs/aep-process.md)). The usual path is:
 
-1. A runtime ships an `x-<prefix>-` field and documents it as safe to ignore or critical.
+1. A runtime ships an `x-<prefix>-` extension field and documents it as safe to ignore or critical.
 2. An AEP proposes the core field, with the experience of that runtime as motivation.
 3. Once the AEP is part of an API version the runtime supports, the runtime writes the core field and reads the extension for one more release with a deprecation warning.
 
@@ -61,7 +77,7 @@ Examples in progress: tool steps ([AEP-0012](https://github.com/agenticworkflowp
 
 ## What does not work
 
-- **Unknown fields without `x-`** are rejected. A typo in a governance field must not be silently ignored (fail closed).
+- **Unknown fields**, including `x-` fields outside an `extensions` object, are rejected. A typo in a governance field must not be silently ignored (fail closed).
 - **Fields of a profile the runtime does not support** are rejected with an error that names the field and the profile; the runtime must not run the rest.
 - **Changing the meaning of a core field** through an extension, for example an `x-` flag that turns `default: deny` into allow, is not allowed.
 

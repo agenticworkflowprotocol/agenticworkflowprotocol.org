@@ -2,7 +2,7 @@
 title: "Integrations"
 description: "AWP builds on MCP and A2A and does not replace them."
 banner:
-  content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 - [MCP](/integrations/mcp/): tools and data
