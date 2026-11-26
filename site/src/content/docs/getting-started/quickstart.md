@@ -26,6 +26,7 @@ npm ci --ignore-scripts
 
 Create `hello.workflow.yaml`. It declares an owner, a budget, one agent, one step and a default-deny permission model.
 
+<!-- awp-check -->
 ```yaml title="hello.workflow.yaml"
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha1
 kind: Workflow
