@@ -2,18 +2,20 @@
 title: "Specification"
 description: "The AWP specification: versions, status and licenses."
 banner:
-  content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3 is the current draft. Fields and semantics may change before v1beta1."
 ---
 
 The normative text lives in the [`spec/`]( https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/spec ) directory of the repository and is rendered on this site without copies.
 
 | API version | Status | Text |
 | ----------- | ------ | ---- |
-| `v1alpha1` | **Draft / alpha**, may change incompatibly | [Specification v1alpha1](/specification/v1alpha1/) |
+| `v1alpha3` | **Current draft / alpha**, may change incompatibly | [Specification v1alpha3](/specification/v1alpha3/), [how it fits together](/specification/v1alpha3-guide/), [migrating](/specification/migrating-to-v1alpha3/) |
+| `v1alpha2` | **Draft / alpha**, `v1alpha1` plus step iteration; errata only | [Specification v1alpha2](/specification/v1alpha2/) |
+| `v1alpha1` | **Draft / alpha**; errata only | [Specification v1alpha1](/specification/v1alpha1/) |
 
-- [Glossary](/specification/v1alpha1/glossary/)
+- Glossary: [v1alpha3](/specification/v1alpha3/glossary/), [v1alpha2](/specification/v1alpha2/glossary/), [v1alpha1](/specification/v1alpha1/glossary/)
 - [Versioning](/specification/versioning/) and [changelog](/specification/changelog/)
-- [JSON Schema](/schema/awp.v1alpha1.json) (structural rules), [conformance suite](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/conformance) and [CLI output formats](/tooling/cli/)
+- JSON Schema (structural rules): [v1alpha3](/schema/awp.v1alpha3.json), [v1alpha2](/schema/awp.v1alpha2.json), [v1alpha1](/schema/awp.v1alpha1.json); [conformance suite](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/conformance) and [CLI output formats](/tooling/cli/)
 
 The specification text is licensed under CC BY 4.0. Examples, schemas and code are licensed under Apache-2.0.
 

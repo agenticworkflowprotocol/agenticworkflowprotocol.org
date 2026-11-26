@@ -31,4 +31,5 @@ Out of scope:
 
 ## Supported versions
 
-Until `v1`, only the latest draft API version of the specification receives fixes.
+Until `v1`, the current draft API version (`v1alpha3`) receives fixes. Older drafts that are still
+supported (`v1alpha1`, `v1alpha2`) receive errata for security issues; they get no new features.

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| **Status** | Informative. Explains pull request #16 and the decisions behind it; it decides nothing. Merged as the `v1alpha3` draft on top of `v1alpha2` by decision [D20](decisions.md#d20-the-kubernetes-resource-model-draft-becomes-v1alpha3); the pull request called it `v1alpha2`. |
+| **Status** | Informative. Explains pull request #16 and the decisions behind it; it decides nothing. Merged as the `v1alpha3` draft on top of `v1alpha2` by decision [D20](decisions.md#d20-the-kubernetes-resource-model-draft-becomes-v1alpha3); the pull request called it `v1alpha2`. Since [D22](decisions.md#d22-v1alpha3-becomes-the-current-draft) `v1alpha3` is the current draft and AEPs 0015 to 0020 are accepted; D22 answers the questions of section 5 except the last one. |
 | **Audience** | Maintainers and reviewers of the `v1alpha3` draft |
 | **Related** | [decision log](decisions.md), [runtime feedback](runtime-feedback.md), [spec v1alpha3](../spec/v1alpha3/README.md), AEPs 0015 to 0021 |
 
@@ -133,7 +133,7 @@ it. It is a concept: nothing in the schema changes until the project lead decide
 | D3 (required extensions, AEP-0011) | AEP-0021 | Unknown extension references fail closed by construction, so `requiredExtensions` is not needed. Reverses D3 if accepted. |
 | D12 (extension prefix list) | AEP-0021 | Domain prefixes are unique without a registry. Reverses D12 if accepted. |
 | Website page "Extending AWP" (`v1alpha1`) | AEP-0015, AEP-0021 | Correct for `v1alpha1`. In `v1alpha3`, `x-` fields move into `extensions`; AEP-0021 removes them. The page now says so in a note. |
-| Scope table (decision log section 2) | AEPs 0015 to 0021 | Listed since D20 as proposed for `v1alpha3`, in its draft but not accepted. |
+| Scope table (decision log section 2) | AEPs 0015 to 0021 | Listed since D20 as proposed for `v1alpha3`; since D22 AEPs 0015 to 0020 are accepted, AEP-0021 stays a concept. |
 | D19 (`v1alpha2` with step iteration, AEP-0022) | D20 | This draft starts from `v1alpha2`, so it has step iteration as section 5.6.5, combined with the step output interface (AEP-0018). |
 | D16 (external reviewer) | all new AEPs | Each still needs a reviewer who is not an author. |
 

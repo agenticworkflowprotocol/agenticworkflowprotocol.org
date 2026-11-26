@@ -7,10 +7,10 @@
 | **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
-| **Status** | Review (proposed for `v1alpha2`; not accepted) |
+| **Status** | Review (proposed for `v1alpha3`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, MCP practitioner, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
 | **Owner decisions** | [D8](../docs/decisions.md#d8-prompt-and-playbook-are-in-v1alpha2), [D9](../docs/decisions.md#d9-mcp-catalog-in-the-mcp-profile-aligned-with-the-mcp-specification) (2026-10-10) |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` (`v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
 | **Profiles affected** | `mcp` (no new profile), `audit` (new event type) |
 | **MCP revision** | Terms checked against the Model Context Protocol specification, revision `2026-07-28` (read as reference data; [conflict C7](../docs/decisions.md#c7-mcp-terms-are-external-reference-data)) |
 | **Created** | 2026-10-09 |
@@ -371,6 +371,8 @@ resources are allowed (runtime feedback G69 to G72). No definition digests yet.
    no substitution of a server that contradicts the declaration?
 
 ## Decision
+
+2026-11-25 ([D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)): the target is now `v1alpha3`, the current draft. The owner direction below is kept as recorded.
 
 Owner direction of 2026-10-10 (D8, D9): in `v1alpha2`, part of the `mcp` profile, aligned with MCP
 terms, authorization (OAuth 2.1) and tool definition digests. Not accepted; needs the reviews listed

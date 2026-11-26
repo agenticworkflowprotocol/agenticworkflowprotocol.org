@@ -1,14 +1,14 @@
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha1
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: Workflow
 metadata:
   name: vulnerability-fixer
+spec:
   version: 0.1.0
   owner:
     team: security-team
   classification: internal
   risk:
     level: medium
-spec:
   triggers:
     - type: manual
   budget:

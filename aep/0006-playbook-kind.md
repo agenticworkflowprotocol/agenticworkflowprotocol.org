@@ -7,10 +7,10 @@
 | **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
-| **Status** | Review (proposed for `v1alpha2`; not accepted) |
+| **Status** | Review (proposed for `v1alpha3`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
 | **Owner decisions** | [D8](../docs/decisions.md#d8-prompt-and-playbook-are-in-v1alpha2) (2026-10-10) |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` (`v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
 | **Profiles affected** | `core`, `audit` |
 | **Created** | 2026-10-09 |
 | **Discussion** | issue to be opened |
@@ -210,6 +210,8 @@ No implementation of this AEP exists.
 3. Should a playbook be runnable on its own (as a one-step workflow, like `Agent`)?
 
 ## Decision
+
+2026-11-25 ([D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)): the target is now `v1alpha3`, the current draft. The owner direction below is kept as recorded.
 
 Owner direction of 2026-10-10 (D8): the kind `Playbook` is in `v1alpha2` (previously proposed for `v1alpha3` or later). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 

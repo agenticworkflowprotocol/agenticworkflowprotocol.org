@@ -21,3 +21,4 @@ AWP is not tied to any runtime. If you build a runtime, validator or tool that i
 
 - [Conformance profiles](/implementations/conformance/)
 - [Build your own AWP runtime](/implementations/build-your-own-runtime/)
+- [Packaging manifests with Helm](/implementations/packaging-with-helm/)

@@ -36,7 +36,7 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | Status | Entries |
 | --- | --- |
 | Accepted and applied to `v1alpha2` and `v1alpha3` | G23 ([AEP-0022](../aep/0022-step-iteration.md), decision D19) |
-| AEP drafted and applied to the `v1alpha3` draft (Draft, not accepted) | G01, G07, G08, G40; partly G14, G15 |
+| AEP applied to the `v1alpha3` draft and accepted (AEPs 0018 to 0020, decision D22) | G01, G07, G08, G40; partly G14, G15 |
 | AEP drafted, not applied | G10, G47, G49, G50, G51, G61, G64, G67 to G69 (AEP-0023); G42 to G46, G54, G56, G86 (AEP-0024); G03, G53, G58, G87 (AEP-0025) |
 | New AEP proposed (number to be confirmed) | G62, G63, G73, G82, G85 (AEP-0026, interactive execution); G65, G66, G81, G83 (AEP-0027, agent engine) |
 | Amendment drafted in an existing AEP that is not applied yet (from section 10) | G71, G72 (AEP-0007); G74 (AEP-0002); G75 (AEP-0005); G76 (AEP-0009); G78 (AEP-0013). Open questions there or in AEP-0026: G70, G77, G84, G85 |

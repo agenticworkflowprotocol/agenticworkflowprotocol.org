@@ -172,11 +172,45 @@ function runVersion(version) {
   return { index, results };
 }
 
+// Older versions stay convertible: the manifest examples of every version that `migrate` converts
+// from must validate after migration to its target version (spec v1alpha3 section 14).
+const MIGRATION_TARGET = 'v1alpha3';
+
+/** Migrates every manifest of a file and validates the result as MIGRATION_TARGET. */
+function migratedResult({ id, file, profiles }) {
+  const loaded = loadManifests(fs.readFileSync(path.join(root, file), 'utf8'));
+  if (loaded.some(l => l.value === undefined)) return { id, file, section: '14', expect: 'valid', ok: false, detail: 'not a valid YAML manifest file' };
+  const docs = loaded.map(({ value }) => stringify(migrateToV1alpha3(value).document, { lineWidth: 0 }));
+  // Digests are not verified: migration changes the digest input, `migrate` asks to recompute it.
+  const errs = errorsOf(validateText(docs.join('---\n'), file, { profiles }));
+  return { id, file, section: '14', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' };
+}
+
+function migratedExampleResults() {
+  const results = [];
+  for (const version of VERSIONS.slice(0, VERSIONS.indexOf(MIGRATION_TARGET))) {
+    const dir = suiteDir(version);
+    const index = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf8'));
+    const nonManifests = new Set(index.nonManifestExamples ?? []);
+    const exDir = path.join(root, 'spec', version, 'examples');
+    for (const f of fs.readdirSync(exDir).filter(f => /\.ya?ml$|\.json$/.test(f) && !nonManifests.has(f)).sort()) {
+      results.push(migratedResult({ id: `migrate:${version}/${f}`, file: `spec/${version}/examples/${f}` }));
+    }
+    // The valid cases of the suite exercise what the examples do not: x- fields, owner shorthand,
+    // plain policy conditions.
+    for (const t of index.tests.filter(t => t.expect === 'valid')) {
+      results.push(migratedResult({ id: `migrate:${version}/${t.file}`, file: path.relative(root, path.join(dir, t.file)), profiles: t.profiles }));
+    }
+  }
+  return results;
+}
+
 function runSuite({ json }) {
   const runs = VERSIONS.map(runVersion);
   const crdProblems = checkCrds();
   const results = [
     ...runs.flatMap(r => r.results),
+    ...migratedExampleResults(),
     { id: 'crd:v1alpha3', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
   ];
   const failed = results.filter(r => !r.ok);

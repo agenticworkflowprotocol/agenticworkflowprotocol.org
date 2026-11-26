@@ -26,8 +26,10 @@ npm test          # node conformance/awp-check.mjs run
 ```
 
 `npm test` validates every case of every suite, checks that every file in `valid/` and `invalid/`
-is indexed, validates the manifest examples of the specification (`spec/<version>/examples/`) and
-checks that the generated CustomResourceDefinitions are current. The checker selects the schema by
+is indexed, validates the manifest examples of the specification (`spec/<version>/examples/`),
+checks that the examples and the valid cases of `v1alpha1` and `v1alpha2` still validate after
+`migrate` (`migrate:` cases, so older versions stay convertible; digests are not verified there) and checks that the generated CustomResourceDefinitions
+are current. The checker selects the schema by
 `apiVersion`. It prints `PASS`/`FAIL` per case and exits with `1` if anything fails.
 `node conformance/awp-check.mjs run --json` prints the same result as JSON.
 
