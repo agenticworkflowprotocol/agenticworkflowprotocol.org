@@ -5,11 +5,11 @@
 | **AEP** | 0019 |
 | **Title** | Kind `WorkflowRun` and status conditions |
 | **Authors** | @agenticworkflowprotocol |
-| **Shepherd** | to be assigned (not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
+| **Shepherd** | Project lead (D22) |
 | **Type** | Specification |
-| **Status** | Draft |
-| **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), security reviewer |
-| **Reviewers** | - |
+| **Status** | Accepted (lead decision [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft), without the external review of D16) |
+| **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), security reviewer (still welcome; see Decision) |
+| **Reviewers** | none yet |
 | **Target API version** | `v1alpha3` |
 | **Profiles affected** | `core` |
 | **Created** | 2026-11-19 |
@@ -171,7 +171,10 @@ used its own run kind with a comparable shape and `Valid` and `Bound` conditions
 
 ## Decision
 
--
+2026-11-25: accepted for `v1alpha3` in the form written into the draft, by the project lead
+(decision [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)). The external review
+that D16 requires was not held; reviews in the roles above are still invited, and their findings are
+handled as errata of the `v1alpha3` draft or as new AEPs.
 
 ## References
 

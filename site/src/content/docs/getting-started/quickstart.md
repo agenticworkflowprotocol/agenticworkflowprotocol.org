@@ -28,17 +28,17 @@ Create `hello.workflow.yaml`. It declares an owner, a budget, one agent, one ste
 
 <!-- awp-check -->
 ```yaml title="hello.workflow.yaml"
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha1
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: Workflow
 metadata:
   name: hello-workflow
+spec:
   version: 0.1.0
   owner:
     team: example-team
   classification: internal
   risk:
     level: low
-spec:
   triggers:
     - type: manual
   budget:
@@ -77,6 +77,6 @@ npm test
 
 ## Next steps
 
-- Read the [Manifest](/concepts/manifest/) concept and the [Specification](/specification/v1alpha1/).
+- Read [v1alpha3: how it fits together](/specification/v1alpha3-guide/) and the [Specification](/specification/v1alpha3/). Manifests of `v1alpha1` and `v1alpha2` still validate; [Migrating to v1alpha3](/specification/migrating-to-v1alpha3/) shows how to convert them.
 - Study the annotated [examples](/examples/).
 - Building a runtime or validator? See [Conformance](/implementations/conformance/) and [Build your own runtime](/implementations/build-your-own-runtime/).

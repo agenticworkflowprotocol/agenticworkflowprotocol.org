@@ -15,7 +15,9 @@
 > semantic rule and every conformance requirement in this document may change incompatibly in a
 > later alpha version (`v1alpha3`, ...). Implementations SHOULD NOT rely on `v1alpha2` for
 > production interoperability. Feedback is welcome as GitHub issues. No
-> implementation is conformant to this version at the time of writing.
+> implementation is conformant to this version at the time of writing. Since decision
+> [D22](../../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft) the current draft is
+> [`v1alpha3`](../v1alpha3/README.md); this version only gets errata.
 
 > **Compliance.** AWP provides machine-readable governance primitives that can help
 > organizations implement and enforce their own compliance requirements. Using AWP does not make

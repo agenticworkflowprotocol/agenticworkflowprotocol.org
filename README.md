@@ -11,11 +11,11 @@
 
 > MCP connects agents to tools. A2A connects agents to agents. AWP defines how agents work.
 
-> **Status: draft / alpha.** The specification has three draft versions: `v1alpha1`, `v1alpha2`
-> (`v1alpha1` plus step iteration, `forEach`) and the proposed `v1alpha3` (`v1alpha2` aligned with
-> the Kubernetes resource model, built from Draft AEPs). All are working drafts: fields, semantics and
-> conformance profiles may change incompatibly before `v1`. Do not rely on them for production
-> interoperability yet.
+> **Status: draft / alpha.** The current draft is `v1alpha3`: `v1alpha2` (`v1alpha1` plus step
+> iteration, `forEach`) aligned with the Kubernetes resource model, with step outputs, schedule
+> semantics, human input, `WorkflowRun` and execution pinning (decision D22). `v1alpha1` and
+> `v1alpha2` stay supported. All are working drafts: fields, semantics and conformance profiles may
+> change incompatibly before `v1`. Do not rely on them for production interoperability yet.
 
 ## What AWP is
 
@@ -43,15 +43,15 @@ execution of agent code on Kubernetes), without depending on them.
 A minimal manifest:
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha1
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
 kind: Workflow
 metadata:
   name: vulnerability-fixer
+spec:
   version: 0.1.0
   owner:
     team: security-team
   classification: internal
-spec:
   triggers:
     - type: manual
   budget:
@@ -124,7 +124,7 @@ public statement of the supported conformance profiles.
 
 | Path | Content |
 | ---- | ------- |
-| `spec/` | Normative specification text (planned for `v1alpha1`) |
+| `spec/` | Normative specification text, one directory per API version |
 | `docs/` | Concept documentation and website plan |
 | `site/` | Website (Astro Starlight), see [site/README.md](site/README.md) |
 | `CNAME` | Custom domain for GitHub Pages (`agenticworkflowprotocol.org`) |

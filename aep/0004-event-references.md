@@ -7,10 +7,10 @@
 | **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
-| **Status** | Review (proposed for `v1alpha2`; not accepted) |
+| **Status** | Review (proposed for `v1alpha3`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, security reviewer, privacy reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
 | **Owner decisions** | [D7](../docs/decisions.md#d7-own-event-root) (2026-10-10) |
-| **Target API version** | `v1alpha2` |
+| **Target API version** | `v1alpha3` (`v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
 | **Profiles affected** | `core` |
 | **Created** | 2026-10-09 |
 | **Discussion** | issue to be opened |
@@ -137,6 +137,8 @@ declared, because no expression can reach it in `v1alpha1`. No implementation of
 2. Should `dataSchema` be REQUIRED under the security profile?
 
 ## Decision
+
+2026-11-25 ([D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)): the target is now `v1alpha3`, the current draft. The owner direction below is kept as recorded.
 
 Owner direction of 2026-10-10 (D7): an own root `${{ event.* }}`; events are not mapped to inputs. Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 

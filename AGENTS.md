@@ -2,6 +2,55 @@
 
 See README for other guidelines.
 
+## New API versions
+
+Applies whenever a new API version (`v1alpha4`, `v1beta1`, ...) is added, and whenever an existing
+version becomes the current draft (as `v1alpha3` did with decision D22). A version is only done
+when the specification, the reference validator and the editor support it together.
+
+**1. Older versions stay backwards compatible.** A new version is added next to the older ones; it
+never changes them.
+
+- `schema/awp.<old>.json`, `spec/<old>/`, the conformance suites of older versions and their
+  examples are unchanged. Check with `git diff origin/main -- schema/awp.<old>.json spec/<old> conformance`
+  (only the new suite and the files of the new version may change). An erratum of an older version
+  is its own commit, named as an erratum in the CHANGELOG.
+- `npm test` passes for every version: the reference checker still knows all older `apiVersion`s,
+  and a manifest is always validated against the schema of its own `apiVersion`, never the newest.
+- `node conformance/awp-check.mjs migrate` converts every older version to the new one, and the
+  migrated examples of every older version validate against the new schema. Changes that
+  `migrate` cannot do mechanically are listed in the spec (section 14) and on the website
+  ("Migrating to ...").
+- Nothing that worked for an older version may stop working in a tool: older versions stay in the
+  version lists of the validator and the editor, with their tests.
+
+**2. Extend the validator and the editor in the same change.** Check out both repositories next to
+this one, on a new branch from `origin/main`:
+
+```sh
+git clone https://github.com/agenticworkflowprotocol/awp-validator ../awp-validator
+git clone https://github.com/agenticworkflowprotocol/awp-editor ../awp-editor
+```
+
+- `awp-validator`: add the version to `API_VERSIONS` in `src/versions.js` (oldest first), copy the
+  artefacts with `node scripts/sync-spec.mjs ../agenticworkflowprotocol.org` (never edit
+  `vendor/` by hand; review the diff), add the schema import in `src/browser.js`, the export
+  `./schema/<version>.json` in `package.json`, the type in `types/index.d.ts` and tests that run its
+  conformance suite. If it becomes the current draft, also set `API_VERSION`, the default `schema`
+  (`src/index.js`, `src/browser.js`, `./schema.json`) and the starter manifest in `site/app.js`.
+- `awp-editor`: render the new fields (`src/model/`, `src/ui/`), add the version where the model
+  distinguishes layouts (for example `KRM_VERSIONS` in `src/model/index.js`), add its examples to
+  `EXAMPLE_SETS` in `scripts/build.mjs` and tests in `test/`. If it becomes the current draft, it
+  is the example set at `examples/` and the starter in `site/app.js`; older sets move to
+  `examples/<version>/`.
+- Both: update `README.md`, add a CHANGELOG section and bump `version` in `package.json` (a changed
+  default is a breaking change). Run `npm test` in each repository. Pushing a new version to
+  `main` publishes it, so release the validator first and then point the editor to it; never push
+  without an explicit request.
+- In this repository: the website (banners in `site/scripts/sync-content.mjs`, sidebar and version
+  selector, `specification/versioning.md`), `spec/README.md`, the README and the Quickstart name
+  the current draft, and `npm run check:examples` passes in `site/`.
+
 ## Code quality and maintainability
 
 Applies to all new code and modifications. Goals: maintainable code, low coupling, high cohesion, minimal dependencies, clear separation of concerns, easy testing, predictable architecture, consistent English codebase, proper i18n, long-term maintainability.

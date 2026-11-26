@@ -9,18 +9,20 @@
 | **Glossary** | [glossary.md](glossary.md) |
 | **Examples** | [examples/](examples/) |
 
-> **Status of this document.** This is a working draft of the third alpha version of AWP. It
+> **Status of this document.** This is the current working draft of AWP, its third alpha version
+> (decision [D22](../../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)). It
 > starts from `v1alpha2` (`v1alpha1` plus step iteration, [section 5.6.5](#565-iteration),
 > [AEP-0022](../../aep/0022-step-iteration.md)) and aligns the document model with the Kubernetes resource model, as
-> proposed by [AEP-0015](../../aep/0015-kubernetes-resource-model.md) (not accepted): governance
+> proposed by [AEP-0015](../../aep/0015-kubernetes-resource-model.md): governance
 > fields move from `metadata` to `spec`, extension fields move into `extensions` objects, and
 > `status` is reserved for runtimes. It also contains the schedule semantics and the human input
 > proposed in [aep/0016-schedule-semantics.md](../../aep/0016-schedule-semantics.md) and
 > [aep/0017-human-input.md](../../aep/0017-human-input.md), the step output interface of
 > [aep/0018-step-outputs.md](../../aep/0018-step-outputs.md), the kind `WorkflowRun` and status
 > conditions of [aep/0019-workflow-run-and-status.md](../../aep/0019-workflow-run-and-status.md) and
-> the pinning of executions of [aep/0020-execution-pinning.md](../../aep/0020-execution-pinning.md)
-> (all Draft, not accepted). Every field, every semantic rule and every conformance
+> the pinning of executions of [aep/0020-execution-pinning.md](../../aep/0020-execution-pinning.md).
+> AEPs 0015 to 0020 are accepted by lead decision D22 without the external review; review findings
+> are handled as errata of this draft. Every field, every semantic rule and every conformance
 > requirement in this document may change incompatibly in a later alpha version. Implementations
 > SHOULD NOT rely on `v1alpha3` for production interoperability. No implementation is conformant
 > to this version at the time of writing. Changes from `v1alpha1` are listed in

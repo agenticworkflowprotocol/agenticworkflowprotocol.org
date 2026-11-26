@@ -19,7 +19,7 @@ The **Agentic Workflow Protocol (AWP)** is an open specification for portable, a
 AWP is a **specification, not a platform**. A *runtime* reads a manifest, validates it, enforces its limits and governance rules while executing it, and emits audit events with standardized semantics. Any runtime may implement AWP; see [implementations](/implementations/).
 
 :::note[Status]
-AWP is a draft. The current API version is `v1alpha1`; fields and semantics may change before `v1beta1`. See [Versioning](/specification/versioning/).
+AWP is a draft. The current API version is `v1alpha3`; `v1alpha1` and `v1alpha2` stay supported. Fields and semantics may change before `v1beta1`. See [Versioning](/specification/versioning/) and [v1alpha3: how it fits together](/specification/v1alpha3-guide/).
 :::
 
 **Validate a manifest** in the browser with the [online validator](https://validator.agenticworkflowprotocol.org/), or in CI and inside your runtime with [`awp validate` and the validator library](https://github.com/agenticworkflowprotocol/awp-validator). **View and edit** manifests as step graph, permissions and budgets in the [AWP editor](https://editor.agenticworkflowprotocol.org/), or embed the [viewer and editor components](https://github.com/agenticworkflowprotocol/awp-editor) in your own application.
@@ -94,7 +94,7 @@ AWP provides machine-readable governance primitives that can help organizations 
 
 <CardGroup>
   <DocCard title="Quickstart" href="/getting-started/quickstart/" icon="rocket">Validate a manifest with the conformance checker in five steps.</DocCard>
-  <DocCard title="Specification" href="/specification/v1alpha1/" icon="book">The normative text of v1alpha1 (draft).</DocCard>
+  <DocCard title="Specification" href="/specification/v1alpha3/" icon="book">The normative text of v1alpha3, the current draft.</DocCard>
   <DocCard title="Examples" href="/examples/" icon="code">Annotated manifests you can copy and adapt.</DocCard>
   <DocCard title="Conformance" href="/implementations/conformance/" icon="check">Profiles and the public conformance suite.</DocCard>
 </CardGroup>
