@@ -2,7 +2,7 @@
 title: "Threat model"
 description: "Security considerations for specification and implementations."
 banner:
-  content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 | Topic | Consideration |
@@ -17,7 +17,7 @@ banner:
 
 Report problems in the specification or tooling via [GitHub private vulnerability reporting](/community/security-policy/).
 
-Normative text: [Security considerations](/specification/v1alpha1/#12-security-considerations), [Privacy considerations](/specification/v1alpha1/#13-privacy-considerations).
+Normative text: [Security considerations](/specification/v1alpha3/#12-security-considerations), [Privacy considerations](/specification/v1alpha3/#13-privacy-considerations).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

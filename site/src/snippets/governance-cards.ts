@@ -1,10 +1,10 @@
-// Short snippets for the governance overview page. Each is an excerpt of a valid v1alpha1 manifest;
+// Short snippets for the governance overview page. Each is an excerpt of a valid v1alpha3 manifest;
 // the normative text is linked from every card.
 export const cards = [
   {
     title: 'Identity & ownership', href: '/governance/identity-and-ownership/',
     text: 'Every workflow names the team accountable for it.',
-    code: 'metadata:\n  name: invoice-processing\n  version: 1.2.0\n  owner:\n    team: finance-ai\n    contact: finance-ai@example.com',
+    code: 'metadata:\n  name: invoice-processing\nspec:\n  version: 1.2.0\n  owner:\n    team: finance-ai\n    contact: finance-ai@example.com',
   },
   {
     title: 'Data classification', href: '/governance/data-classification/',
@@ -34,7 +34,7 @@ export const cards = [
   {
     title: 'Risk levels', href: '/governance/risk-levels/',
     text: 'A possible governance model, not a regulatory classification.',
-    code: 'metadata:\n  risk:\n    level: high\n    category: [security, financial]',
+    code: 'spec:\n  risk:\n    level: high\n    category: [security, financial]',
   },
   {
     title: 'Environments', href: '/governance/environments/',

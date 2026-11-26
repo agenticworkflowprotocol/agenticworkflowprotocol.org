@@ -2,9 +2,9 @@
 title: "Execution placement (executors)"
 description: "Informative guidance on where a runtime executes the steps of a workflow: local, container, Kubernetes, CI runners, serverless."
 banner:
-  content: "Draft - v1alpha1. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
 ---
-A manifest says **what** a workflow may do. It does not say **where** the steps run. That choice belongs to the runtime and its operator: a local process, a container on a host, a Kubernetes pod, a CI job, a serverless task or a managed agent runtime. This page calls such a target an **executor**. It is informative: it adds no requirement to the [specification](/specification/v1alpha1/), and executors are not a manifest field in `v1alpha1`.
+A manifest says **what** a workflow may do. It does not say **where** the steps run. That choice belongs to the runtime and its operator: a local process, a container on a host, a Kubernetes pod, a CI job, a serverless task or a managed agent runtime. This page calls such a target an **executor**. It is informative: it adds no requirement to the [specification](/specification/v1alpha3/), and executors are not a manifest field in `v1alpha3`.
 
 ## Keep placement out of the manifest
 
@@ -38,7 +38,7 @@ Remote executors (CI runners, serverless tasks, managed agent runtimes) are star
 
 - Pin the executor image by digest (`name@sha256:...`), as the security profile requires for command step images. Some platforms cannot override the image per call; create one task definition per image digest rather than reusing a mutable tag.
 - Managed runtimes may require a specific CPU architecture; build multi-architecture images or record the architecture.
-- Record the executor kind, its name and the image digest with the execution. The reproducibility record (spec 10.7) has no field for it in `v1alpha1`; keep it in `runtime` until an AEP adds one.
+- Record the executor kind, its name and the image digest with the execution. The reproducibility record (spec 10.7) lists command step images with their resolved digests but has no field for the executor; keep it in `runtime` until an AEP adds one.
 
 ## Typical executor kinds
 

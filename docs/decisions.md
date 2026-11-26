@@ -278,10 +278,9 @@ a single implementation and were removed from this log by D17.
   errata; `awp-check.mjs migrate` converts both to `v1alpha3`. AEPs that targeted `v1alpha2` and
   are not accepted (0001 to 0007, 0010 to 0014) now target `v1alpha3` (section 2), so that
   accepted changes go into one version. The Draft AEPs 0021 and 0023 to 0027 keep their target
-  `v1alpha3` and join it when accepted. The specification pages, the examples, the Quickstart and
-  the introduction of the website, the README, the reference validator and the editor use
-  `v1alpha3` as the default. The concept, governance, security and integration pages of the
-  website still describe `v1alpha1` (their banners say so) until they are rewritten.
+  `v1alpha3` and join it when accepted. The website, the README, the reference validator and the editor use
+  `v1alpha3` as the default. The CLI output formats (`docs/cli.md`) are versioned on their own and
+  stay `v1alpha1`.
 - **Applied in**: this log, `aep/0001` to `aep/0007`, `aep/0010` to `aep/0020`, `spec/README.md`,
   `spec/v1alpha2/README.md` and `spec/v1alpha3/README.md` (status notes), `docs/aep-process.md`
   (5.1 rule 1, 6.2), `GOVERNANCE.md`, `SECURITY.md` (supported versions),
