@@ -9,7 +9,7 @@ const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
 const GH = 'https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org';
 
-const BANNER = 'Draft - v1alpha1. Fields and semantics may change before v1beta1.';
+const BANNER = 'Draft - v1alpha1, errata only. The current draft is v1alpha3.';
 const V1ALPHA3_BANNER = 'Draft - v1alpha3, the current draft (decision D22). Fields and semantics may change before v1beta1.';
 
 // repo path -> { out: content path (below src/content/docs), title, description, banner }
@@ -27,7 +27,7 @@ const pages = [
   { src: 'spec/v1alpha3/glossary.md', out: 'specification/v1alpha3/glossary.md', url: '/specification/v1alpha3/glossary/',
     title: 'Glossary (v1alpha3)', description: 'Terms used in the AWP v1alpha3 specification.', banner: V1ALPHA3_BANNER },
   { src: 'docs/cli.md', out: 'tooling/cli.md', url: '/tooling/cli/',
-    title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha1).', banner: true },
+    title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha3).', banner: V1ALPHA3_BANNER },
   { src: 'CHANGELOG.md', out: 'specification/changelog.md', url: '/specification/changelog/',
     title: 'Changelog', description: 'Changes to the specification, schemas, conformance suite and website.' },
   { src: 'CONTRIBUTING.md', out: 'community/contributing.md', url: '/community/contributing/',
