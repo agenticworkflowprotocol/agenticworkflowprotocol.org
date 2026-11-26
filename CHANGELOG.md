@@ -33,6 +33,7 @@ API versions (`v1alpha1`, ...) are versioned separately, see [GOVERNANCE.md](GOV
 
 ### Added
 
+- Website: `npm run check:examples` runs every YAML example marked with an `awp-check` comment through the reference checker (valid, or rejected with an expected code and no error of another family); unknown options and profiles and a run without any marked example fail. Part of `npm test` and the pages workflow; the Quickstart manifest is marked.
 - AEP-0026 (interactive execution: kind `AgentSession`, `sessions` opt-in with `maxAutonomy`, three autonomy levels) and AEP-0027 (agent engine: `agents[].engine`, repository configuration off by default) as Draft concepts with open questions; numbers to be confirmed. From runtime feedback G62, G63, G65, G73, G81, G82.
 - AEP-0023 (step isolation) as Draft for `v1alpha3`: structured network destinations (`allowTo` with `host` or `cidr` and `ports`, replacing `allowHosts`), enforce or reject, internal destinations only through a `cidr` entry under `security`, platform ceilings that reject and never adjust (with a change to spec 5.7), credentials and approvals outside the execution environment, a minimum isolation class; hardening as informative implementer guidance. From runtime feedback G10, G47, G49 to G51, G61, G64, G67 to G69.
 - `docs/runtime-feedback.md`: gaps G41 to G87 (event triggers, the concept review, models, interactive sessions and a coding agent engine), with the AEP each belongs to, the evidence from the runtime, and a rule for what goes into AWP (section 10).

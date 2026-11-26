@@ -51,6 +51,9 @@ jobs:
       - name: Install site dependencies (install scripts disabled by .npmrc)
         working-directory: site
         run: npm ci
+      - name: Website examples (reference checker)
+        working-directory: site
+        run: npm run check:examples
 
       - name: Build
         working-directory: site
