@@ -29,10 +29,12 @@ manifest must be able to rely on, and nothing about how a runtime achieves it:
 - internal destinations are denied under `security` unless the manifest allows them;
 - anything above a platform ceiling is rejected, never adjusted;
 - credentials and approvals stay outside the execution environment;
+- other secrets can be delivered as a header to exactly one destination, never into the step;
+- the identity of an execution can serve as a credential (`workloadIdentity`);
 - an agent can require a minimum isolation class.
 
 How to enforce this safely (address checks, proxies, gateways) is informative guidance at the end.
-It answers runtime feedback G10, G47, G49, G50, G51, G61, G64, G67, G68 and G69.
+It answers runtime feedback G05, G10, G47, G49, G50, G51, G55, G61, G64, G67, G68, G69 and G89.
 
 ## Motivation
 
@@ -49,6 +51,9 @@ It answers runtime feedback G10, G47, G49, G50, G51, G61, G64, G67, G68 and G69.
   server credential to the step, where any command can read it. A proof of concept also showed
   that a coding agent's own permission system can be answered from inside: a command read the
   agent's local server password and confirmed its own requests.
+- **Other secrets end up in the step (G05, G55).** A token for a ticket system or a chat bot that a
+  command step uses is an environment variable of the step, readable by every command it runs, and
+  a destination sees only a shared bot secret, not which workflow acts.
 - **Isolation is invisible (G67).** An agent that runs code from an untrusted repository needs more
   than a container; the manifest cannot say so.
 - **Ceilings (G68).** Whether a platform limit rejects a manifest or silently lowers a value is
@@ -126,6 +131,65 @@ Under the `security` profile:
   environment can reach; a permission system inside the step (for example a coding agent's own)
   MAY check in addition and is not enforcement.
 
+Endpoints of declared model providers (spec 5.4.3) and of declared MCP servers (spec 5.5.1) need
+no `allowTo` entry. They are reached by the runtime, outside the execution environment, at the
+address its runtime configuration resolves for them, and that configuration is bounded by the
+platform ceilings (section 7.5.10). `allowTo` lists only what the step itself connects to.
+
+### Secret delivery to a destination (section 7.9)
+
+Credentials for model providers and tool servers already stay outside (above). Other secrets, for
+example a token that a command step uses against a ticket system, reach the step as environment
+variables today. A secret entry gains `deliver`:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `deliver` | object | Optional. How the runtime delivers the secret. Absent: the secret is an environment variable of each consumer in `scope`, named exactly like the secret (`name`). |
+| `deliver.header` | object | The runtime sets the secret as an HTTP request header, outside the execution environment, on connections to one destination: `host` (as in section 7.5.8, no wildcard), `port` (default 443), `name` (header name, for example `Authorization`) and `prefix` (optional, for example `"Bearer "`). |
+
+Rules for `deliver.header`:
+
+1. The value MUST NOT enter the execution environment: not as an environment variable, file or
+   argument. The runtime sets the header only on requests to exactly `host` and `port`, and only
+   over TLS.
+2. The destination MUST be reachable under `permissions.network` (an `allowTo` entry that matches
+   `host` and `port`, or `egress: allow`); otherwise the manifest MUST be rejected.
+3. Two secrets with `deliver.header` for the same `host`, `port` and header `name` make the manifest
+   invalid.
+4. A runtime that cannot deliver a header outside the execution environment MUST reject the
+   manifest; it MUST NOT fall back to an environment variable.
+5. A step MAY send a placeholder value in the header (for example an SDK that requires one); the
+   runtime replaces it. The placeholder is not a secret and carries no meaning.
+
+This answers G05 (naming of the environment variable when `deliver` is absent) and extends G61 to
+every secret whose destination is an HTTP host.
+
+### Execution identity as a credential (sections 5.4.4, 5.5.1, 7.9)
+
+Some destinations accept an identity token instead of a stored secret. A credential object
+(`mcpServers[].auth`, `auth` of a remote agent, `secrets[].deliver`) MAY use:
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `method` | string | `workloadIdentity`. |
+| `audiences` | list of string | REQUIRED with `workloadIdentity`: the audiences the token is issued for; at least one. |
+
+Rules for `workloadIdentity`:
+
+1. No secret is stored or declared. The runtime issues a short-lived token for each execution (or
+   attempt) and sets it outside the execution environment, like a delivered header.
+2. The token identifies the issuer (the runtime installation), the workflow (`metadata.name`,
+   `spec.version`, digest), the execution id and the actor of the execution (spec 10.1). Its
+   lifetime MUST NOT exceed the remaining time limit of the execution.
+3. The destination validates the issuer and the audience. A token MUST NOT be accepted by the
+   runtime itself or its gateways as their own credential.
+4. A runtime that cannot issue such tokens MUST reject the manifest.
+
+This credential runs from the runtime to the destination. It is distinct from the short-lived
+credential in the implementer guidance below, which authenticates a step to the runtime's
+gateway and never leaves the runtime. It answers G55 from the other side: the destination can see
+which workflow and execution acts, without a shared bot secret.
+
 ### Changes to section 5.4 (agents): isolation class
 
 | Field | Type | Description |
@@ -178,12 +242,49 @@ The agent reaches `api.example.com` on port 443 and the ticket system if the pla
 `10.20.0.0/16`. If `api.example.com` resolves to an internal address, the connection is denied. A
 runtime that offers only containers rejects the agent.
 
+A command step that calls a ticket API with a token it never sees, and an MCP server that accepts
+the execution's identity:
+
+```yaml
+spec:
+  permissions:
+    network:
+      egress: deny
+      allowTo:
+        - host: tickets.example.com
+          ports:
+            - port: 443
+  secrets:
+    - name: TICKETS_TOKEN
+      source: secret-manager
+      scope: [command]
+      deliver:
+        header:
+          host: tickets.example.com
+          port: 443
+          name: Authorization
+          prefix: "Bearer "
+  mcpServers:
+    - name: inventory
+      transport: streamable-http
+      url: https://mcp.example.com/inventory
+      auth:
+        method: workloadIdentity
+        audiences: [inventory.example.com]
+```
+
+The command sends its requests to `tickets.example.com` without a token (or with a placeholder);
+the runtime sets the header outside the step. `TICKETS_TOKEN` is not in the step's environment.
+
 ## Schema changes
 
 - `permissions.network.allowTo`: objects with `host` or `cidr` and `ports`; `allowHosts` removed
   (`awp-check.mjs migrate` converts names and ranges).
 - `agents[].isolation`: enum `process`, `container`, `sandbox`, `vm`.
-- Semantic rules for invalid hosts, ranges and port ranges.
+- `secrets[].deliver.header` (`host`, `port`, `name`, `prefix`); credential objects gain `method`
+  `workloadIdentity` with `audiences`.
+- Semantic rules for invalid hosts, ranges and port ranges; `secret.deliver-unreachable`,
+  `secret.deliver-conflict`, `auth.workload-identity-audiences`.
 
 ## Conformance impact
 
@@ -191,6 +292,11 @@ runtime that offers only containers rejects the agent.
 - `security`: `egress: deny` default, internal destinations, credentials and approvals outside,
   isolation class.
 - Valid: `7.5.8-allow-to.yaml`. Invalid: string entry, bare wildcard, host with port, host and cidr.
+- Valid: `7.9-deliver-header.yaml`, `7.9-workload-identity.yaml`. Invalid: delivery to a
+  destination outside `allowTo`, two secrets for the same destination and header,
+  `workloadIdentity` without `audiences`.
+- Runtime (`security`): a delivered secret is absent from the step environment; a runtime without
+  header delivery or token issuance rejects the manifest.
 
 ## Compatibility and migration
 
@@ -226,7 +332,11 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 Prior art (decision D21): [agent-sandbox](https://agent-sandbox.sigs.k8s.io/) (Kubernetes SIG Apps)
 runs isolated, stateful agent workloads with the isolation backend chosen by `RuntimeClass`; it is
-one platform-side way to provide an isolation class.
+one platform-side way to provide an isolation class. [kagent](https://kagent.dev) (a CNCF project)
+attaches a credential to an egress origin (a header with an optional prefix, set by a gateway that
+replaces a placeholder) and can authenticate an agent to a destination with a short-lived token
+for the running agent and named audiences; `deliver.header` and `workloadIdentity` follow these
+two patterns.
 
 ## Implementer guidance (informative)
 
@@ -265,6 +375,9 @@ ports, and no isolation class above `container` is deployed.
    sandbox?
 5. Should separation of duties (spec 7.8) state explicitly that it is checked against the
    authenticated identity of a decision, never against an identity the step asserts?
+6. Should `deliver` also offer a query parameter or a client certificate, or is a header enough?
+7. Should the claims of a `workloadIdentity` token have fixed names (for example following the
+   SPIFFE or OpenID Connect conventions), so that destinations can validate them portably?
 
 ## Decision
 
@@ -272,8 +385,9 @@ Not decided. Number and scope assigned by the maintainer on 2026-11-22.
 
 ## References
 
-- Runtime feedback G10, G47, G49, G50, G51, G61, G64, G67, G68, G69
+- Runtime feedback G05, G10, G47, G49, G50, G51, G55, G61, G64, G67, G68, G69, G89
   ([runtime-feedback.md](../docs/runtime-feedback.md)).
+- kagent (CNCF): egress policies with credential headers, actor tokens with audiences.
 - Spec `v1alpha3` sections 5.4, 5.5.1, 5.7, 7.5, 7.6, 7.9, 11.
 - Kubernetes `NetworkPolicy`; RFC 1918, RFC 3927, RFC 4193, RFC 6598.
 - agent-sandbox, Kubernetes SIG Apps.
