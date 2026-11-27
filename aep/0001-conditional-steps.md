@@ -5,12 +5,13 @@
 | **AEP** | 0001 |
 | **Title** | Conditional steps (`when`) with a restricted expression language |
 | **Authors** | AI agent on behalf of @agenticworkflowprotocol |
-| **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
+| **Shepherd** | Project lead (D23) |
 | **Type** | Specification |
-| **Status** | Review (proposed for `v1alpha3`; not accepted) |
-| **Reviewer roles needed** | runtime implementer, language or schema reviewer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
-| **Owner decisions** | [D5](../docs/decisions.md#d5-when-uses-a-restricted-expression-grammar-not-cel), [D6](../docs/decisions.md#d6-executions-may-succeed-with-condition-skips) (2026-10-10) |
-| **Target API version** | `v1alpha3` (`v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
+| **Status** | Accepted for `v1alpha4` (lead decision [D23](../docs/decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4), without the external review of D16) |
+| **Reviewer roles needed** | runtime implementer, language or schema reviewer, security reviewer (still welcome; see Decision) |
+| **Reviewers** | none yet |
+| **Owner decisions** | [D5](../docs/decisions.md#d5-when-uses-a-restricted-expression-grammar-not-cel), [D6](../docs/decisions.md#d6-executions-may-succeed-with-condition-skips) (2026-10-10), [D23](../docs/decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4) (2026-11-27) |
+| **Target API version** | `v1alpha4` (`v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft), `v1alpha3` until D23); written into the `v1alpha4` draft as section 3.12 |
 | **Profiles affected** | `core` (step semantics), `audit` (new event type) |
 | **Created** | 2026-10-09 |
 | **Discussion** | issue to be opened |
@@ -20,8 +21,8 @@
 ## Summary
 
 Add an optional `when` field to workflow steps. `when` is a boolean condition in a small, typed,
-side-effect-free expression language over workflow inputs, declared step outputs, the triggering
-event (AEP-0004) and the execution environment. A step whose condition is false is **skipped by
+side-effect-free expression language over workflow inputs, declared step outputs and the execution
+environment. A step whose condition is false is **skipped by
 condition**; this does not fail the execution. Evaluation errors fail the step, they are never
 treated as `false`.
 
@@ -47,13 +48,19 @@ the author wanted skipped.
 
 ## Specification
 
+> As accepted into `v1alpha4` (D23). Differences from the text proposed for `v1alpha2`: the
+> section is 3.12, because 3.10 and 3.11 are taken in `v1alpha3`; there is no `event` root,
+> because AEP-0004 is not accepted; and step outputs, which are text since `v1alpha3` (spec 5.6.4),
+> are read as JSON in conditions. The normative text is
+> [spec/v1alpha4 section 3.12](../spec/v1alpha4/README.md#312-conditions).
+
 ### Changes to section 5.6.1 (common step fields)
 
 | Field | Type | Req. | Description |
 | ----- | ---- | ---- | ----------- |
-| `when` | string | no | Condition expression (section 3.10). The step runs only if it evaluates to `true`. |
+| `when` | string | no | Condition expression (section 3.12). The step runs only if it evaluates to `true`. |
 
-### New section 3.10: Conditions
+### New section 3.12: Conditions
 
 A condition is a string in the following grammar. It is written without `${{ }}`; the whole field
 is the expression.
@@ -68,13 +75,15 @@ operand := literal | path | list | "exists" "(" path ")" | "(" expr ")"
 path    := root ( "." name | "[" index "]" )*
 root    := "inputs" "." name
          | "steps" "." step-id "." "outputs" "." name
-         | "event"                                     ; AEP-0004
-         | "execution" "." ( "environment" )
+         | "execution" "." "environment"
 list    := "[" ( literal ( "," literal )* )? "]"
 literal := string | number | "true" | "false" | "null"
 ```
 
 - Strings use double quotes with JSON escapes. Numbers use the JSON number syntax.
+- A step output is text (spec 5.6.4). In a condition it is read as JSON if it parses as a JSON
+  value, otherwise as a string: the output text `true` is the boolean `true`, `high` is the string
+  `"high"`. Path segments after the output name select into the parsed value.
 - Typing is strict: no truthiness and no coercion. `==` and `!=` compare two scalars of any type
   (different types are unequal); `<`, `<=`, `>`, `>=` need two numbers or two strings (code point
   order); `&&`, `||`, `!` need booleans; `in` tests whether a scalar is an element of a list
@@ -124,15 +133,15 @@ Under `payload: metadata` (section 10.2) the event MUST NOT contain the values t
 ## Examples
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha2
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
   name: ticket-triage
+spec:
   version: 0.1.0
   owner:
     team: example-team
   classification: internal
-spec:
   inputs:
     - name: ticket
       type: string
@@ -142,8 +151,6 @@ spec:
       model: { provider: example-provider, name: example-model }
     - id: writer
       model: { provider: example-provider, name: example-model }
-      tools:
-        - { type: mcp, server: tickets, tools: [add_comment] }
   workflow:
     - id: analysis
       agent: analyst
@@ -160,25 +167,30 @@ spec:
 ## Schema changes
 
 - `Step.properties.when`: `{ "type": "string", "minLength": 1, "maxLength": 512 }`.
-- Semantic rules: `when.syntax`, `when.limits`, `when.unknown-step`, `when.not-a-dependency`,
-  `when.undeclared-output`, warning `when.undeclared-input`.
+- Semantic rules: `when.syntax`, `when.limit-exceeded`, `when.forbidden-segment`,
+  `when.unknown-root`, `when.unknown-step`, `when.not-a-dependency`, `when.undeclared-output`,
+  warning `when.undeclared-input` (as implemented in `conformance/conditions.mjs`).
 
 ## Conformance impact
 
 - `core`: static rules above; runtime: readiness, skip reasons, success rule, evaluation errors.
 - `audit`: `step.skipped`.
-- New cases: `valid/5.6.1-step-when.yaml`; `invalid/3.10-when-syntax.yaml` (`when.syntax`),
-  `invalid/3.10-when-too-long.yaml` (`schema.maxLength`), `invalid/3.10-when-proto-segment.yaml`
-  (`when.syntax`), `invalid/3.10-when-step-not-dependency.yaml` (`when.not-a-dependency`),
-  `invalid/3.10-when-undeclared-output.yaml` (`when.undeclared-output`). Runtime tests once a
+- Cases in `conformance/v1alpha4/`: `valid/5.6.1-when-on-every-step-type.yaml`,
+  `valid/5.6.1-when-exists-and-in.yaml`, `valid/5.6.1-when-json-path-into-output.yaml`;
+  `invalid/3.12-when-syntax.yaml` (`when.syntax`), `invalid/3.12-when-too-long.yaml`
+  (`schema.maxLength`), `invalid/3.12-when-forbidden-segment.yaml` (`when.forbidden-segment`),
+  `invalid/3.12-when-unknown-root.yaml` (`when.unknown-root`),
+  `invalid/3.12-when-not-dependency.yaml` (`when.not-a-dependency`),
+  `invalid/3.12-when-undeclared-output.yaml` (`when.undeclared-output`). Runtime tests once a
   runtime suite exists: false condition skips and execution succeeds; evaluation error fails; output
   of skipped step inside `exists()`.
 
 ## Compatibility and migration
 
-Additive for manifests: `v1alpha1` manifests have no `when`. The success rule changes only for
-manifests that use `when`. A `v1alpha1` runtime rejects `when` as an unknown field (fail closed),
-which is the intended behaviour.
+Additive for manifests: manifests of older versions have no `when`, and `migrate` converts them
+to `v1alpha4` unchanged apart from `apiVersion`. The success rule changes only for manifests that
+use `when`. A runtime of an older version rejects `when` as an unknown field (fail closed), which
+is the intended behaviour.
 
 ## Security considerations
 
@@ -224,10 +236,19 @@ No implementation of this AEP exists.
 
 ## Decision
 
+2026-11-27 ([D23](../docs/decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4)):
+accepted for `v1alpha4` by the project lead, in the form written into the
+`v1alpha4` draft (section 3.12 and the changes to 5.6.1, 5.6.3 and 10.4). The external review that
+D16 requires was not held; reviews in the roles above are still invited, and their findings are
+handled as errata of the `v1alpha4` draft. Open questions: 1. `when` is allowed on every step type,
+including approval steps. 2. `execution.environment` is the only execution fact. 3. Not part of
+`v1alpha4`.
+
 2026-11-25 ([D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)): the target is now `v1alpha3`, the current draft. The owner direction below is kept as recorded.
 
 Owner direction of 2026-10-10: the grammar is a restricted expression grammar defined in this AEP, not CEL (D5); an execution may succeed when steps are skipped by a condition (D6). Target `v1alpha2`. Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 
 ## References
 
-- Spec sections 3.9, 5.6, 10.4.
+- [spec/v1alpha4 section 3.12](../spec/v1alpha4/README.md#312-conditions), sections 3.9, 5.6.3,
+  10.4.

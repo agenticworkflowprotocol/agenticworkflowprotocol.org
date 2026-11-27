@@ -1,4 +1,4 @@
-# AWP JSON Schemas (v1alpha1, v1alpha2, v1alpha3)
+# AWP JSON Schemas (v1alpha1 to v1alpha4)
 
 There is one JSON Schema (draft 2020-12) per API version. Each expresses the **structural** rules of
 its specification. Rules that JSON Schema cannot express are listed below as **semantic validation
@@ -11,6 +11,7 @@ document.
 | [`awp.v1alpha1.json`](awp.v1alpha1.json) | `awp.agenticworkflowprotocol.org/v1alpha1` | [spec/v1alpha1](../spec/v1alpha1/README.md) |
 | [`awp.v1alpha2.json`](awp.v1alpha2.json) | `awp.agenticworkflowprotocol.org/v1alpha2` | [spec/v1alpha2](../spec/v1alpha2/README.md): v1alpha1 plus `forEach` (`$defs/ForEach`, new expression references `forEach.*`) |
 | [`awp.v1alpha3.json`](awp.v1alpha3.json) | `awp.agenticworkflowprotocol.org/v1alpha3` | [spec/v1alpha3](../spec/v1alpha3/README.md): v1alpha2 with the Kubernetes resource model alignment (working draft, see below) |
+| [`awp.v1alpha4.json`](awp.v1alpha4.json) | `awp.agenticworkflowprotocol.org/v1alpha4` | v1alpha3 plus step conditions (`Step.when`) and workflow steps (`type: workflow`, `$defs/WorkflowCall`); next draft, see below |
 
 **The schema is normative for document structure**: field names, types, required fields, closed
 objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/decisions.md#d2-json-schema-is-normative-for-structure)).
@@ -34,7 +35,7 @@ A document whose `apiVersion` matches no schema is rejected at `/apiVersion` (sp
 reference checker reports it against the latest schema.
 | `schema/awp.v1alpha3.json` (and the same `$defs`) | Manifests of `awp.agenticworkflowprotocol.org/v1alpha3` ([specification](../spec/v1alpha3/README.md), working draft). |
 | `schema/awp.v1alpha3.json#/$defs/WorkflowRun` | An execution object of kind `WorkflowRun` (spec v1alpha3 section 10.8). `ManifestStatus` and `WorkflowRunStatus` describe the `status` a runtime writes; validators ignore `status`. |
-| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions for `v1alpha3` (`workflows`, `agents`, `policies`, `workflowruns`), generated from `awp.v1alpha3.json` (see below). |
+| `schema/crd/*.yaml` | Kubernetes CustomResourceDefinitions (`workflows`, `agents`, `policies`, `workflowruns`) that serve `v1alpha3` (storage version) and `v1alpha4`, generated from `awp.v1alpha3.json` and `awp.v1alpha4.json` (see below). |
 
 YAML manifests are parsed first (YAML 1.2 core schema; custom tags and non-string keys rejected,
 spec 3.1) and the resulting JSON value is validated. Every document of a multi-document file is
@@ -57,7 +58,7 @@ complete pipeline: YAML restrictions, then this schema, then the semantic rules.
 - **Step types** are checked with `if`/`then`: a step has exactly the fields of its type (spec
   5.6.1). `type` defaults to `agent`.
 - **Expressions.** Expression-enabled fields (`task`, `env` values, `permissions.tools.*.resources`
-  entries, `approval.message`) use the `Expression` pattern: any `${{ ... }}` must contain exactly
+  entries, `approval.message`, in `v1alpha4` also `workflow.inputs` values) use the `Expression` pattern: any `${{ ... }}` must contain exactly
   one of `inputs.<name>`, `steps.<id>.outputs.<name>`, `execution.id`, `execution.environment`
   (spec 3.9). Output names are otherwise unconstrained by the specification; inside expressions
   they must not contain whitespace, `.`, `{`, `}` or `$`. Fields that are not expression-enabled
@@ -102,6 +103,23 @@ The semantic rules below apply to every version. In `v1alpha3` their paths use `
 `v1alpha1` uses `metadata` (for example `/spec/risk/level`), and `extensions` objects are skipped
 where `v1alpha1` skips `x-` fields.
 
+## v1alpha4
+
+`awp.v1alpha4.json` is `awp.v1alpha3.json` plus two additions; everything else is unchanged.
+
+- **Conditions.** Every step may have `when` (string, 1 to 512 characters). The whole field is a
+  condition in the grammar of spec v1alpha4 section 3.12, written without `${{ }}`. Parsing, the
+  remaining limits (128 tokens, nesting depth 16, 16 path segments, 32 list items, string
+  literals of at most 256 characters, indexes at most 10000) and the references are semantic rules
+  (`when.*`, implemented in `conformance/conditions.mjs`).
+- **Workflow steps.** `type: workflow` requires `workflow` (`$defs/WorkflowCall`: `ref` as a
+  DNS-1123 label like `metadata.name`, optional `version`, `inputs` with expression-enabled values,
+  `wait`, `extensions`) and forbids `agent`, `task`, `command`, `image`, `env`, `workingDir`,
+  `approval`, `input` and `forEach`; every other step type forbids `workflow`. Profile: `core`.
+
+Both CRD versions are generated from their own schema; the versions differ only by additions, so
+`v1alpha3` stays the storage version.
+
 ## Semantic validation rules
 
 These rules apply to documents that are structurally valid. They are implemented by the reference
@@ -140,6 +158,14 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `expr.iteration-outside-forEach` | 3.9 | `v1alpha2`, `v1alpha3`: `forEach.*` references appear only in `task` and `env` values of a step that declares `forEach`. |
 | `forEach.input-not-array` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: an input referenced by `forEach.items` has `type: array`. |
 | `forEach.concurrency-exceeds-budget` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: `forEach.concurrency` does not exceed the effective `budget.resources.maxConcurrency` (minimum of workflow, agent and step; the workflow default is `1`). |
+| `when.syntax` | 3.12 (v1alpha4) | A step's `when` parses in the condition grammar. |
+| `when.limit-exceeded` | 3.12 (v1alpha4) | A condition stays within the limits: 128 tokens, nesting depth 16, 16 path segments, 32 list items, string literals of at most 256 characters, indexes at most 10000 (the 512 characters are `schema.maxLength`). |
+| `when.forbidden-segment` | 3.12 (v1alpha4) | No path segment `__proto__`, `prototype` or `constructor`. |
+| `when.unknown-root` | 3.12 (v1alpha4) | Paths start with `inputs.<name>`, `steps.<id>.outputs.<name>` or `execution.environment` (no `event`, no `execution.id`). |
+| `when.unknown-step` | 3.12 (v1alpha4) | `steps.<id>` in a condition names an existing step. |
+| `when.not-a-dependency` | 3.12 (v1alpha4) | `steps.<id>` in a condition is a direct or transitive dependency of the step. |
+| `when.undeclared-output` | 3.12 (v1alpha4) | `<name>` in `steps.<id>.outputs.<name>` is a declared output of `<id>`. |
+| `step.workflow-output` | 5.6.6 (v1alpha4) | A workflow step declares no outputs other than `executionId` and `status`. |
 
 ### Warnings
 
@@ -147,6 +173,7 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | ---- | ---- | ------- |
 | `mcp.server-unresolved` | 5.5.1 | A tool source names an MCP server that is not declared; it must be resolvable by runtime binding. |
 | `expr.undeclared-input` | 3.9 | An expression references an input that is not declared. |
+| `when.undeclared-input` | 3.12 (v1alpha4) | A condition reads an input that is not declared. |
 | `permissions.secret-undeclared` | 7.5.1 | `permissions.secrets` names a secret that is not declared. |
 | `digest.algorithm-unknown` | 3.8 | A digest uses an algorithm other than sha256, sha384, sha512. |
 | `lint.command-expression` | 5.6.2 | `command` contains `${{ }}`; commands are not expression-enabled and the text is passed literally. |

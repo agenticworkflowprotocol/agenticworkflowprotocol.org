@@ -1,7 +1,8 @@
-# AWP conformance material (v1alpha1, v1alpha2, v1alpha3)
+# AWP conformance material (v1alpha1 to v1alpha4)
 This directory contains the first machine-readable conformance material for
 [AWP v1alpha1](../spec/v1alpha1/README.md), [v1alpha2](../spec/v1alpha2/README.md) and the working draft
-[v1alpha3](../spec/v1alpha3/README.md): manifests that a validator must accept or reject, an
+[v1alpha3](../spec/v1alpha3/README.md), plus the next draft `v1alpha4` (schema, examples and suite;
+the specification text follows): manifests that a validator must accept or reject, an
 index describing the expected result, and a small reference checker. It tests **validators**
 (spec 11.1) and manifest rules. It is not a runtime test suite (spec 11.3 still describes
 conformance statements as self-declarations).
@@ -15,8 +16,10 @@ conformance statements as self-declarations).
 | `semantic.mjs` | The semantic rules ([catalogue](../schema/README.md#semantic-validation-rules)). |
 | `v1alpha2/` | The suite for `v1alpha2`: the `v1alpha1` cases with apiVersion `v1alpha2`, plus the cases for step iteration (`5.6.4-...`, `3.9-iteration-...`). |
 | `v1alpha3/` | The suite for `v1alpha3`, with the same layout (`valid/`, `invalid/`, `index.json`). Derived from the `v1alpha1` suite with `migrate.mjs`, plus cases for the document model of `v1alpha3`. | It also has the step iteration cases (`5.6.5-...`).
-| `migrate.mjs` | Mechanical migration of a `v1alpha1` manifest to `v1alpha3` (spec v1alpha3 section 14.1). |
-| `crd.mjs` | Generates the Kubernetes CustomResourceDefinitions in `schema/crd/` from `schema/awp.v1alpha3.json` and checks that they are current. |
+| `v1alpha4/` | The suite for `v1alpha4`: the `v1alpha3` cases with apiVersion `v1alpha4` (digest cases recomputed), plus the cases for step conditions (`3.12-when-...`, `5.6.1-when-...`) and workflow steps (`5.6.6-...`). |
+| `conditions.mjs` | Parser and static rules of step conditions (`when`, v1alpha4 spec 3.12), used by `semantic.mjs`. |
+| `migrate.mjs` | Mechanical migration of a `v1alpha1`, `v1alpha2` or `v1alpha3` manifest to `v1alpha4` (from `v1alpha3` only `apiVersion` changes). |
+| `crd.mjs` | Generates the Kubernetes CustomResourceDefinitions in `schema/crd/` from `schema/awp.v1alpha3.json` and `schema/awp.v1alpha4.json` and checks that they are current. |
 
 ## Run
 
@@ -27,7 +30,7 @@ npm test          # node conformance/awp-check.mjs run
 
 `npm test` validates every case of every suite, checks that every file in `valid/` and `invalid/`
 is indexed, validates the manifest examples of the specification (`spec/<version>/examples/`),
-checks that the examples and the valid cases of `v1alpha1` and `v1alpha2` still validate after
+checks that the examples and the valid cases of `v1alpha1`, `v1alpha2` and `v1alpha3` still validate after
 `migrate` (`migrate:` cases, so older versions stay convertible; digests are not verified there) and checks that the generated CustomResourceDefinitions
 are current. The checker selects the schema by
 `apiVersion`. It prints `PASS`/`FAIL` per case and exits with `1` if anything fails.
@@ -39,10 +42,10 @@ Check single files:
 node conformance/awp-check.mjs check [--profiles core,mcp] [--verify-digest] [--json] manifest.yaml
 ```
 
-Migrate a `v1alpha1` file to `v1alpha3` (YAML on stdout, review notes on stderr):
+Migrate a `v1alpha1`, `v1alpha2` or `v1alpha3` file to `v1alpha4` (YAML on stdout, review notes on stderr):
 
 ```sh
-node conformance/awp-check.mjs migrate manifest.yaml > manifest.v1alpha3.yaml
+node conformance/awp-check.mjs migrate manifest.yaml > manifest.v1alpha4.yaml
 ```
 
 ## Index format

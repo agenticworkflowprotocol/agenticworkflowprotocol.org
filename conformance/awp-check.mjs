@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Reference checker for AWP manifests (v1alpha1, v1alpha2, v1alpha3) and the conformance suites.
+// Reference checker for AWP manifests (v1alpha1 to v1alpha4) and the conformance suites.
 //
 //   node conformance/awp-check.mjs check   [--profiles core,governance] [--verify-digest] [--json] <file...>
 //   node conformance/awp-check.mjs run     [--json]
-//   node conformance/awp-check.mjs migrate <file>   (v1alpha1 or v1alpha2 -> v1alpha3, YAML on stdout)
+//   node conformance/awp-check.mjs migrate <file>   (v1alpha1, v1alpha2 or v1alpha3 -> v1alpha4, YAML on stdout)
 //
 // Layers: yaml (spec 3.1) -> schema (schema/awp.<version>.json, chosen by apiVersion)
 // -> semantic (conformance/semantic.mjs).
@@ -15,13 +15,13 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { parseAllDocuments, stringify, visit, isScalar, isCollection, LineCounter } from 'yaml';
 import { semanticCheck, KNOWN_PROFILES } from './semantic.mjs';
-import { migrateToV1alpha3 } from './migrate.mjs';
+import { migrateToV1alpha4 } from './migrate.mjs';
 import { checkCrds } from './crd.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
 const API_GROUP = 'awp.agenticworkflowprotocol.org';
-const VERSIONS = ['v1alpha1', 'v1alpha2', 'v1alpha3'];
+const VERSIONS = ['v1alpha1', 'v1alpha2', 'v1alpha3', 'v1alpha4'];
 
 const ajv = new Ajv2020({ allErrors: true, strict: true, strictRequired: false });
 const validators = new Map(VERSIONS.map(v => [
@@ -173,14 +173,14 @@ function runVersion(version) {
 }
 
 // Older versions stay convertible: the manifest examples of every version that `migrate` converts
-// from must validate after migration to its target version (spec v1alpha3 section 14).
-const MIGRATION_TARGET = 'v1alpha3';
+// from must validate after migration to its target version (spec v1alpha4 section 14).
+const MIGRATION_TARGET = 'v1alpha4';
 
 /** Migrates every manifest of a file and validates the result as MIGRATION_TARGET. */
 function migratedResult({ id, file, profiles }) {
   const loaded = loadManifests(fs.readFileSync(path.join(root, file), 'utf8'));
   if (loaded.some(l => l.value === undefined)) return { id, file, section: '14', expect: 'valid', ok: false, detail: 'not a valid YAML manifest file' };
-  const docs = loaded.map(({ value }) => stringify(migrateToV1alpha3(value).document, { lineWidth: 0 }));
+  const docs = loaded.map(({ value }) => stringify(migrateToV1alpha4(value).document, { lineWidth: 0 }));
   // Digests are not verified: migration changes the digest input, `migrate` asks to recompute it.
   const errs = errorsOf(validateText(docs.join('---\n'), file, { profiles }));
   return { id, file, section: '14', expect: 'valid', ok: errs.length === 0, detail: errs[0] ? formatDiag(errs[0]) : '' };
@@ -211,7 +211,7 @@ function runSuite({ json }) {
   const results = [
     ...runs.flatMap(r => r.results),
     ...migratedExampleResults(),
-    { id: 'crd:v1alpha3', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
+    { id: 'crd:v1alpha3,v1alpha4', file: 'schema/crd', section: '3.10', expect: 'fresh', ok: crdProblems.length === 0, detail: crdProblems.join('; ') },
   ];
   const failed = results.filter(r => !r.ok);
   if (json) {
@@ -224,7 +224,7 @@ function runSuite({ json }) {
   return failed.length === 0 ? 0 : 1;
 }
 
-/** Print the v1alpha3 form of every manifest in a v1alpha1 or v1alpha2 file; review notes go to stderr. */
+/** Print the v1alpha4 form of every manifest in a v1alpha1, v1alpha2 or v1alpha3 file; review notes go to stderr. */
 function migrateFile(file) {
   const text = fs.readFileSync(file, 'utf8');
   const header = text.match(/^(#[^\n]*\n)*/)[0];
@@ -234,7 +234,7 @@ function migrateFile(file) {
     return 1;
   }
   const docs = loaded.map(({ value }) => {
-    const { document, notes } = migrateToV1alpha3(value);
+    const { document, notes } = migrateToV1alpha4(value);
     for (const n of notes) console.error(`${file}: ${n}`);
     if (document.spec.integrity) console.error(`${file}: spec.integrity.digest must be recomputed (spec 9.1)`);
     return stringify(document, { lineWidth: 0 });
