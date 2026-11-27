@@ -1,6 +1,6 @@
-# Conformance case 3.10-when-not-dependency
-# Spec section 3.10: steps.<id> in when MUST be a direct or transitive dependency.
-# Expected: invalid (when.not-a-dependency at /spec/workflow/2/when)
+# Conformance case 3.12-when-unknown-root
+# Spec section 3.12: Conditions read only inputs, steps.<id>.outputs and execution.environment.
+# Expected: invalid (when.unknown-root at /spec/workflow/1/when)
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
@@ -51,16 +51,11 @@ spec:
       task: Analyze ${{ inputs.repo }}.
       outputs:
         - name: report
-    - id: plan
-      agent: worker
-      task: Plan the change.
-      outputs:
-        - name: plan
     - id: apply
       agent: worker
       dependsOn:
         - analyze
-      when: steps.plan.outputs.plan == "go"
+      when: 'event.action == "opened"'
       task: Apply the report.
   permissions:
     default: deny

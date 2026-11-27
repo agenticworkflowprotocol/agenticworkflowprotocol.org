@@ -1957,14 +1957,14 @@
     {
       "id": "5.6.1-when-exists-and-in",
       "file": "valid/5.6.1-when-exists-and-in.yaml",
-      "section": "3.10",
+      "section": "3.12",
       "rule": "Conditions combine exists(), in with literal lists, comparisons and boolean operators.",
       "expect": "valid"
     },
     {
       "id": "5.6.1-when-json-path-into-output",
       "file": "valid/5.6.1-when-json-path-into-output.yaml",
-      "section": "3.10",
+      "section": "3.12",
       "rule": "Path segments after the output name select into the output parsed as JSON; a transitive dependency may be read.",
       "expect": "valid"
     },
@@ -1983,54 +1983,54 @@
       "expect": "valid"
     },
     {
-      "id": "3.10-when-syntax",
-      "file": "invalid/3.10-when-syntax.yaml",
-      "section": "3.10",
+      "id": "3.12-when-syntax",
+      "file": "invalid/3.12-when-syntax.yaml",
+      "section": "3.12",
       "rule": "when MUST parse in the condition grammar.",
       "expect": "invalid",
       "code": "when.syntax",
       "path": "/spec/workflow/1/when"
     },
     {
-      "id": "3.10-when-too-long",
-      "file": "invalid/3.10-when-too-long.yaml",
-      "section": "3.10",
+      "id": "3.12-when-too-long",
+      "file": "invalid/3.12-when-too-long.yaml",
+      "section": "3.12",
       "rule": "A condition has at most 512 characters.",
       "expect": "invalid",
       "code": "schema.maxLength",
       "path": "/spec/workflow/1/when"
     },
     {
-      "id": "3.10-when-not-dependency",
-      "file": "invalid/3.10-when-not-dependency.yaml",
-      "section": "3.10",
+      "id": "3.12-when-not-dependency",
+      "file": "invalid/3.12-when-not-dependency.yaml",
+      "section": "3.12",
       "rule": "steps.<id> in when MUST be a direct or transitive dependency.",
       "expect": "invalid",
       "code": "when.not-a-dependency",
       "path": "/spec/workflow/2/when"
     },
     {
-      "id": "3.10-when-undeclared-output",
-      "file": "invalid/3.10-when-undeclared-output.yaml",
-      "section": "3.10",
+      "id": "3.12-when-undeclared-output",
+      "file": "invalid/3.12-when-undeclared-output.yaml",
+      "section": "3.12",
       "rule": "<name> in steps.<id>.outputs.<name> MUST be a declared output of <id>.",
       "expect": "invalid",
       "code": "when.undeclared-output",
       "path": "/spec/workflow/1/when"
     },
     {
-      "id": "3.10-when-forbidden-segment",
-      "file": "invalid/3.10-when-forbidden-segment.yaml",
-      "section": "3.10",
+      "id": "3.12-when-forbidden-segment",
+      "file": "invalid/3.12-when-forbidden-segment.yaml",
+      "section": "3.12",
       "rule": "Path segments __proto__, prototype and constructor MUST be rejected.",
       "expect": "invalid",
       "code": "when.forbidden-segment",
       "path": "/spec/workflow/1/when"
     },
     {
-      "id": "3.10-when-unknown-root",
-      "file": "invalid/3.10-when-unknown-root.yaml",
-      "section": "3.10",
+      "id": "3.12-when-unknown-root",
+      "file": "invalid/3.12-when-unknown-root.yaml",
+      "section": "3.12",
       "rule": "Conditions read only inputs, steps.<id>.outputs and execution.environment.",
       "expect": "invalid",
       "code": "when.unknown-root",

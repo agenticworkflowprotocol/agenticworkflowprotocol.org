@@ -1,4 +1,4 @@
-// Static checks of step conditions (`when`, v1alpha4 spec 3.10): tokenizer and parser of the
+// Static checks of step conditions (`when`, v1alpha4 spec 3.12): tokenizer and parser of the
 // restricted condition grammar with its limits. Evaluation is the runtime's job; this module only
 // decides whether a condition is well-formed and which paths it reads.
 //
@@ -221,21 +221,21 @@ export function parseCondition(text) {
 }
 
 /**
- * Static rules of a step's `when` (v1alpha4 spec 3.10): it parses, steps.<id> is a direct or
+ * Static rules of a step's `when` (v1alpha4 spec 3.12): it parses, steps.<id> is a direct or
  * transitive dependency with a declared output <name>, and inputs.<name> is declared (warning).
  * @param {{text: string, path: string, stepId: string, stepIds: Map, dependencies: Set<string>,
  *   outputsOf: Map<string, Set<string>>, inputNames: Set<string>, err: Function, warn: Function}} c
  */
 export function checkStepCondition(c) {
   const parsed = parseCondition(c.text);
-  if (!parsed.ok) return c.err(parsed.code, '3.10', c.path, `when: ${parsed.message}`);
+  if (!parsed.ok) return c.err(parsed.code, '3.12', c.path, `when: ${parsed.message}`);
   for (const p of parsed.paths) {
     if (p.root === 'inputs' && !c.inputNames.has(p.name)) {
-      c.warn('when.undeclared-input', '3.10', c.path, `condition reads undeclared input "${p.name}"`);
+      c.warn('when.undeclared-input', '3.12', c.path, `condition reads undeclared input "${p.name}"`);
     }
     if (p.root !== 'steps') continue;
-    if (!c.stepIds.has(p.stepId)) c.err('when.unknown-step', '3.10', c.path, `condition reads non-existent step "${p.stepId}"`);
-    else if (!c.dependencies.has(p.stepId)) c.err('when.not-a-dependency', '3.10', c.path, `step "${c.stepId}" reads steps.${p.stepId} in when but does not depend on it (directly or transitively)`);
-    else if (!c.outputsOf.get(p.stepId).has(p.name)) c.err('when.undeclared-output', '3.10', c.path, `step "${p.stepId}" does not declare output "${p.name}"`);
+    if (!c.stepIds.has(p.stepId)) c.err('when.unknown-step', '3.12', c.path, `condition reads non-existent step "${p.stepId}"`);
+    else if (!c.dependencies.has(p.stepId)) c.err('when.not-a-dependency', '3.12', c.path, `step "${c.stepId}" reads steps.${p.stepId} in when but does not depend on it (directly or transitively)`);
+    else if (!c.outputsOf.get(p.stepId).has(p.name)) c.err('when.undeclared-output', '3.12', c.path, `step "${p.stepId}" does not declare output "${p.name}"`);
   }
 }

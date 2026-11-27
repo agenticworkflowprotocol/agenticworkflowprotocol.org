@@ -1,6 +1,6 @@
-# Conformance case 3.10-when-too-long
-# Spec section 3.10: A condition has at most 512 characters.
-# Expected: invalid (schema.maxLength at /spec/workflow/1/when)
+# Conformance case 3.12-when-not-dependency
+# Spec section 3.12: steps.<id> in when MUST be a direct or transitive dependency.
+# Expected: invalid (when.not-a-dependency at /spec/workflow/2/when)
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
@@ -51,11 +51,16 @@ spec:
       task: Analyze ${{ inputs.repo }}.
       outputs:
         - name: report
+    - id: plan
+      agent: worker
+      task: Plan the change.
+      outputs:
+        - name: plan
     - id: apply
       agent: worker
       dependsOn:
         - analyze
-      when: 'steps.analyze.outputs.report == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" || steps.analyze.outputs.report == "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" || steps.analyze.outputs.report == "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"'
+      when: steps.plan.outputs.plan == "go"
       task: Apply the report.
   permissions:
     default: deny

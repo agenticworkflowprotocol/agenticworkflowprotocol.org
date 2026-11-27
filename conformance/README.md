@@ -16,8 +16,8 @@ conformance statements as self-declarations).
 | `semantic.mjs` | The semantic rules ([catalogue](../schema/README.md#semantic-validation-rules)). |
 | `v1alpha2/` | The suite for `v1alpha2`: the `v1alpha1` cases with apiVersion `v1alpha2`, plus the cases for step iteration (`5.6.4-...`, `3.9-iteration-...`). |
 | `v1alpha3/` | The suite for `v1alpha3`, with the same layout (`valid/`, `invalid/`, `index.json`). Derived from the `v1alpha1` suite with `migrate.mjs`, plus cases for the document model of `v1alpha3`. | It also has the step iteration cases (`5.6.5-...`).
-| `v1alpha4/` | The suite for `v1alpha4`: the `v1alpha3` cases with apiVersion `v1alpha4` (digest cases recomputed), plus the cases for step conditions (`3.10-when-...`, `5.6.1-when-...`) and workflow steps (`5.6.6-...`). |
-| `conditions.mjs` | Parser and static rules of step conditions (`when`, v1alpha4 spec 3.10), used by `semantic.mjs`. |
+| `v1alpha4/` | The suite for `v1alpha4`: the `v1alpha3` cases with apiVersion `v1alpha4` (digest cases recomputed), plus the cases for step conditions (`3.12-when-...`, `5.6.1-when-...`) and workflow steps (`5.6.6-...`). |
+| `conditions.mjs` | Parser and static rules of step conditions (`when`, v1alpha4 spec 3.12), used by `semantic.mjs`. |
 | `migrate.mjs` | Mechanical migration of a `v1alpha1`, `v1alpha2` or `v1alpha3` manifest to `v1alpha4` (from `v1alpha3` only `apiVersion` changes). |
 | `crd.mjs` | Generates the Kubernetes CustomResourceDefinitions in `schema/crd/` from `schema/awp.v1alpha3.json` and `schema/awp.v1alpha4.json` and checks that they are current. |
 

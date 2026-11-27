@@ -1,6 +1,6 @@
-# Conformance case 3.10-when-undeclared-output
-# Spec section 3.10: <name> in steps.<id>.outputs.<name> MUST be a declared output of <id>.
-# Expected: invalid (when.undeclared-output at /spec/workflow/1/when)
+# Conformance case 3.12-when-too-long
+# Spec section 3.12: A condition has at most 512 characters.
+# Expected: invalid (schema.maxLength at /spec/workflow/1/when)
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
@@ -55,7 +55,7 @@ spec:
       agent: worker
       dependsOn:
         - analyze
-      when: 'steps.analyze.outputs.severity == "high"'
+      when: 'steps.analyze.outputs.report == "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" || steps.analyze.outputs.report == "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" || steps.analyze.outputs.report == "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"'
       task: Apply the report.
   permissions:
     default: deny

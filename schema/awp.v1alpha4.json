@@ -1298,7 +1298,7 @@
           "minimum": 0
         },
         "when": {
-          "description": "Condition (spec 3.10): the step runs only if it evaluates to true. The whole field is the expression, without ${{ }}.",
+          "description": "Condition (spec 3.12): the step runs only if it evaluates to true. The whole field is the expression, without ${{ }}.",
           "type": "string",
           "minLength": 1,
           "maxLength": 512

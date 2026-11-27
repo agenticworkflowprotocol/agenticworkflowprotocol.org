@@ -108,7 +108,7 @@ where `v1alpha1` skips `x-` fields.
 `awp.v1alpha4.json` is `awp.v1alpha3.json` plus two additions; everything else is unchanged.
 
 - **Conditions.** Every step may have `when` (string, 1 to 512 characters). The whole field is a
-  condition in the grammar of spec v1alpha4 section 3.10, written without `${{ }}`. Parsing, the
+  condition in the grammar of spec v1alpha4 section 3.12, written without `${{ }}`. Parsing, the
   remaining limits (128 tokens, nesting depth 16, 16 path segments, 32 list items, string
   literals of at most 256 characters, indexes at most 10000) and the references are semantic rules
   (`when.*`, implemented in `conformance/conditions.mjs`).
@@ -158,13 +158,13 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | `expr.iteration-outside-forEach` | 3.9 | `v1alpha2`, `v1alpha3`: `forEach.*` references appear only in `task` and `env` values of a step that declares `forEach`. |
 | `forEach.input-not-array` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: an input referenced by `forEach.items` has `type: array`. |
 | `forEach.concurrency-exceeds-budget` | 5.6.4 (v1alpha2), 5.6.5 (v1alpha3) | `v1alpha2`, `v1alpha3`: `forEach.concurrency` does not exceed the effective `budget.resources.maxConcurrency` (minimum of workflow, agent and step; the workflow default is `1`). |
-| `when.syntax` | 3.10 (v1alpha4) | A step's `when` parses in the condition grammar. |
-| `when.limit-exceeded` | 3.10 (v1alpha4) | A condition stays within the limits: 128 tokens, nesting depth 16, 16 path segments, 32 list items, string literals of at most 256 characters, indexes at most 10000 (the 512 characters are `schema.maxLength`). |
-| `when.forbidden-segment` | 3.10 (v1alpha4) | No path segment `__proto__`, `prototype` or `constructor`. |
-| `when.unknown-root` | 3.10 (v1alpha4) | Paths start with `inputs.<name>`, `steps.<id>.outputs.<name>` or `execution.environment` (no `event`, no `execution.id`). |
-| `when.unknown-step` | 3.10 (v1alpha4) | `steps.<id>` in a condition names an existing step. |
-| `when.not-a-dependency` | 3.10 (v1alpha4) | `steps.<id>` in a condition is a direct or transitive dependency of the step. |
-| `when.undeclared-output` | 3.10 (v1alpha4) | `<name>` in `steps.<id>.outputs.<name>` is a declared output of `<id>`. |
+| `when.syntax` | 3.12 (v1alpha4) | A step's `when` parses in the condition grammar. |
+| `when.limit-exceeded` | 3.12 (v1alpha4) | A condition stays within the limits: 128 tokens, nesting depth 16, 16 path segments, 32 list items, string literals of at most 256 characters, indexes at most 10000 (the 512 characters are `schema.maxLength`). |
+| `when.forbidden-segment` | 3.12 (v1alpha4) | No path segment `__proto__`, `prototype` or `constructor`. |
+| `when.unknown-root` | 3.12 (v1alpha4) | Paths start with `inputs.<name>`, `steps.<id>.outputs.<name>` or `execution.environment` (no `event`, no `execution.id`). |
+| `when.unknown-step` | 3.12 (v1alpha4) | `steps.<id>` in a condition names an existing step. |
+| `when.not-a-dependency` | 3.12 (v1alpha4) | `steps.<id>` in a condition is a direct or transitive dependency of the step. |
+| `when.undeclared-output` | 3.12 (v1alpha4) | `<name>` in `steps.<id>.outputs.<name>` is a declared output of `<id>`. |
 | `step.workflow-output` | 5.6.6 (v1alpha4) | A workflow step declares no outputs other than `executionId` and `status`. |
 
 ### Warnings
@@ -173,7 +173,7 @@ identifiers for diagnostics ([docs/cli.md](../docs/cli.md#3-diagnostics)).
 | ---- | ---- | ------- |
 | `mcp.server-unresolved` | 5.5.1 | A tool source names an MCP server that is not declared; it must be resolvable by runtime binding. |
 | `expr.undeclared-input` | 3.9 | An expression references an input that is not declared. |
-| `when.undeclared-input` | 3.10 (v1alpha4) | A condition reads an input that is not declared. |
+| `when.undeclared-input` | 3.12 (v1alpha4) | A condition reads an input that is not declared. |
 | `permissions.secret-undeclared` | 7.5.1 | `permissions.secrets` names a secret that is not declared. |
 | `digest.algorithm-unknown` | 3.8 | A digest uses an algorithm other than sha256, sha384, sha512. |
 | `lint.command-expression` | 5.6.2 | `command` contains `${{ }}`; commands are not expression-enabled and the text is passed literally. |

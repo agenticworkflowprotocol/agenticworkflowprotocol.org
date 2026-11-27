@@ -1,5 +1,5 @@
 # Conformance case 5.6.1-when-json-path-into-output
-# Spec section 3.10: Path segments after the output name select into the output parsed as JSON; a transitive dependency may be read.
+# Spec section 3.12: Path segments after the output name select into the output parsed as JSON; a transitive dependency may be read.
 # Expected: valid
 apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow

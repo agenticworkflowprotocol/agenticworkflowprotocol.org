@@ -2346,7 +2346,7 @@ spec:
                         minimum: 0
                         type: integer
                       when:
-                        description: "Condition (spec 3.10): the step runs only if it evaluates to true. The whole field is the expression, without ${{ }}."
+                        description: "Condition (spec 3.12): the step runs only if it evaluates to true. The whole field is the expression, without ${{ }}."
                         minLength: 1
                         maxLength: 512
                         type: string
