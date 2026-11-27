@@ -2,7 +2,7 @@
 title: "A2A"
 description: "Remote agents over the Agent2Agent protocol."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -19,4 +19,4 @@ agents:
 
 Messages to a remote agent are the action `a2a.<id>.send` and are subject to data policy. The local runtime cannot enforce governance inside the remote agent; treat it as an external party.
 
-Normative text: [Remote agents (A2A)](/specification/v1alpha3/#544-remote-agents-a2a).
+Normative text: [Remote agents (A2A)](/specification/v1alpha4/#544-remote-agents-a2a).

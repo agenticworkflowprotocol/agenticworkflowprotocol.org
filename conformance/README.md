@@ -1,8 +1,8 @@
 # AWP conformance material (v1alpha1 to v1alpha4)
 This directory contains the first machine-readable conformance material for
-[AWP v1alpha1](../spec/v1alpha1/README.md), [v1alpha2](../spec/v1alpha2/README.md) and the working draft
-[v1alpha3](../spec/v1alpha3/README.md), plus the next draft `v1alpha4` (schema, examples and suite;
-the specification text follows): manifests that a validator must accept or reject, an
+[AWP v1alpha1](../spec/v1alpha1/README.md), [v1alpha2](../spec/v1alpha2/README.md),
+[v1alpha3](../spec/v1alpha3/README.md) and the current draft [v1alpha4](../spec/v1alpha4/README.md):
+manifests that a validator must accept or reject, an
 index describing the expected result, and a small reference checker. It tests **validators**
 (spec 11.1) and manifest rules. It is not a runtime test suite (spec 11.3 still describes
 conformance statements as self-declarations).

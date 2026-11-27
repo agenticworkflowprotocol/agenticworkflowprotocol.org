@@ -2,15 +2,15 @@
 title: "Specification"
 description: "The AWP specification: versions, status and licenses."
 banner:
-  content: "Draft - v1alpha3 is the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4 is the current draft. Fields and semantics may change before v1beta1."
 ---
 
 The normative text lives in the [`spec/`]( https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/tree/main/spec ) directory of the repository and is rendered on this site without copies.
 
 | API version | Status | Text |
 | ----------- | ------ | ---- |
-| `v1alpha4` | **Next draft / alpha**: `v1alpha3` plus conditional steps (`when`) and workflow steps (decision D23); not yet the default | [Specification v1alpha4](/specification/v1alpha4/) |
-| `v1alpha3` | **Current draft / alpha**, may change incompatibly | [Specification v1alpha3](/specification/v1alpha3/), [how it fits together](/specification/v1alpha3-guide/), [migrating](/specification/migrating-to-v1alpha3/) |
+| `v1alpha4` | **Current draft / alpha**: `v1alpha3` plus conditional steps (`when`) and workflow steps (decisions D23, D24); may change incompatibly | [Specification v1alpha4](/specification/v1alpha4/), [what's new](/specification/v1alpha4-whats-new/), [migrating](/specification/migrating-to-v1alpha4/) |
+| `v1alpha3` | **Draft / alpha**, the Kubernetes resource model; errata only | [Specification v1alpha3](/specification/v1alpha3/), [how it fits together](/specification/v1alpha3-guide/), [migrating](/specification/migrating-to-v1alpha3/) |
 | `v1alpha2` | **Draft / alpha**, `v1alpha1` plus step iteration; errata only | [Specification v1alpha2](/specification/v1alpha2/) |
 | `v1alpha1` | **Draft / alpha**; errata only | [Specification v1alpha1](/specification/v1alpha1/) |
 

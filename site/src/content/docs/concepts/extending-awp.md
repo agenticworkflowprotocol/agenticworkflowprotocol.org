@@ -2,23 +2,23 @@
 title: "Extending AWP"
 description: "How implementations and organisations extend and refine AWP: extension fields, stricter rules, runtime-defined parts and the path into the core."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 AWP is meant to be extended and refined. The core stays small and vendor-neutral; implementations and organisations add what they need on top. One rule limits every extension: **it may add or restrict, never weaken.** A manifest that passed review must not do more on another runtime than its authors expected.
 
 There are four ways to extend AWP, from local to standard.
 
 :::note[Proposed: AEP-0021]
-[AEP-0021](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0021-extension-model.md) proposes to replace `extensions` objects with typed references at defined extension points, domain-prefixed values and attached policies, as the Kubernetes Gateway API does. It is a Draft and not part of `v1alpha3`.
+[AEP-0021](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0021-extension-model.md) proposes to replace `extensions` objects with typed references at defined extension points, domain-prefixed values and attached policies, as the Kubernetes Gateway API does. It is a Draft and not part of `v1alpha4`.
 :::
 
 ## 1. Extension fields (`extensions`)
 
-Any object in `spec` that has defined fields may carry an `extensions` object; its keys start with `x-` ([spec 3.3](/specification/v1alpha3/#33-unknown-fields-and-extensions)). `metadata` has none: non-identifying data belongs in annotations.
+Any object in `spec` that has defined fields may carry an `extensions` object; its keys start with `x-` ([spec 3.3](/specification/v1alpha4/#33-unknown-fields-and-extensions)). `metadata` has none: non-identifying data belongs in annotations.
 
 <!-- awp-check profiles=core -->
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
   name: review
@@ -50,19 +50,19 @@ spec:
 
 Many refinements need no extension, because AWP lets every level only narrow what the level above allows:
 
-- **Budgets** on workflow, agent and step: the effective limit is the minimum ([spec 5.7](/specification/v1alpha3/#57-budgets-and-resources)).
-- **Permissions** on workflow and agent: an action needs both; `allow: false` wins ([spec 7.5](/specification/v1alpha3/#75-tool-governance-permissions)).
-- **Action groups** map concrete tools to well-known actions, so rules can be written once for `git.merge` or `production.deploy` ([spec 5.5.4](/specification/v1alpha3/#554-action-groups)).
-- **`Policy` manifests** hold an organisation's own rules (deny, require approval, data and model conditions) and are included by workflows ([spec 8](/specification/v1alpha3/#8-kind-policy-and-policy-evaluation), `governance` profile).
+- **Budgets** on workflow, agent and step: the effective limit is the minimum ([spec 5.7](/specification/v1alpha4/#57-budgets-and-resources)).
+- **Permissions** on workflow and agent: an action needs both; `allow: false` wins ([spec 7.5](/specification/v1alpha4/#75-tool-governance-permissions)).
+- **Action groups** map concrete tools to well-known actions, so rules can be written once for `git.merge` or `production.deploy` ([spec 5.5.4](/specification/v1alpha4/#554-action-groups)).
+- **`Policy` manifests** hold an organisation's own rules (deny, require approval, data and model conditions) and are included by workflows ([spec 8](/specification/v1alpha4/#8-kind-policy-and-policy-evaluation), `governance` profile).
 
 ## 3. Runtime-defined parts
 
 Some things are deliberately left to the runtime, so that the manifest stays portable:
 
-- binding MCP servers that a manifest does not declare ([spec 5.5.1](/specification/v1alpha3/#551-mcp-servers));
-- built-in tools and their action identifiers ([spec 5.5.2](/specification/v1alpha3/#552-tool-sources));
+- binding MCP servers that a manifest does not declare ([spec 5.5.1](/specification/v1alpha4/#551-mcp-servers));
+- built-in tools and their action identifiers ([spec 5.5.2](/specification/v1alpha4/#552-tool-sources));
 - where steps run ([execution placement](/implementations/execution-placement/));
-- additional audit event types with a reverse-domain prefix, for example `com.example.cache.hit` ([spec 10.4](/specification/v1alpha3/#104-event-types));
+- additional audit event types with a reverse-domain prefix, for example `com.example.cache.hit` ([spec 10.4](/specification/v1alpha4/#104-event-types));
 - rules of a deployment that are stricter than the specification, for example "every MCP tool source lists its tools". A runtime may reject a valid manifest for such a rule if the diagnostic names it; it may never execute a manifest with fewer restrictions.
 
 ## 4. Into the core: AEPs

@@ -1,0 +1,23 @@
+---
+title: "Analyse, then act"
+description: "Annotated workflow that rates the risk of a CVE and starts the fix workflow only when the repository is affected."
+banner:
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
+---
+
+import { Code } from '@astrojs/starlight/components';
+import example from '../../../generated/examples/cve-risk-then-fix.yaml?raw';
+
+
+<Code code={example} lang="yaml" title="cve-risk-then-fix.yaml" />
+
+## Walkthrough
+
+- **`spec.inputs`**: `repository` and `cve`, validated before the run; `cve` must match a pattern.
+- **`spec.agents`**: an analyst with read-only GitHub tools that completes its step with `affected` and `risk`, and a writer for the report.
+- **`risk`**: the analysis step declares the outputs `affected` and `risk`.
+- **`report`**: runs after every analysis and reads both outputs through expressions.
+- **`fix`**: a workflow step (`type: workflow`) that starts the workflow `cve-fixer` as a child execution and waits for it. Its `when` condition reads the output text `true` as the boolean `true`; if the repository is not affected, the step is skipped with reason `condition` and the execution still succeeds.
+- **`spec.permissions`**: default deny; the GitHub read tools and `workflow.start`, the action of starting the child, are allowed. The child runs with its own permissions and budget; its cost also counts against the budget of this workflow.
+
+See [v1alpha4: what's new](/specification/v1alpha4-whats-new/), [Conditions](/specification/v1alpha4/#312-conditions) and [Workflow steps](/specification/v1alpha4/#566-workflow-steps).

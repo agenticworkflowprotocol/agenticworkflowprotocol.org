@@ -2,7 +2,7 @@
 title: "Tool governance"
 description: "Permissions per action, with default deny, network and filesystem limits."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -29,7 +29,7 @@ permissions:
 - Permissions grant, policies restrict. Without a `permissions` object every action of the exposed tools is allowed by permissions; `awp lint` warns about this.
 
 
-Normative text: [Tool governance: permissions](/specification/v1alpha3/#75-tool-governance-permissions).
+Normative text: [Tool governance: permissions](/specification/v1alpha4/#75-tool-governance-permissions).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

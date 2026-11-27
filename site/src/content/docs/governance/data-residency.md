@@ -2,7 +2,7 @@
 title: "Data residency"
 description: "Where data may be processed and by which providers."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -24,7 +24,7 @@ dataPolicy:
 - `forbiddenProviders` takes precedence over `allowedProviders`.
 
 
-Normative text: [Data residency and processing](/specification/v1alpha3/#73-data-residency-and-processing).
+Normative text: [Data residency and processing](/specification/v1alpha4/#73-data-residency-and-processing).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

@@ -2,7 +2,7 @@
 title: "Model governance"
 description: "Allowed providers and models, approval status and requirements."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -28,7 +28,7 @@ modelPolicy:
 - A model can carry `approval`, `evaluation` and `region` metadata; expired approvals do not satisfy a requirement.
 
 
-Normative text: [Model governance](/specification/v1alpha3/#74-model-governance).
+Normative text: [Model governance](/specification/v1alpha4/#74-model-governance).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

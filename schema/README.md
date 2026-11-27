@@ -10,8 +10,8 @@ document.
 | ------ | ----------- | ------------- |
 | [`awp.v1alpha1.json`](awp.v1alpha1.json) | `awp.agenticworkflowprotocol.org/v1alpha1` | [spec/v1alpha1](../spec/v1alpha1/README.md) |
 | [`awp.v1alpha2.json`](awp.v1alpha2.json) | `awp.agenticworkflowprotocol.org/v1alpha2` | [spec/v1alpha2](../spec/v1alpha2/README.md): v1alpha1 plus `forEach` (`$defs/ForEach`, new expression references `forEach.*`) |
-| [`awp.v1alpha3.json`](awp.v1alpha3.json) | `awp.agenticworkflowprotocol.org/v1alpha3` | [spec/v1alpha3](../spec/v1alpha3/README.md): v1alpha2 with the Kubernetes resource model alignment (working draft, see below) |
-| [`awp.v1alpha4.json`](awp.v1alpha4.json) | `awp.agenticworkflowprotocol.org/v1alpha4` | v1alpha3 plus step conditions (`Step.when`) and workflow steps (`type: workflow`, `$defs/WorkflowCall`); next draft, see below |
+| [`awp.v1alpha3.json`](awp.v1alpha3.json) | `awp.agenticworkflowprotocol.org/v1alpha3` | [spec/v1alpha3](../spec/v1alpha3/README.md): v1alpha2 with the Kubernetes resource model alignment (errata only, see below) |
+| [`awp.v1alpha4.json`](awp.v1alpha4.json) | `awp.agenticworkflowprotocol.org/v1alpha4` | [spec/v1alpha4](../spec/v1alpha4/README.md): v1alpha3 plus step conditions (`Step.when`) and workflow steps (`type: workflow`, `$defs/WorkflowCall`); current draft, see below |
 
 **The schema is normative for document structure**: field names, types, required fields, closed
 objects, enumerations and patterns (decided 2026-10-10, [decision log D2](../docs/decisions.md#d2-json-schema-is-normative-for-structure)).

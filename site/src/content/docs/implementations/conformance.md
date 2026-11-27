@@ -2,7 +2,7 @@
 title: "Conformance"
 description: "Profiles and conformance statements."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 | Profile | Depends on | Covers |
@@ -23,7 +23,7 @@ implementation:
   version: 0.4.0
   url: https://runtime.example.org
 conformance:
-  awp: v1alpha3
+  awp: v1alpha4
   profiles:
     - core
     - governance
@@ -37,9 +37,9 @@ conformance:
 
 `limits` states output limits above the minimums of the specification, and `executionObjects` states that executions are exposed as `WorkflowRun` objects.
 
-The conformance suite in the repository tests validators and manifest rules. Until a public runtime test suite exists, conformance statements are self-declarations. No implementation is conformant to `v1alpha3` today.
+The conformance suite in the repository tests validators and manifest rules. Until a public runtime test suite exists, conformance statements are self-declarations. No implementation is conformant to `v1alpha4` today.
 
-Normative text: [Conformance](/specification/v1alpha3/#11-conformance).
+Normative text: [Conformance](/specification/v1alpha4/#11-conformance).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

@@ -70,8 +70,8 @@ const ordered = SECTIONS.map(([name, dirs]) => ({
   pages: pages.filter((p) => dirs.includes(p.dir)).sort((a, b) => rank(a) - rank(b) || a.path.localeCompare(b.path)),
 }));
 
-const summary = 'AWP is an open, declarative specification for defining, governing, executing and auditing agentic workflows. It is a specification, not a platform. The current API version is v1alpha3 (draft); v1alpha1 and v1alpha2 stay supported.';
-let idx = `# Agentic Workflow Protocol (AWP)\n\n> ${summary}\n\nNotes for language models: the normative text is the v1alpha3 specification. AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements; it makes no compliance claims. The full documentation as one Markdown file is at ${ORIGIN}/llms-full.txt.\n`;
+const summary = 'AWP is an open, declarative specification for defining, governing, executing and auditing agentic workflows. It is a specification, not a platform. The current API version is v1alpha4 (draft); v1alpha1, v1alpha2 and v1alpha3 stay supported.';
+let idx = `# Agentic Workflow Protocol (AWP)\n\n> ${summary}\n\nNotes for language models: the normative text is the v1alpha4 specification. AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements; it makes no compliance claims. The full documentation as one Markdown file is at ${ORIGIN}/llms-full.txt.\n`;
 let full = `# Agentic Workflow Protocol (AWP): full documentation\n\n> ${summary}\n\nGenerated from ${ORIGIN} at build time. Index: ${ORIGIN}/llms.txt\n`;
 let n = 0;
 for (const s of ordered) {

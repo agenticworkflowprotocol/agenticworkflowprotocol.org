@@ -2,7 +2,7 @@
 title: "Risk levels"
 description: "An organizational risk model, not a regulatory classification."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -25,7 +25,7 @@ spec:
 Risk levels are a possible governance model. They are not a regulatory classification.
 
 
-Normative text: [Risk levels](/specification/v1alpha3/#77-risk-levels).
+Normative text: [Risk levels](/specification/v1alpha4/#77-risk-levels).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

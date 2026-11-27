@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), security reviewer, privacy reviewer |
 | **Reviewers** | none yet |
-| **Target API version** | `v1alpha3` |
+| **Target API version** | `v1alpha4` (`v1alpha3` until [D24](../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft)) |
 | **Profiles affected** | `core`, `governance`, `audit` |
 | **Created** | 2026-11-22 |
 | **Discussion** | issue to be opened |

@@ -2,7 +2,7 @@
 title: "Reproducibility"
 description: "A record of what an execution depended on."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -17,4 +17,4 @@ workflow:
 
 At the end of every execution an audit-profile runtime produces a record of workflow, agent, model and prompt versions, tools, command step images (as written and as resolved to a digest), policies, inputs and artifacts. This is *traceability of what ran*; AWP does not require identical model output on re-execution.
 
-Normative text: [Reproducibility record](/specification/v1alpha3/#107-reproducibility-record).
+Normative text: [Reproducibility record](/specification/v1alpha4/#107-reproducibility-record).

@@ -2,7 +2,7 @@
 title: "Audit events"
 description: "Event families, the event envelope and tamper evidence."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -23,7 +23,7 @@ Event families: `workflow.*`, `agent.*`, `tool.*`, `policy.*`, `approval.*`, `ar
 
 AWP defines the semantics of audit events; implementations may provide tamper-evident storage. The `audit.integrity.mode` values `none`, `hash-chain` and `signed` describe what a runtime offers.
 
-Normative text: [Event envelope](/specification/v1alpha3/#103-event-envelope), [Event types](/specification/v1alpha3/#104-event-types), [Tamper evidence](/specification/v1alpha3/#105-tamper-evidence).
+Normative text: [Event envelope](/specification/v1alpha4/#103-event-envelope), [Event types](/specification/v1alpha4/#104-event-types), [Tamper evidence](/specification/v1alpha4/#105-tamper-evidence).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

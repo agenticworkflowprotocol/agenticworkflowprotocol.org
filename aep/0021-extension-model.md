@@ -10,7 +10,7 @@
 | **Status** | Draft (concept for discussion) |
 | **Reviewer roles needed** | runtime implementer (Kubernetes operator), runtime implementer (non-Kubernetes), someone familiar with the Gateway API, security reviewer |
 | **Reviewers** | - |
-| **Target API version** | `v1alpha3` |
+| **Target API version** | `v1alpha4` (`v1alpha3` until [D24](../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft)) |
 | **Profiles affected** | all (section 3.3, 8, 11 of the specification) |
 | **Created** | 2026-11-19 |
 | **Discussion** | issue to be opened |

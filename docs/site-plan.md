@@ -32,7 +32,7 @@ Central messages, in this order of importance:
 
 These rules apply to every page and are checked in review.
 
-- **Specification status is always visible**: a banner "Draft - `v1alpha3`, the current draft.
+- **Specification status is always visible**: a banner "Draft - `v1alpha4`, the current draft.
   Fields and semantics may change." on all specification and concept pages until `v1beta1`; pages
   of older versions say which version they show.
 - **No compliance claims.** Never "AWP is GDPR compliant" or "AWP makes your AI EU AI Act
@@ -61,7 +61,7 @@ Top navigation, left to right:
 | Item | Target | Content |
 | ---- | ------ | ------- |
 | **AWP** (logo/wordmark) | `/` | Homepage |
-| **Specification** | `/specification/` | Normative text of `v1alpha3` (current draft), `v1alpha2` and `v1alpha1`, versions, changelog of the spec |
+| **Specification** | `/specification/` | Normative text of `v1alpha4` (current draft), `v1alpha3`, `v1alpha2` and `v1alpha1`, versions, changelog of the spec |
 | **Concepts** | `/concepts/` | Manifest, kinds, agents, tools, workflow steps, triggers, inputs, budgets, execution model |
 | **Governance** | `/governance/` | Identity & ownership, data classification, data residency, model governance, tool governance, human approval, risk levels, separation of duties, environments, policy-as-code |
 | **Security** | `/security/` | Secrets, supply chain (digests, signatures, provenance), tamper-evident audit, threat model, fail-closed semantics |
@@ -70,7 +70,7 @@ Top navigation, left to right:
 | **Implementations** | `/implementations/` | Listed implementations (none yet), call for implementations, conformance profiles, "Build your own AWP runtime" |
 | **GitHub** | external link to the repository | Icon plus label, `rel="noopener"` |
 
-Secondary elements: version switcher (`v1alpha3`, `v1alpha2`, `v1alpha1`), theme toggle (light/dark/system),
+Secondary elements: version switcher (`v1alpha4`, `v1alpha3`, `v1alpha2`, `v1alpha1`), theme toggle (light/dark/system),
 language switcher (EN only at launch; DE added later), search (local, see section 6).
 
 Footer: License (CC BY 4.0 for text, Apache-2.0 for code), Code of Conduct, Governance, Security
@@ -82,10 +82,11 @@ not a platform. Any runtime may implement it."
 ```
 /
 /specification/
-  /specification/v1alpha3/            normative text of the current draft (from spec/v1alpha3/)
-  /specification/v1alpha3/glossary/
-  /specification/v1alpha3-guide/
-  /specification/migrating-to-v1alpha3/
+  /specification/v1alpha4/            normative text of the current draft (from spec/v1alpha4/)
+  /specification/v1alpha4/glossary/
+  /specification/v1alpha4-whats-new/
+  /specification/migrating-to-v1alpha4/
+  /specification/v1alpha3/, /specification/v1alpha3-guide/, /specification/migrating-to-v1alpha3/
   /specification/v1alpha2/, /specification/v1alpha1/   older drafts, errata only
   /specification/versioning/
   /specification/changelog/
@@ -139,11 +140,11 @@ ASCII fallback in `<pre>` (readable without CSS, screen-reader friendly via `ari
 
 ### 1. Hero
 
-- Eyebrow: `Agentic Workflow Protocol · v1alpha3 (draft)`
+- Eyebrow: `Agentic Workflow Protocol · v1alpha4 (draft)`
 - Headline: **Define. Govern. Execute.**
 - Sub-line: *AWP is an open standard for portable, auditable and policy-controlled agentic
   workflows.*
-- Primary CTA: "Read the specification" (`/specification/v1alpha3/`). Secondary CTA: "View on
+- Primary CTA: "Read the specification" (`/specification/v1alpha4/`). Secondary CTA: "View on
   GitHub".
 - Right column (desktop) / below (mobile): a short manifest (about 25 lines), syntax-highlighted
   at build time, with a copy button.
@@ -271,7 +272,7 @@ runtimes**, not as existing implementations.
   navigation, contrast in both themes, reduced motion.
 - Dark and light theme with system preference and a manual toggle.
 - i18n: English first; German added later as a separate locale without restructuring.
-- Versioned documentation (`v1alpha1`, `v1alpha2`, `v1alpha3`, later `v1beta1`).
+- Versioned documentation (`v1alpha1`, `v1alpha2`, `v1alpha3`, `v1alpha4`, later `v1beta1`).
 - Small dependency surface, pinned versions, lockfile checked in.
 
 ### Options
@@ -301,7 +302,7 @@ runtimes**, not as existing implementations.
 - Same approach as the MCP documentation, which is a stated inspiration for the site.
 
 Trade-off: Docusaurus has first-class doc versioning. For AWP this matters less at the start
-(one API version); versions are modelled as directories (`/specification/v1alpha3/`). If several
+(one API version); versions are modelled as directories (`/specification/v1alpha4/`). If several
 API versions need to be maintained in parallel later, this decision can be revisited.
 
 ### Build and deployment (planned, separate PR)

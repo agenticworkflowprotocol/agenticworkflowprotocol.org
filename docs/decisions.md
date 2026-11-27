@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema, D22, which accepts AEPs 0015 to 0020 and makes `v1alpha3` the current draft, and D23, which accepts AEPs 0001 and 0028 and adds the `v1alpha4` draft. D21 refines D17. |
-| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18), 2026-11-19 (D19, D20), 2026-11-22 (D21), 2026-11-25 (D22) and 2026-11-27 (D23) by the project lead |
+| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema, D22, which accepts AEPs 0015 to 0020 and makes `v1alpha3` the current draft, D23, which accepts AEPs 0001 and 0028 and adds the `v1alpha4` draft, and D24, which makes `v1alpha4` the current draft. D21 refines D17. |
+| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18), 2026-11-19 (D19, D20), 2026-11-22 (D21), 2026-11-25 (D22) and 2026-11-27 (D23, D24) by the project lead |
 | **Related** | [AEP process](aep-process.md), [extension prefix list](registry/extension-prefixes.md), [GOVERNANCE.md](../GOVERNANCE.md) |
 
 > Context. AWP is alpha. The owner allows the schema to change where implementation practice shows
@@ -310,41 +310,68 @@ a single implementation and were removed from this log by D17.
   `v1alpha4` (from `v1alpha3` only `apiVersion` changes). The CRDs serve `v1alpha3` and `v1alpha4`,
   with `v1alpha3` as the storage version. The README, the Quickstart and the defaults of the tools
   stay at `v1alpha3`; the website lists `v1alpha4` as the next draft. Making `v1alpha4` the current
-  draft is a new decision.
+  draft is a new decision. Superseded in part by [D24](#d24-v1alpha4-becomes-the-current-draft):
+  since then `v1alpha4` is the current draft and the default.
 - **Applied in**: this log, `aep/0001-conditional-steps.md`, `aep/0028-workflow-steps.md`,
   `aep/0006-playbook-kind.md` (alternatives), `spec/v1alpha4/`, `schema/awp.v1alpha4.json`,
   `schema/crd/`, `schema/README.md`, `conformance/` (`v1alpha4/`, `conditions.mjs`, `migrate`),
   `spec/README.md`, `docs/aep-process.md` (5.1 rule 1, 6.2), `GOVERNANCE.md`, `site/`.
 
+### D24. `v1alpha4` becomes the current draft
+
+- **Question**: since D23, `v1alpha4` (`v1alpha3` plus conditional steps and workflow steps)
+  exists as text, schema, CRD and conformance suite, and the validator and the editor support it,
+  while `v1alpha3` is still the current draft and the default. New manifests that need the
+  *analyse, then act* pattern have to opt in to the next draft. Which version do authors, tools and
+  new AEPs target?
+- **Decision**: `v1alpha4` becomes the current draft. AEP-0001 and AEP-0028 are already accepted
+  by D23; this decision accepts no further AEP and needs no exception to D16 beyond the one D23
+  recorded. The owner waives the 5-day discussion period for this change (alpha waiver of
+  GOVERNANCE.md). `v1alpha4` stays an alpha draft (aep-process 6.2).
+- **Consequence**: `v1alpha1`, `v1alpha2` and `v1alpha3` stay supported drafts and are not
+  changed, except errata; `awp-check.mjs migrate` converts all three to `v1alpha4` (from
+  `v1alpha3` only `apiVersion` changes). AEPs that targeted `v1alpha3` and are not accepted
+  (0002 to 0014) now target `v1alpha4` (section 2), so that accepted changes go into one version.
+  The Draft AEPs 0021 and 0023 to 0027 now also target `v1alpha4` and join it when accepted. The
+  CRDs keep `v1alpha3` as the storage version; changing it is a separate change of
+  `schema/crd/`. The website, the CLI output formats (`docs/cli.md`), the README, the reference
+  validator and the editor use `v1alpha4` as the default.
+- **Applied in**: this log, `aep/0002` to `aep/0014`, `aep/0021`, `aep/0023` to `aep/0027`,
+  `spec/README.md`, `spec/v1alpha3/README.md` and `spec/v1alpha4/README.md` (status notes),
+  `SECURITY.md` (supported versions), `docs/cli.md`, `docs/site-plan.md`, `README.md`,
+  `site/`; in the tool repositories `awp-validator` and `awp-editor`.
+
 ## 2. Resulting scope of `v1alpha2`
 
 Amended by D22: the AEPs that targeted `v1alpha2` and are not accepted target `v1alpha3`, the
 current draft. `v1alpha2` keeps what it has (`v1alpha1` plus AEP-0022) and only gets errata.
+Amended by D24: the AEPs that targeted `v1alpha3` and are not accepted target `v1alpha4`, the
+current draft. `v1alpha3` keeps what it has and only gets errata.
 
 | AEP | Title | Target | Reason |
 | --- | --- | --- | --- |
 | 0001 | Conditional steps (`when`) | `v1alpha4`, accepted and in the draft (`v1alpha2` until D22, `v1alpha3` until D23) | D5, D6, D22, D23 |
-| 0002 | Argument constraints, call limits, no prefix wildcards | `v1alpha3` (`v1alpha2` until D22) | D4, D22 |
-| 0003 | Typed handoffs | `v1alpha3` (`v1alpha2` until D22) | scope decision of 2026-10-10, D22 |
-| 0004 | Event references | `v1alpha3` (`v1alpha2` until D22) | D7, D22 |
-| 0005 | Kind `Prompt` | `v1alpha3` (`v1alpha2` until D22) | D8, D22 |
-| 0006 | Kind `Playbook` | `v1alpha3` (`v1alpha2` until D22) | D8, D22 |
-| 0007 | MCP catalog (in `mcp`, aligned with MCP) | `v1alpha3` (`v1alpha2` until D22) | D8 + D9, D22 |
-| 0008 | `ModelCatalog` kind, referenced by digest | `v1alpha3` | D10 |
-| 0009 | Audit payload levels, mandatory `contentRetention` | `v1alpha3` | D11 |
-| 0010 | Digest canonicalisation | `v1alpha3` (`v1alpha2` until D22) | scope decision of 2026-10-10, D22 |
-| 0011 | Required extensions | `v1alpha3` (`v1alpha2` until D22) | D3, D22 |
-| 0012 | Tool steps | proposed for `v1alpha3`, not yet in scope | D18, D22 |
-| 0013 | Runtime clarifications | proposed for `v1alpha3`, not yet in scope | D18, D22 |
-| 0014 | Input examples and object schemas | proposed for `v1alpha3`, not yet in scope | D18, D22 |
+| 0002 | Argument constraints, call limits, no prefix wildcards | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D4, D22, D24 |
+| 0003 | Typed handoffs | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | scope decision of 2026-10-10, D22, D24 |
+| 0004 | Event references | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D7, D22, D24 |
+| 0005 | Kind `Prompt` | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D8, D22, D24 |
+| 0006 | Kind `Playbook` | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D8, D22, D24 |
+| 0007 | MCP catalog (in `mcp`, aligned with MCP) | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D8 + D9, D22, D24 |
+| 0008 | `ModelCatalog` kind, referenced by digest | `v1alpha4` (`v1alpha3` until D24) | D10, D24 |
+| 0009 | Audit payload levels, mandatory `contentRetention` | `v1alpha4` (`v1alpha3` until D24) | D11, D24 |
+| 0010 | Digest canonicalisation | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | scope decision of 2026-10-10, D22, D24 |
+| 0011 | Required extensions | `v1alpha4` (`v1alpha2` until D22, `v1alpha3` until D24) | D3, D22, D24 |
+| 0012 | Tool steps | proposed for `v1alpha4`, not yet in scope | D18, D22, D24 |
+| 0013 | Runtime clarifications | proposed for `v1alpha4`, not yet in scope | D18, D22, D24 |
+| 0014 | Input examples and object schemas | proposed for `v1alpha4`, not yet in scope | D18, D22, D24 |
 | 0022 | Step iteration (`forEach`) | `v1alpha2`, in the draft since 2026-11-19; also in `v1alpha3` | D19, D20 |
 | 0015-0020 | Kubernetes resource model, schedule semantics, human input, step outputs, `WorkflowRun`, execution pinning | `v1alpha3`, accepted and in the draft | D20, D22 |
-| 0021 | Extension model (concept) | proposed for `v1alpha3`, not applied | D20, D22 |
-| 0023-0027 | Step isolation, event triggers, state, interactive execution, agent engine | proposed for `v1alpha3`, not applied | D18 |
+| 0021 | Extension model (concept) | proposed for `v1alpha4`, not applied | D20, D22, D24 |
+| 0023-0027 | Step isolation, event triggers, state, interactive execution, agent engine | proposed for `v1alpha4`, not applied | D18, D24 |
 | 0028 | Workflow steps (`type: workflow`) | `v1alpha4`, accepted and in the draft | D23 |
 
-Since D19 `v1alpha2` exists as a draft, since D22 `v1alpha3` is the current draft. Since D23
-`v1alpha4` (`v1alpha3` plus AEPs 0001 and 0028) is the next draft. `v1alpha3` is
+Since D19 `v1alpha2` exists as a draft, since D22 `v1alpha3` was the current draft. Since D23
+`v1alpha4` (`v1alpha3` plus AEPs 0001 and 0028) exists, since D24 it is the current draft. `v1alpha4` is
 completed (no longer a draft) when every AEP in its scope is `Accepted` and written into it, or
 explicitly moved to a later version by an amendment to this table (an AEP that does not find a
 reviewer must not block the others).

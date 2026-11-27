@@ -2,7 +2,7 @@
 title: "Data classification"
 description: "Classes for inputs and outputs and the rules that follow from them."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -25,7 +25,7 @@ dataPolicy:
 - The classes are an organizational vocabulary. Mapping them to legal definitions is up to the organization.
 
 
-Normative text: [Data classification](/specification/v1alpha3/#72-data-classification).
+Normative text: [Data classification](/specification/v1alpha4/#72-data-classification).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

@@ -2,7 +2,7 @@
 title: "Supply chain"
 description: "Know what runs before you let it run: digests, signatures, provenance, dependencies."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -21,7 +21,7 @@ spec:
 - Under the security profile, container images are pinned by digest and runtimes can restrict sources to trusted registries. Outside it, tags are allowed: the runtime resolves them to digests when an execution starts and pins them for the whole execution.
 - Runtimes should be able to output the resolved dependency set (SBOM-like metadata).
 
-Normative text: [Supply chain integrity](/specification/v1alpha3/#9-supply-chain-integrity).
+Normative text: [Supply chain integrity](/specification/v1alpha4/#9-supply-chain-integrity).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

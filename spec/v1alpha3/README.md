@@ -9,8 +9,8 @@
 | **Glossary** | [glossary.md](glossary.md) |
 | **Examples** | [examples/](examples/) |
 
-> **Status of this document.** This is the current working draft of AWP, its third alpha version
-> (decision [D22](../../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)). It
+> **Status of this document.** This is the third alpha version of AWP, the current working draft
+> from decision [D22](../../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft) to D24. It
 > starts from `v1alpha2` (`v1alpha1` plus step iteration, [section 5.6.5](#565-iteration),
 > [AEP-0022](../../aep/0022-step-iteration.md)) and aligns the document model with the Kubernetes resource model, as
 > proposed by [AEP-0015](../../aep/0015-kubernetes-resource-model.md): governance
@@ -27,7 +27,9 @@
 > SHOULD NOT rely on `v1alpha3` for production interoperability. No implementation is conformant
 > to this version at the time of writing. Changes from `v1alpha1` are listed in
 > [section 14.1](#141-changes-from-v1alpha1), changes from `v1alpha2` in
-> [section 14.2](#142-changes-from-v1alpha2).
+> [section 14.2](#142-changes-from-v1alpha2). Since decision
+> [D24](../../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft) the current draft is
+> [`v1alpha4`](../v1alpha4/README.md); this version only gets errata.
 
 > **Compliance.** AWP provides machine-readable governance primitives that can help
 > organizations implement and enforce their own compliance requirements. Using AWP does not make

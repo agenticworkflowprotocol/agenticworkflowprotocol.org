@@ -2,7 +2,7 @@
 title: "What AWP is and is not"
 description: "AWP is a specification for declaring, governing and auditing agentic workflows. It is not a platform."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 AWP is a **specification, not a platform**. It describes in a vendor-neutral, machine-readable way:
@@ -15,7 +15,7 @@ AWP is a **specification, not a platform**. It describes in a vendor-neutral, ma
 A *runtime* reads a manifest, validates it, enforces its limits and governance rules while executing it, and emits audit events with standardized semantics.
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
   name: vulnerability-fixer
@@ -33,7 +33,7 @@ spec:
 | A2A | Agent to agent communication |
 | AWP | Definition, governance, execution and audit of agentic workflows |
 
-AWP does not replace MCP or A2A. See [Relationship to other protocols](/specification/v1alpha3/#12-relationship-to-other-protocols).
+AWP does not replace MCP or A2A. See [Relationship to other protocols](/specification/v1alpha4/#12-relationship-to-other-protocols).
 
 ## What AWP is not
 

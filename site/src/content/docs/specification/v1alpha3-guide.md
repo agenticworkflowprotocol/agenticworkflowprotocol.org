@@ -2,10 +2,11 @@
 title: "v1alpha3: how it fits together"
 description: "Informative guide to the v1alpha3 draft: which manifests you write, how they relate, what happens from applying a manifest to a finished run, and checklists for authors and runtime implementers."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, errata only. The current draft is v1alpha4; its model is the one described here."
 ---
-This page explains [v1alpha3](/specification/v1alpha3/), the current draft (decision D22), for
-readers who did not follow its discussion. It is informative: it adds no requirement, and where it differs from the specification,
+This page explains [v1alpha3](/specification/v1alpha3/), the current draft from decision D22 to D24, for
+readers who did not follow its discussion. The current draft `v1alpha4` keeps this model and adds
+conditional steps and workflow steps ([v1alpha4: what's new](/specification/v1alpha4-whats-new/)). It is informative: it adds no requirement, and where it differs from the specification,
 the specification decides. Coming from `v1alpha1`? See [Migrating to v1alpha3](/specification/migrating-to-v1alpha3/).
 
 - **Authors** start with [the example](#a-scheduled-agent-workflow) and [the author checklist](#checklist-for-authors).
@@ -275,7 +276,7 @@ without, for example, its approvals.
 
 ## Proposed on top of v1alpha3
 
-These Draft AEPs target `v1alpha3` but are not applied to its text, schema or conformance suite.
+These Draft AEPs target `v1alpha4` since D24 (`v1alpha3` before) but are not applied to its text, schema or conformance suite.
 Their fields are rejected by the checker until they are.
 
 | AEP | Proposal |
