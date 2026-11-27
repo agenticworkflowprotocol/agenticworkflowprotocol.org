@@ -244,6 +244,14 @@ status:
 - Status per target as in the Gateway API (`ancestors[]`, `Accepted` with `Invalid` or
   `TargetNotFound`); the target gets a condition `PoliciesAttached`. Attached policies are pinned
   with the execution (spec 10.1).
+- **Amendment (2026-11-27): attachment is the primary way for organisation policies.** A policy
+  that a platform or governance team owns is attached with `targetRefs`; `policies.include`
+  (spec 8.1) is for policies the author of the workflow chooses. With `include` and its exact
+  `version`, every change of an organisation policy needs a change in every workflow that includes
+  it; with attachment, the team that owns the policy changes it once, and the record of each
+  execution shows which version applied. The specification SHOULD say so in 8.1, and the
+  `governance` profile SHOULD let an operator attach policies to all workflows of a scope (open
+  question 4).
 
 ### B6. Runtime bindings
 
@@ -297,6 +305,14 @@ spec:
   endpoints, of secret stores and of egress destinations), and MUST reject a binding outside them
   (`Accepted=False`, reason `NotAllowed`). The audit events name the binding and its version.
 - Bindings are pinned with the execution like attached policies (spec 10.1).
+- **Amendment (2026-11-27): suspending schedules (runtime feedback G90).** Pausing the schedule of
+  a workflow is an operational setting, not part of the reviewed manifest. It belongs to the
+  binding (for example a field `suspend`, as `CronJob.spec.suspend` in Kubernetes), so that
+  pausing does not change the digest. AWP reserves the reason `suspended` for the event
+  `trigger.skipped` (spec 10.4): while the accepted binding suspends a workflow, every due schedule
+  tick emits `trigger.skipped` with this reason and starts nothing. A `WorkflowRun` created by hand
+  (spec 10.8) and other non-schedule triggers still start while the schedule is suspended, unless
+  the runtime documents otherwise.
 
 ### B7. Annotations only for hints
 
@@ -421,6 +437,12 @@ of its objects should become AWP kinds is discussed in runtime feedback section 
    enough, or should conformance require a fixed list?
 8. Conflicting bindings: B6 proposes "oldest wins" with an audited takeover. Is that acceptable, or
    should a conflict block the workflow?
+9. Added 2026-11-27: signatures and provenance outside `spec`. Spec 9.1 removes `spec.integrity`,
+   `spec.signature` and `spec.provenance` before computing the digest, so the desired state carries
+   data that is not desired state. Should signatures and provenance live next to the manifest
+   instead, as detached signatures and attestations in the style of OCI artifacts (for example
+   Sigstore bundles referenced by digest) or as annotations, so that `spec` is covered by the
+   digest without exceptions?
 
 ## Decision
 

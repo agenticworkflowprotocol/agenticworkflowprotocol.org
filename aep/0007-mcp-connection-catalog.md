@@ -218,6 +218,10 @@ The event carries digests only, never the definition text.
 referenced manifests it is resolved by the runtime and never fetched from a URL found in the
 catalog.
 
+Note (2026-11-27): [AEP-0031](0031-mcp-server-kind.md) proposes to replace this kind by a kind
+`McpServer`, one object per server with the catalog, the transport and the authorization metadata
+but without URL and credentials, referenced by name with optional `version` and `digest`.
+
 ## Examples
 
 ```yaml

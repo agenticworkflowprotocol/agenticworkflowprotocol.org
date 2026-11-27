@@ -29,7 +29,8 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 8. [Event triggers](#8-event-triggers)
 9. [From the concept review](#9-from-the-concept-review)
 10. [From interactive sessions and a coding agent engine](#10-from-interactive-sessions-and-a-coding-agent-engine)
-11. [Questions for the project lead](#11-questions-for-the-project-lead)
+11. [From a comparison with kagent](#11-from-a-comparison-with-kagent)
+12. [Questions for the project lead](#12-questions-for-the-project-lead)
 
 ## 1. Status overview
 
@@ -40,7 +41,10 @@ portable runtimes, **should** needs a rule, **minor** is editorial or informativ
 | AEP drafted, not applied | G10, G47, G49, G50, G51, G61, G64, G67 to G69 (AEP-0023); G42 to G46, G54, G56, G86 (AEP-0024); G03, G53, G58, G87 (AEP-0025) |
 | New AEP proposed (number to be confirmed) | G62, G63, G73, G82, G85 (AEP-0026, interactive execution); G65, G66, G81, G83 (AEP-0027, agent engine) |
 | Amendment drafted in an existing AEP that is not applied yet (from section 10) | G71, G72 (AEP-0007); G74 (AEP-0002); G75 (AEP-0005); G76 (AEP-0009); G78 (AEP-0013). Open questions there or in AEP-0026: G70, G77, G84, G85 |
-| Covered by an existing AEP that is not applied yet | G02, G04, G06, G22; G41 (AEP-0004); G48, G57 (AEP-0019 open question 1); G52 (AEP-0021); G55 (AEP-0012); G59, G60 (AEP-0008) |
+| Covered by an existing AEP that is not applied yet | G02, G06, G22; G41 (AEP-0004); G48, G57 (AEP-0019 open question 1); G52 (AEP-0021); G55 (AEP-0012); G59, G60 (AEP-0008) |
+| Applied to the `v1alpha4` draft and accepted (AEP-0001, decision D23) | G04 |
+| New AEP or amendment drafted (from section 11) | G88 (AEP-0030); G89 (AEP-0023); G90 (AEP-0021); G91, G92 (AEP-0029, AEP-0030, AEP-0031); G93 (AEP-0032); G94 (AEP-0033) |
+| Recorded as an issue | G95 |
 | Open, needs a decision whether and how | G05, G09, G11, G12, G13, G16 to G21, G24 to G39, G77, G79, G80, K |
 
 ## 2. Step interface
@@ -265,7 +269,42 @@ attaches with `targetRefs` or `parametersRef` (AEP-0021 B5, B6).
 | Sandbox profile | implementation-specific, behind `agents[].isolation` (G67) | Like `StorageClass` or `RuntimeClass`: the manifest asks for a class, the platform maps it to a mechanism. |
 | Gateways, proxies | not an object of AWP | Mechanisms. AWP states only the property they provide (outside the execution environment). |
 
-## 11. Questions for the project lead
+## 11. From a comparison with kagent
+
+Collected on 2026-11-27 by comparing the data model of [kagent](https://github.com/kagent-dev/kagent)
+(a CNCF project, named as prior art under decision D21; API `api.kagent.dev/v1alpha3`) with the
+`v1alpha4` draft and the open AEPs. kagent is a platform for conversational agents with long-lived
+sessions; its resources are `Agent`, `AgentTemplate`, `Harness`, `ModelConfig`,
+`ModelProviderConfig`, `RemoteMCPServer`, `EgressPolicy` and `SandboxTemplate`, while sessions and
+schedules live in a database. Many of its cuts follow from that product and do not fit a reviewed,
+digest-covered format (a harness reference inside the agent, endpoints and TLS settings in an
+object that authors write, live updates of running sessions, "the last good revision keeps
+running"). Several mechanisms carry over.
+
+**One object per thing, referenced by name.** The common thread of G91, G92 and the model and MCP
+proposals: AWP has list kinds (`ModelCatalog`) and references with a required exact version or
+digest to objects the platform owns (`modelPolicy.catalog`, `mcpServers[].catalog.ref`,
+`policies.include`). A price change, a new tool of a server or a stricter organisation policy then
+needs a change in every workflow. Kubernetes keeps one object per thing (`StorageClass`,
+`RuntimeClass`, `IngressClass`) and resolves references by name. Proposed rule, for a decision of
+the project lead: every reference is `{name, version?, digest?}`; the name resolves in the scope;
+`version` and `digest` are assertions; the runtime records what it resolved; pins are required by
+the `security` profile or by policy, not by the format; objects the platform owns exist once per
+thing and are attached with `targetRefs`. This revises the "split as in AEP-0008" rows of
+section 10: the split between facts and deployment data stays, the shape changes.
+
+| ID | Sev. | Gap | Proposal | Home | Status |
+| --- | --- | --- | --- | --- | --- |
+| G88 | should | Models the runtime calls on its own for an execution (fallback, summarisation of a long history, embeddings, routing, MCP sampling) are not covered by `modelPolicy`, `dataPolicy` or the budget. kagent selects summariser and embedding models in the harness, invisible to the author. | Every model invocation of the runtime for an execution falls under model policy, data policy and budget and appears in usage and the reproducibility record. | [AEP-0030](../aep/0030-model-kind.md) | proposal |
+| G89 | should | A target system cannot authenticate the execution itself; every credential is a stored secret. Extends G55. | `auth.method: workloadIdentity` with `audiences`: a short-lived token issued by the runtime that names workflow, version, execution and actor (kagent `ActorJWT`). | [AEP-0023](../aep/0023-step-isolation.md) | proposal |
+| G90 | minor | A schedule cannot be paused without changing the reviewed manifest. | `suspend` in the binding, like `CronJob.spec.suspend`; AWP reserves the `trigger.skipped` reason `suspended`. | [AEP-0021](../aep/0021-extension-model.md) | proposal |
+| G91 | should | Workflow steps (5.6.6) reference the child by a SemVer range without a digest, while every other reference is exact. The reviewer of the parent does not see which child runs. | `workflow.digest`, an exact version assertion, the resolved child digest recorded at the parent step; pins required under `security`. | [AEP-0029](../aep/0029-references-by-name.md) | proposal |
+| G92 | should | List kinds and required pins to platform objects force a change in every workflow when the platform changes one entry; `name` plus `version` reads like a selector, although an object store holds one object per name. | One object per thing (`Model`, `McpServer`), references by name with optional assertions, policies attached with `targetRefs`. Spec 3.10 states that the name resolves. | AEP-0029, [AEP-0030](../aep/0030-model-kind.md), [AEP-0031](../aep/0031-mcp-server-kind.md), spec 3.10 (editorial) | proposal |
+| G93 | minor | Policy shorthands are booleans whose `true` adds no rule (8.1), and rule conditions are a map keyed by a fixed list of attribute paths (8.3), which extension attributes cannot join and which differs from the match expressions Kubernetes users know. | Enums such as `git.push: deny`, and conditions as a list of match expressions `{key, operator, values}`. Spec 8.1 is clarified meanwhile. | [AEP-0032](../aep/0032-policy-syntax.md) | proposal, next API version |
+| G94 | minor | Durations allow `d`, `w` and `y` (3.6), which Go, Kubernetes and CEL do not parse. | The Go and Kubernetes duration format; long retention periods as day counts or dates. | [AEP-0033](../aep/0033-durations.md) | proposal, next API version |
+| G95 | should | The generated CustomResourceDefinitions declare no list types, so server-side apply treats lists such as `agents[]`, the steps, `secrets[]` and policy rules as atomic, and two field managers overwrite each other's entries. Closed objects keep unknown fields on purpose (3.10), so misplaced fields are only reported with strict field validation or an admission webhook. | `x-kubernetes-list-type: map` with `x-kubernetes-list-map-keys` (`id` or `name`) for lists of identified objects; later CEL rules for what a structural schema can express. | [issue #33](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/issues/33) (schema generator, AEP-0021 B8) | open |
+
+## 12. Questions for the project lead
 
 1. Do the three drafted AEPs (G01, G07, G08) join the `v1alpha3` scope table in the decision log,
    once they reach `Review`?
@@ -292,3 +331,8 @@ attaches with `targetRefs` or `parametersRef` (AEP-0021 B5, B6).
 11. Which objects become AWP kinds (section 10): `Session` as a new kind, `Prompt` and
     `McpCatalog` as already proposed, and tenants, sandbox profiles and bindings left to the
     runtime?
+12. Section 11: record the rule "one object per thing, references by name, pins by profile or
+    policy" as a decision, revisiting D10 (required catalog digest)? If yes, AEP-0030 replaces
+    AEP-0008 and AEP-0031 replaces the kind `McpCatalog` of AEP-0007.
+13. G91 changes the accepted AEP-0028 (range to exact version, plus `workflow.digest`): an erratum
+    of the `v1alpha4` draft, or part of AEP-0029 for the next acceptance?

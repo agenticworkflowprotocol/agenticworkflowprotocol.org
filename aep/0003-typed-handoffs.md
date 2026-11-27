@@ -108,6 +108,31 @@ step's expressions as an object keyed by their reference text).
 
 `handoff.invalid` MUST NOT contain the offending values under `payload: metadata`.
 
+### Typing in conditions and expressions (amendment for `v1alpha4`)
+
+`v1alpha4` reads step outputs in conditions as JSON if the text parses as a JSON value, and
+otherwise as a string (spec 3.12, "Values and typing"). Without a schema, the form of the text
+decides the type: an output `true` is a boolean, and an output that happens to parse as JSON
+changes its type. With this AEP the type is declared instead:
+
+1. **Outputs with `schema`.** The value of an output with `schema` is the validated JSON value. In
+   a condition, `steps.<id>.outputs.<name>` and every path below it have the type the schema
+   gives them. The runtime MUST NOT apply the parse rule of spec 3.12 to such an output: the
+   string output `"true"` of a schema `{ type: string }` stays a string.
+2. **Outputs without `schema`.** The parse rule of spec 3.12 applies unchanged.
+3. **Field access in expressions.** For an output with an object or array schema, an expression
+   MAY select into the value: `${{ steps.<id>.outputs.<name>.<key> }}` with one or more keys, with
+   the key syntax and rendering rules of `forEach.item.<key>` (spec 3.9). Validators MUST reject a
+   key path that the schema does not allow when the schema sets `additionalProperties: false` on
+   the object along the path. Field access on an output without `schema` MUST be rejected.
+4. **The runtime validates itself.** A runtime MAY pass the schema to the model provider (for
+   example a strict structured-output mode). It MUST still validate the value itself against the
+   schema before the step completes. A provider mode is an optimisation, never the check.
+
+The static rule of spec 3.12 (item 2, `<name>` is a declared output) is extended: a path below an
+output with a schema SHOULD be checked against the schema, and validators SHOULD warn when a path
+cannot resolve under it.
+
 ## Examples
 
 ```yaml
@@ -137,12 +162,24 @@ spec:
           - steps.analysis.outputs.result
 ```
 
+With a schema, the condition above reads `action` as a string because the schema says so, and a
+task can use a single field:
+
+```yaml
+    - id: notify
+      agent: writer
+      dependsOn: [analysis]
+      task: "Write a short note for a ${{ steps.analysis.outputs.result.severity }} finding."
+```
+
 ## Schema changes
 
 - `WorkflowSpec.properties.schemas`; output entry `schema`, `onInvalid`; step `input`.
 - `$defs/SchemaSubset` (structural part); keyword, reference, recursion and limit rules as semantic
   rules `schema.keyword`, `schema.ref`, `schema.recursion`, `schema.limits`, `schema.pattern`;
   `input.from-not-a-dependency`, `input.from-undeclared-output`, `input.expression-not-in-from`.
+- Expression references `steps.<id>.outputs.<name>.<key>` (amendment); semantic rules
+  `expression.field-access-without-schema`, `expression.field-not-in-schema`.
 
 ## Conformance impact
 
@@ -151,6 +188,9 @@ spec:
 - New cases: `valid/5.8-schemas-and-handoffs.yaml`; invalid: `5.8-unsupported-keyword.yaml`,
   `5.8-remote-ref.yaml`, `5.8-recursive-ref.yaml`, `5.8-pattern-without-maxlength.yaml`,
   `5.6.1-input-from-not-dependency.yaml`, `5.6.1-expression-outside-from.yaml`.
+- Amendment: `valid/3.12-condition-schema-typed.yaml` (a string-typed output `"true"` compared
+  with `"true"`); invalid: `3.9-field-access-without-schema.yaml`,
+  `3.9-field-not-in-schema.yaml`.
 
 ## Compatibility and migration
 
@@ -180,6 +220,10 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 - **Full JSON Schema**: unbounded evaluation cost, remote references, formats; rejected.
 - **Schemas only on workflow inputs**: does not cover model output, which is the risky part.
 - **Do nothing**: typing stays in prompts.
+- **Rely on provider structured-output modes**: not portable, and not every provider has one.
+  Prior art: kagent (a CNCF project) defines a portable schema subset for agent output, validates
+  in the runtime regardless of the provider mode, and fails the task on an invalid value; this AEP
+  follows the same split (amendment above, item 4).
 
 ## Implementation status
 
@@ -204,4 +248,5 @@ Owner direction of 2026-10-10: part of the `v1alpha2` scope ([decision log secti
 ## References
 
 - JSON Schema draft 2020-12.
-- Spec sections 3.9, 5.6, 10.4.
+- Spec sections 3.9, 3.12 (`v1alpha4`), 5.6, 10.4.
+- Runtime feedback G02, G16, G66 ([docs/runtime-feedback.md](../docs/runtime-feedback.md)).
