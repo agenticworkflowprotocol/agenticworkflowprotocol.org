@@ -55,6 +55,11 @@ Comment Period, and may still be moved to a later version or rejected.
 | [0026](../aep/0026-interactive-execution.md) | Interactive execution: `AgentSession` and autonomy levels | Draft | proposed for `v1alpha4` |
 | [0027](../aep/0027-agent-engine.md) | Agent engine: running an agent with an existing coding agent | Draft | proposed for `v1alpha4` |
 | [0028](../aep/0028-workflow-steps.md) | Workflow steps (`type: workflow`) | Accepted (lead decision D23) | in the `v1alpha4` draft |
+| [0029](../aep/0029-references-by-name.md) | References by name, optional pins, recorded resolution | Draft | proposed for `v1alpha4` |
+| [0030](../aep/0030-model-kind.md) | Kind `Model`: one object per model, parameters and runtime model calls | Draft | proposed for `v1alpha4` |
+| [0031](../aep/0031-mcp-server-kind.md) | Kind `McpServer`: one object per MCP server, referenced by name | Draft | proposed for `v1alpha4` |
+| [0032](../aep/0032-policy-syntax.md) | Policy syntax: enums instead of booleans, match expressions | Draft | proposed for the API version after `v1alpha4` |
+| [0033](../aep/0033-durations.md) | Durations in the Go and Kubernetes format | Draft | proposed for the API version after `v1alpha4` |
 
 The specification text is licensed under [CC BY 4.0](../LICENSE-SPEC); examples, schemas and
 code are licensed under [Apache-2.0](../LICENSE).
