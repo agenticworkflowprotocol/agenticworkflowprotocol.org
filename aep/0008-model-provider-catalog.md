@@ -24,6 +24,10 @@ governance status and optional aliases, referenced from a workflow (`spec.modelP
 name, version and a required digest. The catalog becomes an input of model policy, data residency and budget
 checks; it replaces per-runtime lookup tables that differ between runtimes.
 
+> **Note (2026-11-27):** [AEP-0030](0030-model-kind.md) proposes to replace the list kind
+> `ModelCatalog` with one `Model` object per model, referenced by name with an optional digest,
+> and to supersede this AEP if accepted. This AEP is otherwise unchanged.
+
 ## Motivation
 
 Spec 5.4.3 says provider identifiers are opaque and region and cost are runtime knowledge. The
