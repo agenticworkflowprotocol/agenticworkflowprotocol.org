@@ -11,10 +11,11 @@
 
 > MCP connects agents to tools. A2A connects agents to agents. AWP defines how agents work.
 
-> **Status: draft / alpha.** The current draft is `v1alpha3`: `v1alpha2` (`v1alpha1` plus step
-> iteration, `forEach`) aligned with the Kubernetes resource model, with step outputs, schedule
-> semantics, human input, `WorkflowRun` and execution pinning (decision D22). `v1alpha1` and
-> `v1alpha2` stay supported. All are working drafts: fields, semantics and conformance profiles may
+> **Status: draft / alpha.** The current draft is `v1alpha4` (decision D24): `v1alpha3` plus
+> conditional steps (`when`) and workflow steps (`type: workflow`). `v1alpha3` is `v1alpha2`
+> (`v1alpha1` plus step iteration, `forEach`) aligned with the Kubernetes resource model, with step
+> outputs, schedule semantics, human input, `WorkflowRun` and execution pinning. `v1alpha1`,
+> `v1alpha2` and `v1alpha3` stay supported. All are working drafts: fields, semantics and conformance profiles may
 > change incompatibly before `v1`. Do not rely on them for production interoperability yet.
 
 ## What AWP is
@@ -43,7 +44,7 @@ execution of agent code on Kubernetes), without depending on them.
 A minimal manifest:
 
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
   name: vulnerability-fixer

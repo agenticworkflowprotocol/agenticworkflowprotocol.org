@@ -5,7 +5,7 @@ See README for other guidelines.
 ## New API versions
 
 Applies whenever a new API version (`v1alpha4`, `v1beta1`, ...) is added, and whenever an existing
-version becomes the current draft (as `v1alpha3` did with decision D22). A version is only done
+version becomes the current draft (as `v1alpha3` did with decision D22 and `v1alpha4` with D24). A version is only done
 when the specification, the reference validator and the editor support it together.
 
 **1. Older versions stay backwards compatible.** A new version is added next to the older ones; it

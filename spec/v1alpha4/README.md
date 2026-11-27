@@ -9,11 +9,10 @@
 | **Glossary** | [glossary.md](glossary.md) |
 | **Examples** | [examples/](examples/) |
 
-> **Status of this document.** This is the next working draft of AWP, its fourth alpha version
-> (decision [D23](../../docs/decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4)).
-> `v1alpha3` stays the current draft
-> ([D22](../../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)); `v1alpha4` is added next
-> to it. `v1alpha4` is `v1alpha3` plus exactly two additions: conditional steps (`when`,
+> **Status of this document.** This is the current working draft of AWP, its fourth alpha version
+> (decisions [D23](../../docs/decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4)
+> and [D24](../../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft)). It was added next to
+> `v1alpha3`, which only gets errata since D24. `v1alpha4` is `v1alpha3` plus exactly two additions: conditional steps (`when`,
 > [section 3.12](#312-conditions), [AEP-0001](../../aep/0001-conditional-steps.md)) and workflow
 > steps that start another workflow as a child execution ([section 5.6.6](#566-workflow-steps),
 > [AEP-0028](../../aep/0028-workflow-steps.md)). Both AEPs are accepted by lead decision D23

@@ -2,12 +2,12 @@
 title: "Policy-as-Code"
 description: "Declarative rules evaluated by the runtime before an action."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 <!-- awp-check profiles=core,governance -->
 ```yaml
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Policy
 metadata:
   name: no-production-autonomy
@@ -31,7 +31,7 @@ spec:
 - Decisions of several sources are combined by a defined algorithm; an unevaluable policy denies.
 - Policies are reusable `Policy` manifests that workflows reference.
 
-Normative text: [Kind Policy and policy evaluation](/specification/v1alpha3/#8-kind-policy-and-policy-evaluation), [Decision combination](/specification/v1alpha3/#84-decision-combination).
+Normative text: [Kind Policy and policy evaluation](/specification/v1alpha4/#8-kind-policy-and-policy-evaluation), [Decision combination](/specification/v1alpha4/#84-decision-combination).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

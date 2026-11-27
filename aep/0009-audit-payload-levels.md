@@ -7,10 +7,10 @@
 | **Authors** | AI agent on behalf of @agenticworkflowprotocol |
 | **Shepherd** | Project lead (proposed; not an author, [aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)) |
 | **Type** | Specification |
-| **Status** | Review (proposed for `v1alpha3`; not accepted) |
+| **Status** | Review (proposed for `v1alpha4`; not accepted) |
 | **Reviewer roles needed** | runtime implementer, privacy reviewer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
 | **Owner decisions** | [D11](../docs/decisions.md#d11-contentretention-is-mandatory-with-a-documented-default) (2026-10-10) |
-| **Target API version** | `v1alpha3` |
+| **Target API version** | `v1alpha4` (`v1alpha3` until [D24](../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft)) |
 | **Profiles affected** | `audit` |
 | **Created** | 2026-10-09 |
 | **Discussion** | issue to be opened |
@@ -172,6 +172,8 @@ idea, shown on a test installation). It has no separate content storage, no salt
 2. Should approval requests (spec 7.6) follow the same levels?
 
 ## Decision
+
+2026-11-27 ([D24](../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft)): the target is now `v1alpha4`, the current draft. The owner direction below is kept as recorded.
 
 Owner direction of 2026-10-10 (D11): `contentRetention` is mandatory when content capture is used, with the documented default `7d` that tools write explicitly ([conflict C4](../docs/decisions.md#c4-mandatory-field-with-a-default-value)). Not in the `v1alpha2` scope of D8; target `v1alpha3` ([conflict C3](../docs/decisions.md#c3-d10-and-d11-decide-details-but-not-the-target-version)). Not accepted; needs the reviews listed in the header ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)).
 

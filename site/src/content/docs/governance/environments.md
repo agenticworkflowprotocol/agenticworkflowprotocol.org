@@ -2,7 +2,7 @@
 title: "Environments"
 description: "Different autonomy for the same workflow in different environments."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -25,7 +25,7 @@ environments:
 - The runtime is responsible for running an environment with that environment's credentials; AWP cannot verify it.
 
 
-Normative text: [Environments](/specification/v1alpha3/#710-environments).
+Normative text: [Environments](/specification/v1alpha4/#710-environments).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

@@ -1,17 +1,17 @@
-# AWP command-line interface: output formats (v1alpha3)
+# AWP command-line interface: output formats (v1alpha4)
 
 | | |
 | --- | --- |
-| **Status** | **Draft / alpha.** Follows the status of the [v1alpha3 specification](../spec/v1alpha3/README.md), the current draft. Until decision D22 this document followed `v1alpha1`; the formats did not change. |
+| **Status** | **Draft / alpha.** Follows the status of the [v1alpha4 specification](../spec/v1alpha4/README.md), the current draft. Until decision D22 this document followed `v1alpha1`, until D24 `v1alpha3`; the formats did not change. |
 | **Scope** | Output formats and exit codes of `awp validate`, `awp lint`, `awp simulate`, `awp plan`, `awp run` and `awp audit`. This document specifies formats only; it is not an implementation. |
 | **License** | [CC BY 4.0](../LICENSE-SPEC) |
 
 Section 11.4 of the specification names the command vocabulary and leaves the output formats to a
 separate document. This is that document. It is **not** a conformance profile: an implementation
 may provide any subset of the commands, and an implementation that provides a command and wants to
-call its output "AWP CLI output format v1alpha3" SHOULD follow the section of this document for that
+call its output "AWP CLI output format v1alpha4" SHOULD follow the section of this document for that
 command. The key words MUST, SHOULD and MAY are used as defined in the specification
-([section 2](../spec/v1alpha3/README.md#2-notational-conventions)) and apply only to such
+([section 2](../spec/v1alpha4/README.md#2-notational-conventions)) and apply only to such
 implementations.
 
 The reference checker in [`conformance/`](../conformance/README.md) implements the diagnostics of
@@ -39,7 +39,7 @@ awp <command> [options] <manifest>...
 ```
 
 - `<manifest>` is a path to a YAML or JSON file, or `-` for standard input. A file with several
-  documents is processed document by document ([spec 3.1](../spec/v1alpha3/README.md#31-serialization));
+  documents is processed document by document ([spec 3.1](../spec/v1alpha4/README.md#31-serialization));
   results carry the zero-based `document` index.
 - **Streams.** Results are written to standard output. Progress, logging and prompts go to standard
   error. With `--output json` standard output contains exactly one JSON document (`run` and `audit`
@@ -49,7 +49,7 @@ awp <command> [options] <manifest>...
   | Option | Meaning |
   | ------ | ------- |
   | `--output <format>` | `text` (default) or `json`. `run` and `audit` also accept `jsonl` (one JSON object per line). |
-  | `--profiles <list>` | Comma-separated conformance profiles the command treats as supported (`core`, `governance`, `audit`, `security`, `mcp`, `a2a`, `interaction`). Default: the profiles the implementation supports. Fields of other profiles are rejected ([spec 3.3](../spec/v1alpha3/README.md#33-unknown-fields-and-extensions)). |
+  | `--profiles <list>` | Comma-separated conformance profiles the command treats as supported (`core`, `governance`, `audit`, `security`, `mcp`, `a2a`, `interaction`). Default: the profiles the implementation supports. Fields of other profiles are rejected ([spec 3.3](../spec/v1alpha4/README.md#33-unknown-fields-and-extensions)). |
   | `--environment <name>` | Environment of the execution for `simulate`, `plan` and `run`. |
   | `--strict` | Treat warnings as errors (affects the exit code only). |
   | `--no-color`, `--no-unicode` | Disable ANSI colors; use ASCII marks (`[ok]`, `[x]`, `-` instead of the check mark, cross and bullet). Also implied when the output is not a terminal or the `NO_COLOR` environment variable is set. |
@@ -59,7 +59,7 @@ awp <command> [options] <manifest>...
 - **JSON envelope.** Every JSON result has the shape
 
   ```json
-  { "awp": "v1alpha3", "command": "plan", "ok": true, "result": { } }
+  { "awp": "v1alpha4", "command": "plan", "ok": true, "result": { } }
   ```
 
   `awp` is the API version the manifests were processed as (for example `v1alpha1` for a `v1alpha1` manifest), `command` the command, `ok` is `true`
@@ -69,7 +69,7 @@ awp <command> [options] <manifest>...
 - **Text output** is for humans and MAY change between versions of the CLI. Scripts SHOULD use
   JSON. The text formats below are normative for layout and wording of the fixed parts (headings,
   keys, marks); variable parts are marked `<...>`.
-- Secret values MUST NOT appear in any output ([spec 7.9](../spec/v1alpha3/README.md#79-secrets)).
+- Secret values MUST NOT appear in any output ([spec 7.9](../spec/v1alpha4/README.md#79-secrets)).
   Digests, identifiers and references may.
 
 ## 2. Exit codes
@@ -125,7 +125,7 @@ If the position is unknown the line and column are omitted: `<file>: <severity> 
 
 | Prefix | Origin |
 | ------ | ------ |
-| `yaml.` | YAML restrictions of [spec 3.1](../spec/v1alpha3/README.md#31-serialization). |
+| `yaml.` | YAML restrictions of [spec 3.1](../spec/v1alpha4/README.md#31-serialization). |
 | `schema.` | Structural violation. The suffix names the violated JSON Schema keyword (`schema.additionalProperties`, `schema.required`, `schema.enum`, ...). |
 | `profile.` | A field or kind belongs to an unsupported profile, or a profile-specific requirement is not met. |
 | other | Semantic rules, for example `dependsOn.cycle`, `secretRef.scope`, `expr.not-a-dependency`. Catalogue: [schema/README.md](../schema/README.md#semantic-validation-rules). |
@@ -139,9 +139,9 @@ awp validate [--profiles <list>] [--verify-digest] [--strict] [--output text|jso
 ```
 
 Checks that each document is a manifest that satisfies all requirements on documents of the
-selected profiles ([spec 11.1](../spec/v1alpha3/README.md#111-roles)): YAML restrictions, structure,
+selected profiles ([spec 11.1](../spec/v1alpha4/README.md#111-roles)): YAML restrictions, structure,
 semantic rules. It does not resolve references and contacts no network.
-`--verify-digest` verifies `spec.integrity.digest` (`metadata.integrity.digest` in `v1alpha1` and `v1alpha2`) ([spec 9.1](../spec/v1alpha3/README.md#91-manifest-digest)).
+`--verify-digest` verifies `spec.integrity.digest` (`metadata.integrity.digest` in `v1alpha1` and `v1alpha2`) ([spec 9.1](../spec/v1alpha4/README.md#91-manifest-digest)).
 Warnings from the semantic catalogue are reported but do not fail the command unless `--strict`.
 
 **Text output.**
@@ -161,7 +161,7 @@ The summary line is written once per document.
 
 ```json
 {
-  "awp": "v1alpha3",
+  "awp": "v1alpha4",
   "command": "validate",
   "ok": false,
   "result": {
@@ -229,7 +229,7 @@ awp simulate [--environment <name>] [--input <name>=<value>]... [--actor <type>:
 `simulate` evaluates the governance of a workflow **without running anything**: no model is called,
 no tool is executed, nothing is written to an audit log. It answers: for each step, which actions
 could happen and what would the runtime decide for them
-([spec 8.4](../spec/v1alpha3/README.md#84-decision-combination))?
+([spec 8.4](../spec/v1alpha4/README.md#84-decision-combination))?
 
 Because the actions an agent chooses are not known in advance, the simulation covers the
 **potential actions** of a step:
@@ -245,7 +245,7 @@ policy manifests, data policy, model policy, environment `prohibited`), then app
 (`approval.requiredFor`, `requireApproval` rules, environment autonomy, risk level). Attributes that
 cannot be determined statically (for example the data classification of an operation or the region
 of a model) are treated as the specification requires: fail closed
-([spec 8.3](../spec/v1alpha3/README.md#83-conditions), [7.3](../spec/v1alpha3/README.md#73-data-residency-and-processing))
+([spec 8.3](../spec/v1alpha4/README.md#83-conditions), [7.3](../spec/v1alpha4/README.md#73-data-residency-and-processing))
 and marked `"determinable": false`.
 
 **Text output.**
@@ -281,7 +281,7 @@ contributed, in the order of the algorithm). `Result:` counts decisions.
 
 ```json
 {
-  "awp": "v1alpha3",
+  "awp": "v1alpha4",
   "command": "simulate",
   "ok": true,
   "result": {
@@ -315,7 +315,7 @@ contributed, in the order of the algorithm). `Result:` counts decisions.
 ```
 
 `decision` is one of `allow`, `deny`, `requireApproval`; each `evaluated` entry has the shape of an
-entry of the `policy.evaluated` event ([spec 10.4](../spec/v1alpha3/README.md#104-event-types)).
+entry of the `policy.evaluated` event ([spec 10.4](../spec/v1alpha4/README.md#104-event-types)).
 For `requireApproval`, an `approval` object with `approvers`, `minApprovals`, `timeout` and
 `onTimeout` is added. Exit code: `0` if the manifest is valid and the simulation completes (denied
 actions are findings, not failures), `1` if the manifest is invalid or `--strict` is set and any
@@ -332,7 +332,7 @@ awp plan [--environment <name>] [--profiles <list>] [--output text|json] <manife
 could consume, before anything runs. It validates the manifest first (a plan is only produced for a
 valid manifest, otherwise the diagnostics of `validate` are printed and the exit code is `1`) and
 resolves references and dependencies as far as the runtime can without executing
-([spec 9.4](../spec/v1alpha3/README.md#94-dependencies)); a reference that cannot be resolved makes
+([spec 9.4](../spec/v1alpha4/README.md#94-dependencies)); a reference that cannot be resolved makes
 the exit code `3`.
 
 ### 7.1 Text format
@@ -424,7 +424,7 @@ step with its dependencies) and `Warnings:` (the non-error diagnostics).
 
 ```json
 {
-  "awp": "v1alpha3",
+  "awp": "v1alpha4",
   "command": "plan",
   "ok": true,
   "result": {
@@ -465,12 +465,12 @@ step with its dependencies) and `Warnings:` (the non-error diagnostics).
 
 | Field | Description |
 | ----- | ----------- |
-| `workflow.digest` | Manifest digest per [spec 9.1](../spec/v1alpha3/README.md#91-manifest-digest), computed by the implementation (never copied from `spec.integrity`). |
+| `workflow.digest` | Manifest digest per [spec 9.1](../spec/v1alpha4/README.md#91-manifest-digest), computed by the implementation (never copied from `spec.integrity`). |
 | `environment` | The selected environment or `null`. |
 | `agents[].form` | `inline`, `reference` or `remote`; `model` for inline, `ref` (`name`, `version`, `digest`) for references, `endpoint` for remote agents. |
 | `controls[].status` | `enforced` or `unenforceable`; `source` is a JSON Pointer. |
 | `approvals[]` | `kind`: `action`, `step`, `environment` or `risk`; plus the fields of the approval configuration. |
-| `dependencies[]` | The resolved dependency set of [spec 9.4](../spec/v1alpha3/README.md#94-dependencies). `type`: `agent`, `policy`, `prompt`, `mcpServer`, `image`, `remoteAgent`. |
+| `dependencies[]` | The resolved dependency set of [spec 9.4](../spec/v1alpha4/README.md#94-dependencies). `type`: `agent`, `policy`, `prompt`, `mcpServer`, `image`, `remoteAgent`. |
 | `estimatedMaximum` | Effective limits; a missing limit is `null` (printed `unlimited`). |
 
 Exit code: `0` for a valid, resolvable and enforceable plan; `1` if the manifest is invalid or a
@@ -485,7 +485,7 @@ awp run [--environment <name>] [--input <name>=<value>]... [--no-wait]
 
 `run` performs an execution. It validates and plans first (a failed plan stops the command with the
 exit code of the plan). `--input` provides input values; values are validated against the
-declarations before the execution starts ([spec 5.3](../spec/v1alpha3/README.md#53-inputs)).
+declarations before the execution starts ([spec 5.3](../spec/v1alpha4/README.md#53-inputs)).
 Approvals are requested interactively on a terminal or through the runtime's configured channel;
 with `--no-wait` the command exits with code `11` as soon as an execution is waiting for approval,
 leaving the execution in the state `waitingForApproval`.
@@ -512,7 +512,7 @@ state the execution id, the status (`succeeded`, `failed`, `cancelled`, `waiting
 if `--audit-out` was given or the runtime writes a log, its location.
 
 **`jsonl`** writes the audit events of the execution to standard output, one event envelope per
-line, exactly as defined in [spec 10.3](../spec/v1alpha3/README.md#103-event-envelope), in causal
+line, exactly as defined in [spec 10.3](../spec/v1alpha4/README.md#103-event-envelope), in causal
 order, followed by a final line with the summary object. The summary line has `"type": "x-awp.cli.summary"`
 (an extension, not an audit event) and is the only line that is not an audit event:
 
@@ -523,14 +523,14 @@ order, followed by a final line with the summary object. The summary line has `"
 **`json`** writes only the summary as the `result` of the envelope:
 
 ```json
-{ "awp": "v1alpha3", "command": "run", "ok": true,
+{ "awp": "v1alpha4", "command": "run", "ok": true,
   "result": { "executionId": "awp-exec-01JABC7Q4M2W9X0Y1Z2A3B4C5D", "status": "succeeded",
               "environment": "development", "usage": { "steps": 12, "costUsd": 0.84, "costKnown": true, "durationSeconds": 781 },
               "auditLog": "./awp-exec-01JABC7Q4M2W9X0Y1Z2A3B4C5D.events.jsonl",
               "reproducibilityRecord": "./awp-exec-01JABC7Q4M2W9X0Y1Z2A3B4C5D.record.json" } }
 ```
 
-Events and the reproducibility record keep the formats of the specification ([section 10](../spec/v1alpha3/README.md#10-execution-audit-and-traceability));
+Events and the reproducibility record keep the formats of the specification ([section 10](../spec/v1alpha4/README.md#10-execution-audit-and-traceability));
 with `audit.payload: metadata` the CLI output MUST NOT contain more than the events do (no prompts,
 no tool results). Exit codes: `0` succeeded, `10` failed (including `reason: budgetExceeded`),
 `11` cancelled or ended by a rejected or expired approval, `1` if plan or validation failed before
@@ -591,7 +591,7 @@ assert compliance with any law, regulation or standard.
 JSON result:
 
 ```json
-{ "awp": "v1alpha3", "command": "audit", "ok": true,
+{ "awp": "v1alpha4", "command": "audit", "ok": true,
   "result": { "mode": "manifest",
               "workflow": { "name": "invoice-processing", "version": "1.2.0" },
               "checks": [ { "id": "owner-team", "status": "present", "detail": "finance-ai" },
@@ -605,13 +605,13 @@ JSON result:
 ### 9.2 Log mode: audit trail verification
 
 `awp audit --log events.jsonl` reads audit events (one envelope per line,
-[spec 10.3](../spec/v1alpha3/README.md#103-event-envelope)) and verifies them:
+[spec 10.3](../spec/v1alpha4/README.md#103-event-envelope)) and verifies them:
 
 1. every line is a valid event envelope with the required fields;
 2. all events of one `executionId` are in causal order (`workflow.started` first, exactly one
    terminal `workflow.completed|failed|cancelled` last) and every `tool.requested` has a matching
-   outcome (`tool.executed`, `tool.denied` or an approval event) ([spec 10.4](../spec/v1alpha3/README.md#104-event-types));
-3. for `hash-chain` and `signed` integrity, the chain verifies ([spec 10.5](../spec/v1alpha3/README.md#105-tamper-evidence));
+   outcome (`tool.executed`, `tool.denied` or an approval event) ([spec 10.4](../spec/v1alpha4/README.md#104-event-types));
+3. for `hash-chain` and `signed` integrity, the chain verifies ([spec 10.5](../spec/v1alpha4/README.md#105-tamper-evidence));
    signatures are verified only if the implementation supports the documented format;
 4. under `payload: metadata` no event carries content fields (`arguments`/`inputs` values, prompts,
    tool results), and no event contains a value matching a declared secret;
@@ -639,14 +639,14 @@ The result has `Result: verified` or `Result: failed` and, for failures, one dia
 with the code prefix `audit.` (`audit.envelope-invalid`, `audit.order`, `audit.chain-broken`,
 `audit.chain-missing`, `audit.content-in-metadata-payload`, `audit.record-mismatch`) and `path`
 set to `/<line number>` of the event (1-based). A hash chain detects modification but not
-deletion of a whole chain ([spec 12](../spec/v1alpha3/README.md#12-security-considerations));
+deletion of a whole chain ([spec 12](../spec/v1alpha4/README.md#12-security-considerations));
 `awp audit` says so in the result (`"anchored": false`) unless the log was checked against an
 external anchor the implementation supports.
 
 JSON result:
 
 ```json
-{ "awp": "v1alpha3", "command": "audit", "ok": true,
+{ "awp": "v1alpha4", "command": "audit", "ok": true,
   "result": { "mode": "log",
               "executions": [ { "executionId": "awp-exec-01JABC7Q4M2W9X0Y1Z2A3B4C5D",
                                 "workflow": { "name": "vulnerability-fixer", "version": "0.1.0" },
@@ -661,7 +661,7 @@ Exit code: `0` verified, `1` verification failed or the manifest is invalid, `3`
 
 ## 10. Stability
 
-Everything in this document is part of the v1alpha3 draft: formats, codes and exit codes may change
+Everything in this document is part of the v1alpha4 draft: formats, codes and exit codes may change
 incompatibly in a later alpha version. Diagnostic codes of the semantic catalogue and the exit code
 meanings are kept stable within one alpha version as far as possible so that the conformance suite
 ([conformance/](../conformance/README.md)) can rely on them.

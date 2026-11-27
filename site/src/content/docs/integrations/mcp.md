@@ -2,7 +2,7 @@
 title: "MCP"
 description: "Referencing MCP servers as tool sources."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -13,4 +13,4 @@ tools:
 
 A manifest declares MCP servers under `spec.mcpServers` (transport, url or image, authentication via `secretRef`) and references them from agents. Every tool call becomes an action identifier that permissions, policies and approvals evaluate, and produces `tool.*` events. The MCP wire protocol is out of scope.
 
-Normative text: [MCP servers](/specification/v1alpha3/#551-mcp-servers), [Tool sources](/specification/v1alpha3/#552-tool-sources).
+Normative text: [MCP servers](/specification/v1alpha4/#551-mcp-servers), [Tool sources](/specification/v1alpha4/#552-tool-sources).

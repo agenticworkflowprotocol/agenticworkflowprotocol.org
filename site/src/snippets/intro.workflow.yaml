@@ -1,4 +1,4 @@
-apiVersion: awp.agenticworkflowprotocol.org/v1alpha3
+apiVersion: awp.agenticworkflowprotocol.org/v1alpha4
 kind: Workflow
 metadata:
   name: vulnerability-fixer

@@ -9,9 +9,9 @@ const siteRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(siteRoot, '..');
 const GH = 'https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org';
 
-const BANNER = 'Draft - v1alpha1, errata only. The current draft is v1alpha3.';
-const V1ALPHA3_BANNER = 'Draft - v1alpha3, the current draft (decision D22). Fields and semantics may change before v1beta1.';
-const V1ALPHA4_BANNER = 'Next draft - v1alpha4: v1alpha3 plus conditional steps and workflow steps (decision D23). The current draft is v1alpha3.';
+const BANNER = 'Draft - v1alpha1, errata only. The current draft is v1alpha4.';
+const V1ALPHA3_BANNER = 'Draft - v1alpha3, errata only. The current draft is v1alpha4.';
+const V1ALPHA4_BANNER = 'Draft - v1alpha4, the current draft (decision D24). Fields and semantics may change before v1beta1.';
 
 // repo path -> { out: content path (below src/content/docs), title, description, banner }
 const pages = [
@@ -20,19 +20,19 @@ const pages = [
   { src: 'spec/v1alpha1/glossary.md', out: 'specification/v1alpha1/glossary.md', url: '/specification/v1alpha1/glossary/',
     title: 'Glossary (v1alpha1)', description: 'Terms used in the AWP v1alpha1 specification.', banner: true },
   { src: 'spec/v1alpha2/README.md', out: 'specification/v1alpha2/index.md', url: '/specification/v1alpha2/',
-    title: 'Specification v1alpha2', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha2 (draft): v1alpha1 plus step iteration.', banner: 'Draft - v1alpha2: v1alpha1 plus step iteration (forEach), errata only. The current draft is v1alpha3.' },
+    title: 'Specification v1alpha2', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha2 (draft): v1alpha1 plus step iteration.', banner: 'Draft - v1alpha2: v1alpha1 plus step iteration (forEach), errata only. The current draft is v1alpha4.' },
   { src: 'spec/v1alpha2/glossary.md', out: 'specification/v1alpha2/glossary.md', url: '/specification/v1alpha2/glossary/',
-    title: 'Glossary (v1alpha2)', description: 'Terms used in the AWP v1alpha2 specification.', banner: 'Draft - v1alpha2, errata only. The current draft is v1alpha3.' },
+    title: 'Glossary (v1alpha2)', description: 'Terms used in the AWP v1alpha2 specification.', banner: 'Draft - v1alpha2, errata only. The current draft is v1alpha4.' },
   { src: 'spec/v1alpha3/README.md', out: 'specification/v1alpha3/index.md', url: '/specification/v1alpha3/',
-    title: 'Specification v1alpha3', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha3 (current draft): v1alpha2 aligned with the Kubernetes resource model.', banner: V1ALPHA3_BANNER },
+    title: 'Specification v1alpha3', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha3 (draft, errata only): v1alpha2 aligned with the Kubernetes resource model.', banner: V1ALPHA3_BANNER },
   { src: 'spec/v1alpha3/glossary.md', out: 'specification/v1alpha3/glossary.md', url: '/specification/v1alpha3/glossary/',
     title: 'Glossary (v1alpha3)', description: 'Terms used in the AWP v1alpha3 specification.', banner: V1ALPHA3_BANNER },
   { src: 'spec/v1alpha4/README.md', out: 'specification/v1alpha4/index.md', url: '/specification/v1alpha4/',
-    title: 'Specification v1alpha4', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha4 (next draft): v1alpha3 plus conditional steps and workflow steps.', banner: V1ALPHA4_BANNER },
+    title: 'Specification v1alpha4', description: 'Normative text of the Agentic Workflow Protocol, API version v1alpha4 (current draft): v1alpha3 plus conditional steps and workflow steps.', banner: V1ALPHA4_BANNER },
   { src: 'spec/v1alpha4/glossary.md', out: 'specification/v1alpha4/glossary.md', url: '/specification/v1alpha4/glossary/',
     title: 'Glossary (v1alpha4)', description: 'Terms used in the AWP v1alpha4 specification.', banner: V1ALPHA4_BANNER },
   { src: 'docs/cli.md', out: 'tooling/cli.md', url: '/tooling/cli/',
-    title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha3).', banner: V1ALPHA3_BANNER },
+    title: 'CLI output formats', description: 'Output formats and exit codes of awp validate, lint, simulate, plan, run and audit (v1alpha4).', banner: V1ALPHA4_BANNER },
   { src: 'CHANGELOG.md', out: 'specification/changelog.md', url: '/specification/changelog/',
     title: 'Changelog', description: 'Changes to the specification, schemas, conformance suite and website.' },
   { src: 'CONTRIBUTING.md', out: 'community/contributing.md', url: '/community/contributing/',
@@ -46,7 +46,7 @@ const pages = [
 ];
 const urlBySrc = new Map(pages.map((p) => [p.src, p.url]));
 urlBySrc.set('spec/README.md', '/specification/');
-urlBySrc.set('spec/v1alpha3/examples', '/examples/');
+urlBySrc.set('spec/v1alpha4/examples', '/examples/');
 
 function mapTarget(fromSrc, target) {
   if (/^([a-z][a-z0-9+.-]*:|#|\/|mailto:)/i.test(target)) return target;
@@ -87,8 +87,8 @@ for (const p of pages) {
 const genDir = join(siteRoot, 'src/generated/examples');
 rmSync(genDir, { recursive: true, force: true });
 mkdirSync(genDir, { recursive: true });
-// The example pages show the current draft (decision D22).
-const exDir = join(repoRoot, 'spec/v1alpha3/examples');
+// The example pages show the current draft (decision D24).
+const exDir = join(repoRoot, 'spec/v1alpha4/examples');
 for (const f of readdirSync(exDir).filter((f) => f.endsWith('.yaml'))) copyFileSync(join(exDir, f), join(genDir, f));
 
 // Machine-readable schema, served at its $id (https://agenticworkflowprotocol.org/schema/...).

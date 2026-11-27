@@ -10,7 +10,7 @@
 | **Status** | Draft |
 | **Reviewer roles needed** | runtime implementer, security reviewer. None identified yet; an external review is required before `Accepted` ([aep-process 5.1](../docs/aep-process.md#51-review-before-acceptance)). |
 | **Owner decisions** | [D18](../docs/decisions.md#d18-implementation-experience-goes-into-aeps-and-implementer-guidance) (2026-11-18) |
-| **Target API version** | `v1alpha3` (proposed, not yet in scope; `v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
+| **Target API version** | `v1alpha4` (proposed, not yet in scope; `v1alpha3` until [D24](../docs/decisions.md#d24-v1alpha4-becomes-the-current-draft), `v1alpha2` until [D22](../docs/decisions.md#d22-v1alpha3-becomes-the-current-draft)) |
 | **Profiles affected** | `core`, `governance`, `mcp` |
 | **Created** | 2026-11-18 |
 | **Discussion** | issue to be opened |

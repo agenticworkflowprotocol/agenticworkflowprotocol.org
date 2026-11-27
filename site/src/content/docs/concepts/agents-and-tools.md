@@ -2,7 +2,7 @@
 title: "Agents and tools"
 description: "Agents, models, MCP tool sources and action identifiers."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -20,4 +20,4 @@ agents:
 - Agents can be defined inline, referenced by `name@version` from an `Agent` manifest, or be remote agents over A2A.
 - Every tool call is an **action** with an identifier such as `github.create_pull_request`. Permissions, policies and approvals all work on action identifiers; action groups map many tools to one name like `git.merge`.
 
-Normative text: [Agents](/specification/v1alpha3/#54-agents), [Tools and action identifiers](/specification/v1alpha3/#55-tools-and-action-identifiers), [Kind Agent](/specification/v1alpha3/#6-kind-agent).
+Normative text: [Agents](/specification/v1alpha4/#54-agents), [Tools and action identifiers](/specification/v1alpha4/#55-tools-and-action-identifiers), [Kind Agent](/specification/v1alpha4/#6-kind-agent).

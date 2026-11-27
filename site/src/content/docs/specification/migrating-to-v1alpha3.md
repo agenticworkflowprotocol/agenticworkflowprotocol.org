@@ -2,14 +2,16 @@
 title: "Migrating to v1alpha3"
 description: "What changes for manifest authors from v1alpha1 and v1alpha2 to the v1alpha3 draft, with before and after examples and the reason for each change."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha3, errata only. The current draft is v1alpha4: see Migrating to v1alpha4."
 ---
 `v1alpha3` aligns the document model with Kubernetes, so that a manifest can be stored unchanged as a
 custom resource and still be used without Kubernetes ([AEP-0015](https://github.com/agenticworkflowprotocol/agenticworkflowprotocol.org/blob/main/aep/0015-kubernetes-resource-model.md)).
 It also adds step outputs, schedule semantics, human input, `WorkflowRun` and execution pinning.
 This page is informative; the normative change lists are [spec 14.1](/specification/v1alpha3/#141-changes-from-v1alpha1)
 and [spec 14.2](/specification/v1alpha3/#142-changes-from-v1alpha2). For the new parts see
-[v1alpha3: how it fits together](/specification/v1alpha3-guide/).
+[v1alpha3: how it fits together](/specification/v1alpha3-guide/). The current draft is `v1alpha4`;
+`migrate` converts to it directly, and the changes on this page apply in the same way, see
+[Migrating to v1alpha4](/specification/migrating-to-v1alpha4/).
 
 ## Convert
 

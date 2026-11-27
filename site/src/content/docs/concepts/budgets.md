@@ -2,7 +2,7 @@
 title: "Budgets and resources"
 description: "Bounding cost, steps, duration, tokens, tool calls, retries and concurrency."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -19,4 +19,4 @@ budget:
 - The runtime checks limits before every model invocation and action and stops the execution with `workflow.failed` and `reason: budgetExceeded`.
 - Absent limits are unlimited, except `maxConcurrency` (default 1) and `maxRetries` (default 0).
 
-Normative text: [Budgets and resources](/specification/v1alpha3/#57-budgets-and-resources).
+Normative text: [Budgets and resources](/specification/v1alpha4/#57-budgets-and-resources).

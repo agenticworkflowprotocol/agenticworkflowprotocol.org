@@ -2,7 +2,7 @@
 title: "Secrets"
 description: "Secrets are referenced by name, never written into manifests."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 
 ```yaml
@@ -23,7 +23,7 @@ mcpServers:
 - Manifests with fields such as `token`, `password` or `apiKey` holding literal values are rejected.
 - Runtimes must not pass secret values to models and must not write them to audit events, logs or approval requests.
 
-Normative text: [Secrets](/specification/v1alpha3/#79-secrets).
+Normative text: [Secrets](/specification/v1alpha4/#79-secrets).
 
 :::note[Compliance]
 AWP provides machine-readable governance primitives that can help organizations implement and enforce their own compliance requirements. Compliance depends on the implementation, organizational controls and applicable regulatory requirements.

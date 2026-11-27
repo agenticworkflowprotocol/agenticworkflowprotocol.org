@@ -1,11 +1,11 @@
 ---
 title: "Packaging manifests with Helm"
-description: "Informative notes on shipping v1alpha3 manifests in a Helm chart: AWP expressions in templates, what the digest covers, and image tags."
+description: "Informative notes on shipping v1alpha4 manifests in a Helm chart: AWP expressions in templates, what the digest covers, and image tags."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
 Since `v1alpha3`, AWP manifests are Kubernetes custom resources
-([spec 3.10](/specification/v1alpha3/#310-object-stores-and-kubernetes)), so they can be shipped
+([spec 3.10](/specification/v1alpha4/#310-object-stores-and-kubernetes)), so they can be shipped
 like any other Kubernetes object, for example in a Helm chart published to an OCI registry. This
 page is informative. A chart contains no runtime: without an AWP runtime in the cluster the objects
 are stored and nothing runs.
@@ -29,7 +29,7 @@ env:
 ## Keep the identity stable
 
 The digest covers `apiVersion`, `kind`, `metadata.name` and `spec`, not the namespace, labels or
-annotations ([spec 9.1](/specification/v1alpha3/#91-manifest-digest)).
+annotations ([spec 9.1](/specification/v1alpha4/#91-manifest-digest)).
 
 - Labels that Helm adds and the release namespace do not change the digest, so a signed manifest
   still verifies after `helm install`.
@@ -41,9 +41,9 @@ annotations ([spec 9.1](/specification/v1alpha3/#91-manifest-digest)).
 ## Image tags
 
 Outside the `security` profile command step images may be tags: the runtime resolves them to
-digests when an execution starts and records them ([spec 10.1](/specification/v1alpha3/#101-execution-identity)),
+digests when an execution starts and records them ([spec 10.1](/specification/v1alpha4/#101-execution-identity)),
 so a chart does not need digest maintenance. Under the `security` profile images MUST be pinned by
-digest ([spec 9.4](/specification/v1alpha3/#94-dependencies)); a chart that targets it needs a
+digest ([spec 9.4](/specification/v1alpha4/#94-dependencies)); a chart that targets it needs a
 digest in its default values, or the rendered manifest is rejected with `security.image-not-pinned`.
 
 ## Check the rendered output

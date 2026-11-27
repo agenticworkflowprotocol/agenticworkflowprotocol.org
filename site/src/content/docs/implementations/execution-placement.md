@@ -2,9 +2,9 @@
 title: "Execution placement (executors)"
 description: "Informative guidance on where a runtime executes the steps of a workflow: local, container, Kubernetes, CI runners, serverless."
 banner:
-  content: "Draft - v1alpha3, the current draft. Fields and semantics may change before v1beta1."
+  content: "Draft - v1alpha4, the current draft. Fields and semantics may change before v1beta1."
 ---
-A manifest says **what** a workflow may do. It does not say **where** the steps run. That choice belongs to the runtime and its operator: a local process, a container on a host, a Kubernetes pod, a CI job, a serverless task or a managed agent runtime. This page calls such a target an **executor**. It is informative: it adds no requirement to the [specification](/specification/v1alpha3/), and executors are not a manifest field in `v1alpha3`.
+A manifest says **what** a workflow may do. It does not say **where** the steps run. That choice belongs to the runtime and its operator: a local process, a container on a host, a Kubernetes pod, a CI job, a serverless task or a managed agent runtime. This page calls such a target an **executor**. It is informative: it adds no requirement to the [specification](/specification/v1alpha4/), and executors are not a manifest field in `v1alpha4`.
 
 ## Keep placement out of the manifest
 
