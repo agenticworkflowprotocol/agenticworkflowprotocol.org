@@ -77,6 +77,7 @@ export default defineConfig({
           { label: 'v1alpha3 (current draft)', slug: 'specification/v1alpha3' },
           { label: 'v1alpha3: how it fits together', slug: 'specification/v1alpha3-guide' },
           { label: 'Migrating to v1alpha3', slug: 'specification/migrating-to-v1alpha3' },
+          { label: 'v1alpha4 (next draft)', slug: 'specification/v1alpha4' },
           { label: 'v1alpha2 (draft)', slug: 'specification/v1alpha2' },
           { label: 'v1alpha1 (draft)', slug: 'specification/v1alpha1' },
           { label: 'Glossary', slug: 'specification/v1alpha3/glossary' },
