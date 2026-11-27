@@ -2,8 +2,8 @@
 
 | | |
 | --- | --- |
-| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema, and D22, which accepts AEPs 0015 to 0020 and makes `v1alpha3` the current draft. D21 refines D17. |
-| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18), 2026-11-19 (D19, D20), 2026-11-22 (D21) and 2026-11-25 (D22) by the project lead |
+| **Status** | Record of the project owner's decisions. D1 and D2 change how this repository works. All other decisions set the direction of AEPs that are still in `Draft` or `Review`; they do not accept any AEP and do not change `v1alpha1`, except D19, which accepts AEP-0022 and starts the `v1alpha2` draft, D20, which adds the `v1alpha3` draft and fixes the `v1alpha1` approval step schema, D22, which accepts AEPs 0015 to 0020 and makes `v1alpha3` the current draft, and D23, which accepts AEPs 0001 and 0028 and adds the `v1alpha4` draft. D21 refines D17. |
+| **Decided** | 2026-10-10 (D1-D12, D16), 2026-11-18 (D17, D18), 2026-11-19 (D19, D20), 2026-11-22 (D21), 2026-11-25 (D22) and 2026-11-27 (D23) by the project lead |
 | **Related** | [AEP process](aep-process.md), [extension prefix list](registry/extension-prefixes.md), [GOVERNANCE.md](../GOVERNANCE.md) |
 
 > Context. AWP is alpha. The owner allows the schema to change where implementation practice shows
@@ -164,7 +164,8 @@ a single implementation and were removed from this log by D17.
   cannot be accepted by its author or by the project lead alone, also not during alpha. Each AEP
   lists the reviewer roles it needs in its header. Until reviews exist, every AEP stays in
   `Review`.
-- **Exceptions**: D19 (AEP-0022) and D22 (AEPs 0015 to 0020), each limited to the AEPs it names.
+- **Exceptions**: D19 (AEP-0022), D22 (AEPs 0015 to 0020) and D23 (AEPs 0001 and 0028), each
+  limited to the AEPs it names.
 - **Applied in**: `docs/aep-process.md`, `aep/0000-template.md`, `aep/0001` to `aep/0011`.
 
 ### D17. The repository is implementation-neutral
@@ -287,6 +288,34 @@ a single implementation and were removed from this log by D17.
   valid cases of older versions are tested), `README.md`, `AGENTS.md`, `site/`; in the tool
   repositories `awp-validator` and `awp-editor`.
 
+### D23. Conditional steps and workflow steps start `v1alpha4`
+
+- **Question**: a common pattern is *analyse, then act*: a risk analysis decides whether a fix
+  workflow runs. `v1alpha3` has neither step conditions nor a way to start another workflow from a
+  step. AEP-0001 (conditional steps) is in `Review` without a reviewer since 2026-10-10. Add both to
+  the current draft `v1alpha3`, or start a new version?
+- **Decision**: the project lead accepts AEP-0001 and the new AEP-0028 (workflow steps) in the form
+  written into a new draft, `v1alpha4`: `v1alpha3` plus exactly these two additions. As in D19 and
+  D22, this is an exception to D16 for these AEPs only: they are accepted without the external
+  review. Reviews are still invited; their findings are handled as errata of the draft or as new
+  AEPs. The exception deviates from aep-process 5.1 rule 1 and the matching sentence of
+  GOVERNANCE.md; both now name D19, D22 and D23 as the only recorded exceptions, so the rule stands
+  for every other AEP. The project lead is the shepherd of both AEPs. The owner waives the 5-day
+  discussion period for this change (alpha waiver of GOVERNANCE.md). AEP-0001 is adapted to
+  `v1alpha4`: its section is 3.12 (3.10 and 3.11 are taken), it has no `event` root (AEP-0004 is not
+  accepted), and step outputs, which are text since `v1alpha3`, are read as JSON in conditions.
+- **Consequence**: `v1alpha3` stays the current draft (D22) and keeps its scope (section 2);
+  `v1alpha4` is the next draft, added next to it as `v1alpha3` was added next to `v1alpha2` (D20).
+  `v1alpha1` to `v1alpha3` are not changed; `awp-check.mjs migrate` converts all three to
+  `v1alpha4` (from `v1alpha3` only `apiVersion` changes). The CRDs serve `v1alpha3` and `v1alpha4`,
+  with `v1alpha3` as the storage version. The README, the Quickstart and the defaults of the tools
+  stay at `v1alpha3`; the website lists `v1alpha4` as the next draft. Making `v1alpha4` the current
+  draft is a new decision.
+- **Applied in**: this log, `aep/0001-conditional-steps.md`, `aep/0028-workflow-steps.md`,
+  `aep/0006-playbook-kind.md` (alternatives), `spec/v1alpha4/`, `schema/awp.v1alpha4.json`,
+  `schema/crd/`, `schema/README.md`, `conformance/` (`v1alpha4/`, `conditions.mjs`, `migrate`),
+  `spec/README.md`, `docs/aep-process.md` (5.1 rule 1, 6.2), `GOVERNANCE.md`, `site/`.
+
 ## 2. Resulting scope of `v1alpha2`
 
 Amended by D22: the AEPs that targeted `v1alpha2` and are not accepted target `v1alpha3`, the
@@ -294,7 +323,7 @@ current draft. `v1alpha2` keeps what it has (`v1alpha1` plus AEP-0022) and only 
 
 | AEP | Title | Target | Reason |
 | --- | --- | --- | --- |
-| 0001 | Conditional steps (`when`) | `v1alpha3` (`v1alpha2` until D22) | D5, D6, D22 |
+| 0001 | Conditional steps (`when`) | `v1alpha4`, accepted and in the draft (`v1alpha2` until D22, `v1alpha3` until D23) | D5, D6, D22, D23 |
 | 0002 | Argument constraints, call limits, no prefix wildcards | `v1alpha3` (`v1alpha2` until D22) | D4, D22 |
 | 0003 | Typed handoffs | `v1alpha3` (`v1alpha2` until D22) | scope decision of 2026-10-10, D22 |
 | 0004 | Event references | `v1alpha3` (`v1alpha2` until D22) | D7, D22 |
@@ -312,8 +341,10 @@ current draft. `v1alpha2` keeps what it has (`v1alpha1` plus AEP-0022) and only 
 | 0015-0020 | Kubernetes resource model, schedule semantics, human input, step outputs, `WorkflowRun`, execution pinning | `v1alpha3`, accepted and in the draft | D20, D22 |
 | 0021 | Extension model (concept) | proposed for `v1alpha3`, not applied | D20, D22 |
 | 0023-0027 | Step isolation, event triggers, state, interactive execution, agent engine | proposed for `v1alpha3`, not applied | D18 |
+| 0028 | Workflow steps (`type: workflow`) | `v1alpha4`, accepted and in the draft | D23 |
 
-Since D19 `v1alpha2` exists as a draft, since D22 `v1alpha3` is the current draft. `v1alpha3` is
+Since D19 `v1alpha2` exists as a draft, since D22 `v1alpha3` is the current draft. Since D23
+`v1alpha4` (`v1alpha3` plus AEPs 0001 and 0028) is the next draft. `v1alpha3` is
 completed (no longer a draft) when every AEP in its scope is `Accepted` and written into it, or
 explicitly moved to a later version by an amendment to this table (an AEP that does not find a
 reviewer must not block the others).
@@ -326,7 +357,7 @@ D1 and D2 change how decisions are made. The process in force before (GOVERNANCE
 least 5 working days of public discussion for substantive changes. Resolution: the owner waived
 the 5-day period for that change (alpha, no third party depends on the schema yet; recorded under
 the "Alpha waiver" in GOVERNANCE.md). No AEP changes status beyond `Review` until the external
-review (D16) has happened, except the AEPs named by the recorded lead decisions D19 and D22.
+review (D16) has happened, except the AEPs named by the recorded lead decisions D19, D22 and D23.
 
 ### C2. A larger `v1alpha2` depends on more reviews
 
@@ -351,7 +382,8 @@ explicitly when the author does not choose one. Runtimes never assume a retentio
 AEPs could in principle be accepted by the project lead during alpha. D16 requires an external
 reviewer, and aep-process requires a Final Comment Period of at least 10 working days. Resolution:
 no self-acceptance; AEPs are in `Review` and record the needed reviewer roles. Recorded exceptions:
-D19 (AEP-0022) and D22 (AEPs 0015 to 0020). Each names the AEPs it covers; it is no general rule.
+D19 (AEP-0022), D22 (AEPs 0015 to 0020) and D23 (AEPs 0001 and 0028). Each names the AEPs it
+covers; it is no general rule.
 
 ### C7. MCP terms are external reference data
 

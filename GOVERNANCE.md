@@ -74,8 +74,8 @@ that no single organization holds a majority of maintainers once the specificati
   ([decision log](docs/decisions.md)). An AEP is never accepted by its author or by the
   project lead alone: it needs a reviewer who is not an author and, while all maintainers belong to
   one organisation, an external one ([aep-process 5.1](docs/aep-process.md#51-review-before-acceptance)).
-  The only exceptions are the recorded lead decisions D19 (AEP-0022) and D22 (AEPs 0015 to 0020),
-  each limited to the AEPs it names.
+  The only exceptions are the recorded lead decisions D19 (AEP-0022), D22 (AEPs 0015 to 0020) and
+  D23 (AEPs 0001 and 0028), each limited to the AEPs it names.
 - If consensus cannot be reached, the maintainers decide by simple majority; the project lead
   breaks ties.
 

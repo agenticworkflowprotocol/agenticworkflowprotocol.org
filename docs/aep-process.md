@@ -9,8 +9,9 @@
 
 > Sections 1 to 6 and 7.0 are the adopted process. Sections 7.1 to 7.5 (conformance mark) remain
 > a proposal: no conformance mark exists, and no implementation has been certified or has received
-> a mark. No AEP has been accepted through the full process yet; AEP-0022 and AEPs 0015 to 0020
-> are accepted by the recorded lead decisions D19 and D22 (section 5.1, rule 1). Nothing here is a
+> a mark. No AEP has been accepted through the full process yet; AEP-0022, AEPs 0015 to 0020 and
+> AEPs 0001 and 0028 are accepted by the recorded lead decisions D19, D22 and D23 (section 5.1,
+> rule 1). Nothing here is a
 > compliance promise: AWP provides machine-readable governance primitives that can help
 > organizations implement and enforce their own compliance requirements; compliance depends on the
 > implementation, organizational controls and applicable regulatory requirements.
@@ -138,7 +139,9 @@ Decided on 2026-10-10 ([decision log D16](decisions.md#d16-external-reviewer-bef
    and not on the decision of the project lead alone. This also applies to alpha API versions.
    Recorded exceptions, each limited to the AEPs it names: lead decision
    [D19](decisions.md#d19-step-iteration-goes-into-v1alpha2-directly) (AEP-0022) and
-   [D22](decisions.md#d22-v1alpha3-becomes-the-current-draft) (AEPs 0015 to 0020). They do not
+   [D22](decisions.md#d22-v1alpha3-becomes-the-current-draft) (AEPs 0015 to 0020) and
+   [D23](decisions.md#d23-conditional-steps-and-workflow-steps-start-v1alpha4) (AEPs 0001 and
+   0028). They do not
    change this rule for any other AEP; reviews of the excepted AEPs are still invited and handled
    as errata.
 2. **Shepherd and reviewer are not the author.** The shepherd MUST NOT be listed as an author of
@@ -221,7 +224,7 @@ Proposed rules:
 
 ### 6.2 Published versions are frozen
 
-- An API version is a **draft** while its text carries the draft status (today: `v1alpha1`, `v1alpha2` and `v1alpha3`, the current draft since D22).
+- An API version is a **draft** while its text carries the draft status (today: `v1alpha1`, `v1alpha2`, `v1alpha3`, the current draft since D22, and `v1alpha4`, the next draft since D23).
   Drafts may change through AEPs and editorial pull requests.
 - When an API version is **published** (a repository release marks it as published), its
   normative text, JSON Schema `$id` and conformance requirements are frozen. Afterwards only

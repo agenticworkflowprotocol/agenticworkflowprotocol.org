@@ -196,6 +196,8 @@ enforce their own compliance requirements. This proposal makes no compliance pro
 
 - **Workflow references a workflow** (sub-workflows): heavier, carries its own triggers and
   governance sections that would conflict with the parent's.
+  [AEP-0028](0028-workflow-steps.md) (accepted for `v1alpha4`, D23) adds workflow steps that avoid
+  the conflict: the child runs as a separate execution with its own governance.
 - **Skills as Markdown plus scripts without a manifest**: no identity, no permissions, no checks.
 - **Do nothing**: procedures stay in prompts.
 
