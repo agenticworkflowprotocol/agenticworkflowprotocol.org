@@ -339,6 +339,12 @@ with Kubernetes semantics.
   author instead of being stored or dropped.
 - A runtime MUST NOT modify the `spec` of a manifest. Observed state belongs in `status` or in
   other objects.
+- In an object store, a reference to another manifest (`agents[].ref`, `promptRef`,
+  `policies.include`, the `ref` of a workflow step, `WorkflowRun.spec.workflowRef`) resolves by
+  name within the scope: there is one object per name, so `version` and `digest` in a reference
+  select nothing and act as assertions that the runtime verifies against the resolved object.
+  Several versions of a manifest that must be available side by side need distinct names, for
+  example `summarizer-v1` and `summarizer-v2`.
 
 ### 3.11 Status
 
@@ -1604,6 +1610,10 @@ is allowed by permissions only if **every** applicable object allows it. `networ
 `filesystem` restrictions combine to the intersection. Within one object, a key with
 `allow: false` that matches an action takes precedence over keys with `allow: true`.
 
+Because combining can only narrow, network and filesystem requirements of a specific use belong in
+the workflow. An `Agent` manifest that several workflows reference carries only the restrictions
+that hold for every use; a workflow cannot widen what the referenced agent allows.
+
 ### 7.6 Human approval
 
 Approvals are human decisions that gate actions or steps.
@@ -1798,10 +1808,12 @@ policies:
 | `merge.allow: false` | deny actions matching `git.merge` |
 | `production.allow: false` | deny actions matching `production.deploy` |
 
-A shorthand with the value `true` adds no rule (it does not grant permissions; see
-[section 8.4](#84-decision-combination)). `include` lists `Policy` manifests by `name` and exact
-`version`, optionally with `digest`; resolution follows the rules for agent references
-([section 5.4.2](#542-agent-references)).
+A shorthand with the value `true` adds no rule: it does not allow the action, it only leaves it
+without a policy restriction. `git.allowPush: true` therefore does not permit a push; a push runs
+only if the permissions allow `git.push` ([section 7.5](#75-tool-governance-permissions)) and no
+other rule denies it ([section 8.4](#84-decision-combination)). `include` lists `Policy`
+manifests by `name` and exact `version`, optionally with `digest`; resolution follows the rules
+for agent references ([section 5.4.2](#542-agent-references)).
 
 ### 8.2 Kind `Policy`
 
